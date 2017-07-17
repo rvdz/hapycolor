@@ -1,5 +1,11 @@
 """ Utilitary methods to convert color types  """
 
+def contrast(rgbcolor):
+    return (299*rgbcolor[0] + 587*rgbcolor[1] + 114*rgbcolor[2]) / 1000
+
+def contrast_norm(rgbcol1, rgbcol2):
+    return abs(contrast(rgbcol1) - contrast(rgbcol2))
+
 def rgb_to_hex(colrgb):
     return '#%02x%02x%02x' % (colrgb[0], colrgb[1], colrgb[2])
 
