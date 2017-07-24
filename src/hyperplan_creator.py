@@ -14,12 +14,16 @@ if len(sys.argv) != 2:
 data_file = sys.argv[1]
 
 MIN_HUE = 0
-MAX_HUE = 360
-SIZE_H = 10
+MAX_HUE = 359
 
 MIN_SAT = 0
 MAX_SAT = 1
 SIZE_S = 10
+
+# This constant will be used to determine how many points will be analyzed
+# for a given radius. Currently it is set to analyze 25 points for the last
+# circle of radius 1, for a total of 121 points
+K = 5 / (2 * np.pi)
 
 STEP_L_SMALL  = 0.01
 STEP_L_LARGEL = 0.1
@@ -34,11 +38,10 @@ LEFT    = 2
 RIGHT   = 3
 DELETE = 127
 
-hues        = np.linspace(MIN_HUE, MAX_HUE, SIZE_H)
 saturations = np.linspace(MIN_SAT, MAX_SAT, SIZE_S)
 
-# Displays a given image
 def display_image(image):
+    """ Displays a given image """
     cv2.namedWindow('HyperplanCreator', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('HyperplanCreator', WIDTH, HEIGHT)
     cv2.imshow('HyperplanCreator', image)
@@ -46,9 +49,10 @@ def display_image(image):
     # cv2.destroyAllWindows()
     return key
 
-# Creates an image where on top sits a rectangle of the given color and on
-# bottom, lays a text which color is the one provided over a black background
 def create_image(h, s, l):
+    """ Creates an image where on top sits a rectangle of the given color
+        and on bottom, lays a text which color is the one provided over a
+        black background """
     r, g, b = hsl_to_rgb([h, s, l])
     image = np.zeros((HEIGHT,WIDTH,3), np.uint8)
     image[0:HEIGHT/2] = (b, g, r)
@@ -62,8 +66,8 @@ def create_image(h, s, l):
             [b,g,r])
     return image
 
-# For a given key, increses or decreases the luminosity
 def edit_luminosity(key, l):
+    """ For a given key, increses or decreases the luminosity """
     if key == RIGHT:
         l += STEP_L_SMALL
     elif key == LEFT:
@@ -90,6 +94,8 @@ values = []
 removed = []
 
 def choose_luminosity(h, s, l):
+    """ For a given hue and saturation, loop for different values of
+        luminosity until the user accepts a value """
     while True:
         image = create_image(h, s, l)
         key = display_image(image)
@@ -104,14 +110,17 @@ def choose_luminosity(h, s, l):
         l = edit_luminosity(key, l)
     return l
 
-for h in hues:
-    for s in saturations:
+for s in saturations:
+    """ The number of points to analyze is determined by the length of the
+        perimeter multiplied by a constant """
+    hues = np.linspace(MIN_HUE, MAX_HUE, 2 * np.pi * s * K)
+    for h in hues:
         l = choose_luminosity(h, s, l)
 
+# Analyze the values that have been removed during the first loop
 while removed:
     color = removed.pop()
     choose_luminosity(color[0], color[1], color[2])
-
 
 save_json(values)
 
