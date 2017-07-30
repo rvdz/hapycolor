@@ -105,3 +105,6 @@ src/tags
 
 # YouCompleteMe
 src/.ycm_extra_conf.py
+
+# local auxiliary files
+src/keys.json

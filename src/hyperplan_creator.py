@@ -5,13 +5,41 @@ import sys
 import colorsys
 import numpy as np
 import json
+from enum import Enum
+from pathlib import Path
+
+
 
 # The output file
 if len(sys.argv) != 2:
     print "Usage: hyperplan_creator.py <output_file_name>"
     exit()
 
-data_file = sys.argv[1]
+hyperplan_file = sys.argv[1]
+keys_file = "keys.json"
+
+def load_keys():
+    with open(keys_file, 'r') as f:
+        return json.load(f)
+
+def save_json(data_file, data_object):
+    with open(data_file, 'w') as f:
+        json.dump(data_object, f, indent=4)
+
+def init_keys():
+    if not Path(keys_file).is_file():
+        keys = {}
+        cv2.namedWindow('Key setter', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('HyperplanCreator', 10, 10)
+        for k in ["UP", "DOWN", "RIGHT", "LEFT", "RETURN", "DELETE"]:
+            print "Press key: " + str(k)
+            keys[k] = cv2.waitKey(0)
+        save_json(keys_file, keys)
+        return keys
+    else:
+        return load_keys()
+
+keys = init_keys()
 
 MIN_HUE = 0
 MAX_HUE = 359
@@ -31,13 +59,6 @@ STEP_L_LARGEL = 0.1
 WIDTH   = 700
 HEIGHT  = 800
 
-RETURN  = 13
-UP      = 0
-DOWN    = 1
-LEFT    = 2
-RIGHT   = 3
-DELETE = 127
-
 saturations = np.linspace(MIN_SAT, MAX_SAT, SIZE_S)
 
 def display_image(image):
@@ -54,7 +75,7 @@ def create_image(h, s, l):
         and on bottom, lays a text which color is the one provided over a
         black background """
     r, g, b = hsl_to_rgb([h, s, l])
-    image = np.zeros((HEIGHT,WIDTH,3), np.uint8)
+    image = np.zeros((HEIGHT, WIDTH, 3), np.uint8)
     image[0:HEIGHT/2] = (b, g, r)
     image[HEIGHT/2:] = (0,0,0)
     cv2.putText(
@@ -68,13 +89,13 @@ def create_image(h, s, l):
 
 def edit_luminosity(key, l):
     """ For a given key, increses or decreases the luminosity """
-    if key == RIGHT:
+    if key == keys["RIGHT"]:
         l += STEP_L_SMALL
-    elif key == LEFT:
+    elif key == keys["LEFT"]:
         l -= STEP_L_SMALL
-    elif key == UP:
+    elif key == keys["UP"]:
         l += STEP_L_LARGEL
-    elif key == DOWN:
+    elif key == keys["DOWN"]:
         l -= STEP_L_LARGEL
 
     if l < 0:
@@ -83,9 +104,6 @@ def edit_luminosity(key, l):
         l = 1.0
     return l
 
-def save_json(array):
-    with open(data_file, 'w') as f:
-        json.dump(array, f, indent=4)
 
 l = 0
 h = 100
@@ -100,10 +118,10 @@ def choose_luminosity(h, s, l):
         image = create_image(h, s, l)
         key = display_image(image)
         print "Current luminosity: " + str(l)
-        if key == RETURN:
+        if key == keys["RETURN"]:
             values.append([h, s, l])
             break
-        elif key == DELETE:
+        elif key == keys["DELETE"]:
             if values:
                 print "The last color has been removed"
                 removed.append(values.pop())
@@ -122,5 +140,5 @@ while removed:
     color = removed.pop()
     choose_luminosity(color[0], color[1], color[2])
 
-save_json(values)
+save_json(hyperplan_file, values)
 
