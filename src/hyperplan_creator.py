@@ -1,13 +1,10 @@
 import cv2
 from utils import hsl_to_rgb
-from utils import hsl_to_hex
 import sys
-import colorsys
 import numpy as np
 import json
-from enum import Enum
 from pathlib import Path
-
+import random
 
 
 # The output file
@@ -51,7 +48,7 @@ SIZE_S = 10
 # This constant will be used to determine how many points will be analyzed
 # for a given radius. Currently it is set to analyze 25 points for the last
 # circle of radius 1, for a total of 121 points
-K = 5 / (2 * np.pi)
+K = 25 / (2 * np.pi)
 
 STEP_L_SMALL  = 0.01
 STEP_L_LARGEL = 0.1
@@ -76,15 +73,14 @@ def create_image(h, s, l):
         black background """
     r, g, b = hsl_to_rgb([h, s, l])
     image = np.zeros((HEIGHT, WIDTH, 3), np.uint8)
-    image[0:HEIGHT/2] = (b, g, r)
+    #image[0:HEIGHT/2] = (b, g, r)
     image[HEIGHT/2:] = (0,0,0)
-    cv2.putText(
-            image,
-            "Notre Rice a nous",
-            (20, int(3*HEIGHT/4.0)),
-            cv2.FONT_HERSHEY_TRIPLEX,
-            2,
-            [b,g,r])
+    cv2.putText(image, "Ben deja on", (20, int(1*HEIGHT/4.0)),
+            fontFace=0, fontScale=3, lineType=2, thickness=3, color=[b,g,r])
+    cv2.putText(image, "aurait une cabane", (20, int(2*HEIGHT/4.0)),
+            fontFace=0, fontScale=3, lineType=2, thickness=3, color=[b,g,r])
+    cv2.putText(image, "Notre Rice a nous", (20, int(3*HEIGHT/4.0)),
+            fontFace=0, fontScale=3, lineType=2, thickness=3, color=[b,g,r])
     return image
 
 def edit_luminosity(key, l):
@@ -128,12 +124,14 @@ def choose_luminosity(h, s, l):
         l = edit_luminosity(key, l)
     return l
 
-for s in saturations:
+for i, s in enumerate(saturations):
     """ The number of points to analyze is determined by the length of the
         perimeter multiplied by a constant """
     hues = np.linspace(MIN_HUE, MAX_HUE, 2 * np.pi * s * K)
-    for h in hues:
+    random.shuffle(hues)
+    for j, h in enumerate(hues):
         l = choose_luminosity(h, s, l)
+        print "saturation {}/{}, hue {}/{}".format(i+1, len(saturations), j+1, len(hues))
 
 # Analyze the values that have been removed during the first loop
 while removed:
