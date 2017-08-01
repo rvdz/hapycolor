@@ -1,10 +1,19 @@
 #include "color_reducer.hpp"
-#define THRESHOLD 50
+#define THRESHOLD 300
 #include <utility>
 #include <cmath>
 
+uint32_t Color::next_id = 0;
+
+static uint32_t distance(const Color& c1, const Color& c2);
+
+static void free_graphs(Graph* root);
+
+/////////////////////////////////////
+////////////// GRAPH ////////////////
+/////////////////////////////////////
 Graph* Graph::create_child(color_id_t removed_color) {
-    Graph* new_graph = new Graph(removed_colors, removed_color);
+    Graph* new_graph = new Graph(this, removed_color);
     for (auto& l : lists) {
         if (l.first != removed_color) {
             List new_list (l.second);
@@ -25,7 +34,34 @@ bool Graph::are_nodes_linked() {
     return false;
 }
 
-Graph* create_graph(std::vector<Color>& colors) {
+std::vector<color_id_t>* Graph::explore_graph() {
+    if (!are_nodes_linked())
+        return &removed_colors;
+    if (get_optimal_length() != (uint16_t)(-1)
+            && removed_colors.size() > get_optimal_length())
+        return nullptr;
+
+    std::vector<color_id_t>* removed_tmp;
+    std::vector<color_id_t>* opt_removal;
+    for (auto& l : lists) {
+        if (l.second.empty())
+            continue;
+        Graph* child = create_child(l.first);
+        removed_tmp = child->explore_graph();
+        if (removed_tmp != nullptr 
+                && removed_tmp->size() < get_optimal_length()) {
+            opt_removal = removed_tmp;
+            set_optimal_length(removed_tmp->size());
+        }
+    }
+    return opt_removal;
+}
+
+/////////////////////////////////////
+//////// STATIC FUNCTIONS ///////////
+/////////////////////////////////////
+//
+static Graph* create_graph(const std::vector<Color>& colors) {
     Graph* graph = new Graph();
     for (const auto& c1 : colors) {
         for (const auto& c2 : colors) {
@@ -38,76 +74,77 @@ Graph* create_graph(std::vector<Color>& colors) {
     return graph;
 }
 
-std::vector<color_id_t>* Graph::explore_graph() {
-    if (!are_nodes_linked())
-        return &removed_colors;
 
-    std::vector<color_id_t>* removed_tmp;
-    std::vector<color_id_t>* colors_removed;
-    uint32_t min_size = -1;
-    for (auto& l : lists) {
-        if (l.second.empty())
-            continue;
-        Graph* child = create_child(l.first);
-        removed_tmp = child->explore_graph();
-        if (removed_tmp->size() < min_size) {
-            colors_removed = removed_tmp;
-            min_size = removed_tmp->size();
-        }
+bool in_vector(color_id_t val, std::vector<color_id_t>& vect) {
+    for (const auto& c : vect) {
+        if (val == c)
+            return true;
     }
-    return colors_removed;
+    return false;
 }
 
-void solve_problem(std::vector<Color>& colors) {
+void encode_color(char* output_string, color_type_t color) {
+    output_string[0] = color.l;
+    output_string[1] = color.a;
+    output_string[2] = color.b;
+}
 
-    Graph* graph = create_graph(colors);
+void encode_colors(std::vector<color_id_t>& opt_removal,
+                      std::vector<Color>& input_colors,
+                      char* output_string) {
 
-    if (!graph->are_nodes_linked()) {
-        std::cout << "No colors to be removed" << std::endl;
-        return;
+    uint16_t i = 0;
+    for (const auto& c_in : input_colors) {
+        if (!in_vector(c_in.id, opt_removal)) {
+            encode_color(&(output_string[i * 3]), c_in.value);
+            i++;
+        }
     }
+    output_string[i * 3] = '\0';
+}
 
-    std::vector<color_id_t>* colors_removed = graph->explore_graph();
-
-    std::cout << "Finished exploring, the smallest set is: ";
-    for (auto& c : *colors_removed) {
-        std::cout << c << ", ";
+void decode_colors(
+        char* input_string, std::vector<Color>& input_colors) {
+    uint32_t i = 0;
+    while (input_string[i] != '\0') {
+        Color c(&(input_string[i]));
+        input_colors.push_back(c);
+        i += 3;
     }
-    std::cout << std::endl;
+}
+
+void reduce_colors(char* input_string, char* output_string) {
+
+    std::vector<Color> input_colors;
+    decode_colors(input_string, input_colors);
+
+    Graph* graph = create_graph(input_colors);
+    /* std::cout << *graph << std::endl; */
+
+    std::vector<color_id_t>* opt_removal = graph->explore_graph();
+
+    /* std::cout << "Finished exploring, the smallest set is: "; */
+    /* for (auto& c : *opt_removal) { */
+    /*     std::cout << c << ", "; */
+    /* } */
+    /* std::cout << std::endl; */
+
+    encode_colors(*opt_removal, input_colors, output_string);
+
     free_graphs(graph);
+
 }
 
 uint32_t distance(const Color& c1, const Color& c2) {
-    if (c1.value > c2.value)
-        return c1.value - c2.value;
-    return c2.value - c1.value;
+    return std::pow(c1.value.l - c2.value.l, 2) 
+                + std::pow(c1.value.a - c2.value.a, 2)
+                + std::pow(c1.value.b - c2.value.b, 2);
 }
 
 bool Color::operator!=(const Color& c) const {
     if (c.id != id)
         return true;
     return false;
-}
-
-int main() {
-    std::vector<Color> colors;
-    colors.push_back(Color(1, 0));
-    colors.push_back(Color(2, 30));
-    colors.push_back(Color(3, 70));
-    colors.push_back(Color(4, 100));
-    colors.push_back(Color(5, 140));
-
-    solve_problem(colors);
-    return 0;
-}
-
-std::ostream& operator<<(std::ostream& out, const Graph& graph) {
-    for (const auto& it : graph.lists) {
-        out << "List " 
-            << it.first 
-            << " size: " << it.second.color_list.size() << std::endl;
-    }
-    return out;
 }
 
 void free_graphs(Graph* root) {
@@ -117,4 +154,20 @@ void free_graphs(Graph* root) {
         it++;
     }
     delete root;
+}
+
+std::ostream& operator<<(std::ostream& out, const List& l) {
+    std::cout << l.id << " : ";
+    for (const auto& e : l.color_list) {
+        std::cout << " " << e;
+    }
+    std::cout << std::endl;
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Graph& graph) {
+    for (const auto& it : graph.lists) {
+        out << it.second;
+    }
+    return out;
 }
