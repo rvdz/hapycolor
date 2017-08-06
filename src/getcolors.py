@@ -1,6 +1,8 @@
+from visual import print_palette
+from utils import hex_to_rgb
 from color_extractor import ColorExtractor
 from PIL import Image, ImageDraw
-import sys
+import argparse
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
     """ Creates a color palette and saves it to file """
@@ -18,8 +20,13 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
     pal.save(filename, "PNG")
 
 if __name__ == '__main__':
-    extractor = ColorExtractor(sys.argv[1], num_colors=200)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-f", "--file", help="File path to the image", required=True)
+    args = vars(ap.parse_args())
+
+    extractor = ColorExtractor(args["file"], num_colors=200)
     colors = extractor.get_colors()
-    for col in colors:
-        print(col)
+    rgbcols = [hex_to_rgb(col) for col in colors]
+    print "\nFinal palette"
+    print_palette(rgbcols, size=2)
     colors_to_file(colors, "palette.png")

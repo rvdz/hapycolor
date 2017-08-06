@@ -1,4 +1,5 @@
 from utils import contrast_norm, rgb_to_hex, rgb_to_hsl, hsl_to_rgb
+from visual import print_palette
 from ast import literal_eval as make_tuple
 import subprocess as sp
 import re
@@ -31,6 +32,9 @@ class ColorExtractor():
         magic_colors = [re.search("rgb\(.*\)", str(col)).group(0)[3:] for col in raw_colors]
         magic_colors = [make_tuple(rgb_col) for rgb_col in magic_colors]
 
+        print "ImageMagick colors"
+        print_palette(magic_colors, size=1)
+
         # Convert colors to hsl and pick the best ones
         hsl_colors = [rgb_to_hsl(col) for col in magic_colors]
         good_colors = []
@@ -53,6 +57,10 @@ class ColorExtractor():
         # Flatten the list and convert colors to rgb format
         all_colors = [col for label in labeled_colors for col in label]
         rgb_colors = [hsl_to_rgb(col) for col in all_colors]
+
+        print "\nColors by label"
+        print_palette(rgb_colors, size=2)
+
         diff_contrast = 30
         i = 0
         while i < len(rgb_colors)-1:
