@@ -1,3 +1,6 @@
+from colormath.color_objects import LabColor, sRGBColor, HSLColor
+from colormath.color_conversions import convert_color
+
 """ Utilitary methods to convert color types  """
 
 def contrast(rgbcolor):
@@ -66,3 +69,11 @@ def _tmpcolor(tmpc, tmp1, tmp2):
     else:
         c = tmp2
     return int(round(255*c))
+
+def hsl_to_lab(colhsl):
+    hsl = HSLColor(colhsl[0], colhsl[1], colhsl[2])
+    return convert_color(hsl, LabColor).get_value_tuple()
+
+def lab_to_hsl(collab):
+    lab = LabColor(collab[0], collab[1], collab[2])
+    return convert_color(lab, HSLColor).get_value_tuple()
