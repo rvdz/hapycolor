@@ -1,4 +1,5 @@
-from utils import contrast_norm, rgb_to_hex, rgb_to_hsl, hsl_to_rgb
+from utils import contrast_norm, rgb_to_hex, rgb_to_hsl, hsl_to_rgb, hsl_to_lab, lab_to_hsl
+import color_filter
 from visual import print_palette
 from ast import literal_eval as make_tuple
 import subprocess as sp
@@ -7,6 +8,7 @@ import re
 class ColorExtractor():
 
     def __init__(self, image, num_colors):
+        self.cf = color_filter.ColorFilter()
         self.image = image
         self.num_colors = num_colors
         self.min_lightness = 0.20
@@ -37,15 +39,18 @@ class ColorExtractor():
 
         # Convert colors to hsl and pick the best ones
         hsl_colors = [rgb_to_hsl(col) for col in magic_colors]
-        good_colors = []
+        filtered_colors = []
         for col in hsl_colors:
-            if col[2] >= self.min_lightness\
-                    and col[2] <= self.max_lightness\
-                    and col[1] >= self.min_saturation:
-                good_colors.append(col)
+            if not self.cf.is_too_dark(col) and not self.cf.is_too_bright(col):
+                filtered_colors.append(col)
 
+        filtered_colors_lab = [hsl_to_lab(c) for c in filtered_colors]
+        # Remove close colors
+        reduced_colors_lab = self.cf.color_reducer(filtered_colors_lab, 200)
+
+        reduced_colors = [lab_to_hsl(c) for c in reduced_colors_lab]
         # Sort colors by label
-        labeled_colors = self.__label_colors(good_colors)
+        labeled_colors = self.__label_colors(reduced_colors)
 
         # Pick two colors for each label (if possible)
         for i, l in enumerate(labeled_colors):
