@@ -9,6 +9,10 @@ def contrast_norm(rgbcol1, rgbcol2):
 def rgb_to_hex(colrgb):
     return '#%02x%02x%02x' % (colrgb[0], colrgb[1], colrgb[2])
 
+def hex_to_rgb(hexcol):
+    h = hexcol.lstrip("#")
+    return tuple(int(h[i:i+2], 16) for i in (0, 2 ,4))
+
 def hsl_to_hex(colhsl):
     colrgb = hsl_to_rgb(colhsl)
     return rgb_to_hex(colrgb)
