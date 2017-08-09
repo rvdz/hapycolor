@@ -1,173 +1,121 @@
-#include "color_reducer.hpp"
-#define THRESHOLD 300
-#include <utility>
+/*
+    Copyright 2007-2012 Janez Konc 
+
+    If you use this program, please cite: 
+    Janez Konc and Dusanka Janezic. An improved branch and bound algorithm for the 
+    maximum clique problem. MATCH Commun. Math. Comput. Chem., 2007, 58, 569-590.
+
+    More information at: http://www.sicmm.org/~konc
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include <fstream>
+#include <iostream>
+#include <set>
+#include <string.h>
+#include <map>
+#include <assert.h>
+#include "mcqd.h"
 #include <cmath>
 
-uint32_t Color::next_id = 0;
-
-static uint32_t distance(const Color& c1, const Color& c2);
-
-static void free_graphs(Graph* root);
-
-/////////////////////////////////////
-////////////// GRAPH ////////////////
-/////////////////////////////////////
-Graph* Graph::create_child(color_id_t removed_color) {
-    Graph* new_graph = new Graph(this, removed_color);
-    for (auto& l : lists) {
-        if (l.first != removed_color) {
-            List new_list (l.second);
-            new_list.remove(removed_color);
-            std::pair<const color_id_t, List> p(new_list.id, new_list);
-            new_graph->lists.insert(p);
-        }
-    }
-    children.push_back(new_graph);
-    return children.back();
+extern "C" {
+  void color_reducer(char* input_char, uint32_t length, char* output_char);
 }
 
-bool Graph::are_nodes_linked() {
-    for (auto& l : lists) {
-        if (!l.second.empty())
-            return true;
-    }
-    return false;
+using namespace std;
+        
+/**
+ * Decode a string where an integer is encoded over four bytes. The even ones
+ * contain either '\x01' or '\x02' if the following value is null. The odd
+ * ones contain a dummy value if it should be null, or the actual value 
+ * Then populates the data structure used to solve the maximal clique problem
+ */
+void read_colors(char* input_char, uint32_t length, bool** &conn, int &size) {
+  set<int> v;
+  multimap<int,int> e;
+  for (uint32_t i = 0; i < length; i++) {
+    int vi = 0;
+    if ((uint8_t)(input_char[i * 8]) == 2)
+        vi += (uint8_t)(input_char[i * 8 + 1]) << 8;
+
+    if ((uint8_t)(input_char[i * 8 + 2]) == 2)
+        vi += (uint8_t)(input_char[i * 8 + 3]);
+
+
+    int vj = 0;
+    if ((uint8_t)(input_char[i * 8 + 4]) == 2)
+        vj += (uint8_t)(input_char[i * 8 + 5]) << 8;
+
+    if ((uint8_t)(input_char[i * 8 + 6]) == 2)
+        vj += (uint8_t)(input_char[i * 8 + 7]);
+
+    assert(vi >= 0 && vj >= 0);
+    v.insert(vi);
+    v.insert(vj);
+    e.insert(make_pair(vi, vj));
+  }
+
+//  size = v.size() + 1;
+  size = *v.rbegin() + 1;
+  conn = new bool*[size];
+  for (int i=0; i < size; i++) {
+    conn[i] = new bool[size];
+    memset(conn[i], 0, size * sizeof(bool));
+  }
+
+  for (multimap<int,int>::iterator it = e.begin(); it != e.end(); it++) {
+    assert(0 <= it->first && it->first < size 
+           && 0 <= it->second && it->second < size);
+    conn[it->first][it->second] = true;
+    conn[it->second][it->first] = true;
+  }
 }
+  
+/**
+ * Finds the maximal clique for a given graph
+ * @param input_char  an encoded string containing the graph
+ * @param length      the number of couple of vertices in the graph having a common edge
+ * @param output_char the string in which the encoded result will be stored
+ */
+void color_reducer(char* input_char, uint32_t length, char* output_char) {
+  bool **conn;
+  int size;
+  read_colors(input_char, length, conn, size);
 
-std::vector<color_id_t>* Graph::explore_graph() {
-    if (!are_nodes_linked())
-        return &removed_colors;
-    if (get_optimal_length() != (uint16_t)(-1)
-            && removed_colors.size() > get_optimal_length())
-        return nullptr;
+  Maxclique m(conn, size);
+  int *qmax;
+  int qsize;
+  m.mcq(qmax, qsize);
+  for (int i = 0; i < qsize; i++) {
+      if ((qmax[i] & 0xFF00) == 0) {
+          output_char[i * 4] = '\x01';
+          output_char[i * 4 + 1] = '\x01';
+      } else {
+          output_char[i * 4] = '\x02';
+          assert((qmax[i] >> 8) != 0);
+          output_char[i * 4 + 1] = char(qmax[i] >> 8);
+      }
 
-    std::vector<color_id_t>* removed_tmp;
-    std::vector<color_id_t>* opt_removal;
-    for (auto& l : lists) {
-        if (l.second.empty())
-            continue;
-        Graph* child = create_child(l.first);
-        removed_tmp = child->explore_graph();
-        if (removed_tmp != nullptr 
-                && removed_tmp->size() < get_optimal_length()) {
-            opt_removal = removed_tmp;
-            set_optimal_length(removed_tmp->size());
-        }
-    }
-    return opt_removal;
-}
-
-/////////////////////////////////////
-//////// STATIC FUNCTIONS ///////////
-/////////////////////////////////////
-//
-static Graph* create_graph(const std::vector<Color>& colors) {
-    Graph* graph = new Graph();
-    for (const auto& c1 : colors) {
-        for (const auto& c2 : colors) {
-            uint32_t dist = distance(c1, c2);
-            if (c1 != c2 &&  dist < THRESHOLD) {
-                graph->append_node(c1.id, c2.id);
-            }
-        }
-    }
-    return graph;
-}
-
-
-bool in_vector(color_id_t val, std::vector<color_id_t>& vect) {
-    for (const auto& c : vect) {
-        if (val == c)
-            return true;
-    }
-    return false;
-}
-
-void encode_color(char* output_string, color_type_t color) {
-    output_string[0] = color.l;
-    output_string[1] = color.a;
-    output_string[2] = color.b;
-}
-
-void encode_colors(std::vector<color_id_t>& opt_removal,
-                      std::vector<Color>& input_colors,
-                      char* output_string) {
-
-    uint16_t i = 0;
-    for (const auto& c_in : input_colors) {
-        if (!in_vector(c_in.id, opt_removal)) {
-            encode_color(&(output_string[i * 3]), c_in.value);
-            i++;
-        }
-    }
-    output_string[i * 3] = '\0';
-}
-
-void decode_colors(
-        char* input_string, std::vector<Color>& input_colors) {
-    uint32_t i = 0;
-    while (input_string[i] != '\0') {
-        Color c(&(input_string[i]));
-        input_colors.push_back(c);
-        i += 3;
-    }
-}
-
-void reduce_colors(char* input_string, char* output_string) {
-
-    std::vector<Color> input_colors;
-    decode_colors(input_string, input_colors);
-
-    Graph* graph = create_graph(input_colors);
-    /* std::cout << *graph << std::endl; */
-
-    std::vector<color_id_t>* opt_removal = graph->explore_graph();
-
-    /* std::cout << "Finished exploring, the smallest set is: "; */
-    /* for (auto& c : *opt_removal) { */
-    /*     std::cout << c << ", "; */
-    /* } */
-    /* std::cout << std::endl; */
-
-    encode_colors(*opt_removal, input_colors, output_string);
-
-    free_graphs(graph);
-
-}
-
-uint32_t distance(const Color& c1, const Color& c2) {
-    return std::pow(c1.value.l - c2.value.l, 2) 
-                + std::pow(c1.value.a - c2.value.a, 2)
-                + std::pow(c1.value.b - c2.value.b, 2);
-}
-
-bool Color::operator!=(const Color& c) const {
-    if (c.id != id)
-        return true;
-    return false;
-}
-
-void free_graphs(Graph* root) {
-    auto it = root->children_begin();
-    while (it != root->children_end()) {
-        free_graphs(*it);
-        it++;
-    }
-    delete root;
-}
-
-std::ostream& operator<<(std::ostream& out, const List& l) {
-    std::cout << l.id << " : ";
-    for (const auto& e : l.color_list) {
-        std::cout << " " << e;
-    }
-    std::cout << std::endl;
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Graph& graph) {
-    for (const auto& it : graph.lists) {
-        out << it.second;
-    }
-    return out;
+      if ((qmax[i] & 0x00FF) == 0) {
+          output_char[i * 4 + 2] = '\x01';
+          output_char[i * 4 + 3] = '\x01';
+      } else {
+          output_char[i * 4 + 2] = '\x02';
+          assert((qmax[i] & 0x00FF) != 0);
+          output_char[i * 4 + 3] = char(qmax[i] & 0x00FF);
+      }
+  }
+  delete [] qmax;
 }
