@@ -1,8 +1,7 @@
 CC=g++
-CFLAGS=-std=c++11 
-DEBUG=-g
-DEPS=color_reducer.hpp
-OBJ=color_reducer.o 
+CFLAGS=-std=c++11 -O3
+DEPS=mcqd.h
+OBJ=mcqd.o 
 SRC=color_reducer.cpp
 
 EXE=color_reducer
