@@ -1,6 +1,4 @@
-from colormath.color_objects import LabColor, sRGBColor, HSLColor
-from colormath.color_conversions import convert_color
-
+import json
 """ Utilitary methods to convert color types  """
 
 def contrast(rgbcolor):
@@ -70,10 +68,11 @@ def _tmpcolor(tmpc, tmp1, tmp2):
         c = tmp2
     return int(round(255*c))
 
-def hsl_to_lab(colhsl):
-    hsl = HSLColor(colhsl[0], colhsl[1], colhsl[2])
-    return convert_color(hsl, LabColor).get_value_tuple()
+def load_json(file_path):
+    with open(file_path) as f:
+        data = json.load(f)
+    return data
 
-def lab_to_hsl(collab):
-    lab = LabColor(collab[0], collab[1], collab[2])
-    return convert_color(lab, HSLColor).get_value_tuple()
+def save_json(data_file, data_object):
+    with open(data_file, 'w') as f:
+        json.dump(data_object, f, indent=4)

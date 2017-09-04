@@ -27,6 +27,6 @@ if __name__ == '__main__':
     extractor = ColorExtractor(args["file"], num_colors=200)
     colors = extractor.get_colors()
     rgbcols = [hex_to_rgb(col) for col in colors]
-    print "\nFinal palette"
+    print("\nFinal palette (" + str(len(rgbcols)) + "):")
     print_palette(rgbcols, size=2)
     colors_to_file(colors, "palette.png")
