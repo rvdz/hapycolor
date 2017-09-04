@@ -1,5 +1,6 @@
-from utils import contrast_norm, rgb_to_hex, rgb_to_hsl, hsl_to_rgb, hsl_to_lab, lab_to_hsl
+from utils import contrast_norm, rgb_to_hex, rgb_to_hsl, hsl_to_rgb
 import color_filter
+import color_reducer
 from visual import print_palette
 from ast import literal_eval as make_tuple
 import subprocess as sp
@@ -9,6 +10,7 @@ class ColorExtractor():
 
     def __init__(self, image, num_colors):
         self.cf = color_filter.ColorFilter()
+        self.cr = color_reducer.ColorReducer()
         self.image = image
         self.num_colors = num_colors
         self.min_lightness = 0.20
@@ -34,21 +36,26 @@ class ColorExtractor():
         magic_colors = [re.search("rgb\(.*\)", str(col)).group(0)[3:] for col in raw_colors]
         magic_colors = [make_tuple(rgb_col) for rgb_col in magic_colors]
 
-        print "ImageMagick colors"
+        print("ImageMagick colors (" + str(len(magic_colors)) + "):")
         print_palette(magic_colors, size=1)
 
         # Convert colors to hsl and pick the best ones
         hsl_colors = [rgb_to_hsl(col) for col in magic_colors]
         filtered_colors = []
         for col in hsl_colors:
-            if not self.cf.is_too_dark(col) and not self.cf.is_too_bright(col):
+            if not self.cf.is_too_dark(col)              \
+                    and not self.cf.is_too_bright(col)   \
+                    and not self.cf.is_too_saturated(col):
                 filtered_colors.append(col)
 
-        filtered_colors_lab = [hsl_to_lab(c) for c in filtered_colors]
-        # Remove close colors
-        reduced_colors_lab = self.cf.color_reducer(filtered_colors_lab, 200)
+        print("Filtered colors (" + str(len(filtered_colors)) + "):")
+        print_palette([hsl_to_rgb(c) for c in filtered_colors], size=2)
 
-        reduced_colors = [lab_to_hsl(c) for c in reduced_colors_lab]
+        # Remove close colors
+        reduced_colors = self.cr.color_reducer(filtered_colors, 20)
+
+        print("Reduced colors (" + str(len(reduced_colors)) + "):")
+        print_palette([hsl_to_rgb(c) for c in reduced_colors], size=2)
         # Sort colors by label
         labeled_colors = self.__label_colors(reduced_colors)
 
@@ -56,14 +63,14 @@ class ColorExtractor():
         for i, l in enumerate(labeled_colors):
             if len(l) >= 2:
                 l.sort(key=lambda c: c[2])
-                labeled_colors[i] = [max(l[:len(l)/2], key=lambda c: c[1]),
-                        max(l[len(l)/2:], key=lambda c: c[1])]
+                labeled_colors[i] = [max(l[:len(l)//2], key=lambda c: c[1]),
+                        max(l[len(l)//2:], key=lambda c: c[1])]
 
         # Flatten the list and convert colors to rgb format
         all_colors = [col for label in labeled_colors for col in label]
         rgb_colors = [hsl_to_rgb(col) for col in all_colors]
 
-        print "\nColors by label"
+        print("\nColors by label (" + str(len(rgb_colors)) + "):")
         print_palette(rgb_colors, size=2)
 
         diff_contrast = 30
