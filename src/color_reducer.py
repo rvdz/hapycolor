@@ -47,39 +47,18 @@ class ColorReducer():
                     graph.extend([i1, i2])
 
         in_string = c_wchar_p(self.__encode_colors_id(graph))
-        out = '\x00' * (len(colors_set) * 2 + 1)
-        out_string = c_wchar_p(out)
+        out_string = c_wchar_p('\x00' * (len(colors_set) * 2 + 1))
         number_color_in = c_uint(len(graph) // 2)
 
         self.lib.color_reducer(in_string, number_color_in, out_string)
 
         return [colors_set[i] for i in self.__decode_colors_id(out_string.value)]
 
-    # TODO: I think that with this new interface (CPP/Python3) it is possible to just shift all the
-    # ids by one when encoding in order to avoid the end of string problem
     def __decode_colors_id(self, string):
-        """ Decode a string where an integer is encoded over two string's cells.
-            The first one contains either '\x01' if the following value is null or
-            '\x02' otherwise. """
-        colors_id = []
-        i = 0
-        while i < len(string):
-            index = 0
-            if ord(string[i]) == 2:
-                index = ord(string[i + 1])
-            assert(index < 150)
-            colors_id.append(index)
-            i += 2
-        return colors_id
+        """ Subtract one in order to get the original values of the color identifiers """
+        return [ord(e) - 1 for e in string]
 
     def __encode_colors_id(self, graph):
-        """ Encode a string where an integer is encoded over two string's cells.
-            The first one contains either '\x01' if the following value is null or
-            '\x02' otherwise. """
-        ba = ""
-        for c in graph:
-            if c  == 0:
-                ba += chr(1) + chr(1)
-            else:
-                ba += chr(2) + chr(c)
-        return ba
+        """ Add one to the ids in order to avoid the problem of the null character which
+            breaks the python string """
+        return "".join([chr(c + 1) for c in graph])
