@@ -38,29 +38,16 @@ extern "C" {
 using namespace std;
 
 /**
- * Decode a string where an integer is encoded over four bytes. The even ones
- * contain either '\x01' or '\x02' if the following value is null. The odd
- * ones contain a dummy value if it should be null, or the actual value
- * Then populates the data structure used to solve the maximal clique problem
+ * Decodes the input string and then populates the data structure used to solve the maximal clique problem
  */
 void read_colors(wchar_t* input_char, uint32_t length, bool** &conn, int &size) {
   set<int> v;
   multimap<int,int> e;
-  for (uint32_t i = 0; i < length; i++) {
-      assert(static_cast<uint32_t>(input_char[i]) < 150);
-  }
 
   for (uint32_t i = 0; i < length; i++) {
+    int vi = static_cast<uint32_t>(input_char[i * 2]);
+    int vj = static_cast<uint32_t>(input_char[i * 2 + 1]);
 
-    int vi = 0;
-    if (static_cast<uint32_t>(input_char[i * 4]) == 2)
-        vi = static_cast<uint32_t>(input_char[i * 4 + 1]);
-
-    int vj = 0;
-    if (static_cast<uint32_t>(input_char[i * 4 + 2]) == 2)
-        vj = static_cast<uint32_t>(input_char[i * 4 + 3]);
-
-    assert(vi < 150 && vj < 150);
     assert(vi >= 0 && vj >= 0);
     v.insert(vi);
     v.insert(vj);
@@ -85,13 +72,7 @@ void read_colors(wchar_t* input_char, uint32_t length, bool** &conn, int &size) 
 
 void write_colors(int* results, int size, wchar_t* output_char) {
   for (int i = 0; i < size; i++) {
-      if (results[i] == 0) {
-          output_char[i * 2] = 1;
-          output_char[i * 2 + 1] = 1;
-      } else {
-          output_char[i * 2] = 2;
-          output_char[i * 2 + 1] = results[i];
-      }
+      output_char[i] = results[i];
   }
 }
 
@@ -104,11 +85,6 @@ void write_colors(int* results, int size, wchar_t* output_char) {
 void color_reducer(wchar_t* input_char, uint32_t length, wchar_t* output_char) {
   bool **conn;
   int size;
-  /* for (int i = 0; i < length; i++) { */
-  /*     if (i % 4 == 3) */
-  /*         cout << (uint32_t)(unsigned char)(input_char[i]) << " "; */
-  /* } */
-  /* cout << endl; */
   read_colors(input_char, length, conn, size);
 
   Maxclique m(conn, size);
