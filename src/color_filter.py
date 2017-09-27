@@ -26,8 +26,11 @@ class ColorFilter():
         grey_data   = utils.load_json(grey_hyperplan)
 
         # Convert points to catesian
-        dark_points, dark_values     = self.__polar_to_cartesian(dark_data)
-        bright_points, bright_values = self.__polar_to_cartesian(bright_data)
+        dark_points   = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in dark_data])
+        dark_values   = [e[2] for e in dark_data]
+
+        bright_points = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in bright_data])
+        bright_values = [e[2] for e in bright_data]
 
         # Interpolate the data
         self.dark_Z   = interpolate.griddata(dark_points, dark_values, \
@@ -39,7 +42,7 @@ class ColorFilter():
                                         (grid_x, grid_y),   \
                                         method='linear')
 
-        self.grey_interpolation   = self.__interpolate_saturations([e[0] for e in grey_data], \
+        self.grey_interpolation = self.__interpolate_saturations([e[0] for e in grey_data],   \
                                                                    [e[1] for e in grey_data], \
                                                                    [e[2] for e in grey_data])
 
@@ -67,9 +70,8 @@ class ColorFilter():
             # Convert to cartesian (sat, hues)
             surface = []
             for i, h in enumerate(set(H)):
-                surface.append(self.__convert_to_cartesian(h, sat[i]))
+                surface.append(self.__polar_to_cartesian(h, sat[i]))
 
-            # surface = [self.__polar_to_cartesian(h, sat[i]) for i, h in enumerate(set(H))]
             x = [e[0] for e in surface]
             x.append(x[0])
             y = [e[1] for e in surface]
@@ -80,23 +82,9 @@ class ColorFilter():
             interpolation[l] = interpolate.splev(unew, tck)
         return interpolation
 
-    # TODO: Replace name of this function or the other one's
-    def __convert_to_cartesian(self, r, theta):
+
+    def __polar_to_cartesian(self, r, theta):
         return r * np.cos(np.radians(theta)), r * np.sin(np.radians(theta))
-
-
-    # TODO: Replace name of this function or the other one's
-    def __polar_to_cartesian(self, data):
-        """ Converts points defined in a polar base to a cartesian base
-            Returns the points in a numpy array """
-        points = []
-        values = []
-        for e in data:
-            points.append(
-                    [e[1] * np.cos(np.radians(e[0])),
-                     e[1] * np.sin(np.radians(e[0])) ] )
-            values.append(e[2])
-        return np.asarray(points), np.asarray(values)
 
 
     def display_interpolation(self, X, Y, Z):
@@ -118,8 +106,9 @@ class ColorFilter():
 
     def __find_nearest_index(self, value, vector):
         i = 0
-        while vector[i] < value:
-            i += 1
+        for i, v in enumerate(vector):
+            if v > value:
+                return i
         return i
 
 
@@ -176,16 +165,15 @@ class ColorFilter():
     def is_too_bright(self, hsl_color):
         """ Returns a boolean depending if the given color is too bright.
             The color provided must be in hsl format"""
-        [point], [val] =  self.__polar_to_cartesian([hsl_color])
-        val > self.__project_point(point[0], point[1], self.bright_Z)
-        return False
+        x, y =  self.__polar_to_cartesian(hsl_color[0], hsl_color[1])
+        return hsl_color[2] > self.__project_point(x, y, self.bright_Z)
 
 
     def is_too_dark(self, hsl_color):
         """ Returns a boolean depending if the given color is too dark.
             The color provided must be in hsl format"""
-        [point], [val] =  self.__polar_to_cartesian([hsl_color])
-        return val < self.__project_point(point[0], point[1], self.dark_Z)
+        x, y =  self.__polar_to_cartesian(hsl_color[0], hsl_color[1])
+        return hsl_color[2] < self.__project_point(x, y, self.dark_Z)
 
 
     def __is_in_saturated_area(self, x, y, interpolation):
@@ -211,7 +199,7 @@ class ColorFilter():
             (saturations, hues) for the previous luminosity. """
         keys = list(self.grey_interpolation.keys())
         epsilon = keys[1] - keys[0]
-        [P], [z] =  self.__polar_to_cartesian([hsl_color])
+        x, y =  self.__polar_to_cartesian(hsl_color[0], hsl_color[1])
         for l in self.grey_interpolation:
-            if abs(l - z) < epsilon:
-                return self.__is_in_saturated_area(P[0], P[1], self.grey_interpolation[l])
+            if abs(l - hsl_color[2]) < epsilon:
+                return self.__is_in_saturated_area(x, y, self.grey_interpolation[l])
