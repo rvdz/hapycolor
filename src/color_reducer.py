@@ -23,7 +23,7 @@ class ColorReducer():
 
         if not os.path.isfile(library):
             os.system(compiler + " " + options + " " + library + " " + source)
-        self.lib = cdll.LoadLibrary(library)
+        self.lib = cdll.LoadLibrary("./" + library)
 
     def __distance(self, c1, c2):
         """ The employed distance between colors is the CIEDE2000
