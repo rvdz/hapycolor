@@ -1,5 +1,5 @@
 from scipy import interpolate
-from  matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sys
@@ -77,6 +77,7 @@ class ColorFilter():
             y = [e[1] for e in surface]
             y.append(y[0])
 
+            # Interpolate circle: https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.splprep.html
             tck, u = interpolate.splprep([x, y], s=0)
             unew = np.arange(0, 1.01, 0.01)
             interpolation[l] = interpolate.splev(unew, tck)
