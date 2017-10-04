@@ -13,11 +13,16 @@ class ColorExtractor():
         self.cr = color_reducer.ColorReducer()
         self.image = image
         self.num_colors = num_colors
+        self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
+        self.labels.append([345, 15]) # Special case for red
+
+        # Filter parameters
         self.min_lightness = 0.20
         self.max_lightness = 0.80
         self.min_saturation = 0.10
-        self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
-        self.labels.append([345, 15]) # Special case for red
+
+        # Reduction distance
+        self.min_distance = 20
 
     def get_colors(self):
         """ This method tries to extract the most various colors in an image
@@ -45,14 +50,14 @@ class ColorExtractor():
         for col in hsl_colors:
             if not self.cf.is_too_dark(col)              \
                     and not self.cf.is_too_bright(col)   \
-                    and not self.cf.is_too_saturated(col):
+                    and self.cf.is_saturated_enough(col):
                 filtered_colors.append(col)
 
         print("Filtered colors (" + str(len(filtered_colors)) + "):")
         print_palette([hsl_to_rgb(c) for c in filtered_colors], size=2)
 
         # Remove close colors
-        reduced_colors = self.cr.color_reducer(filtered_colors, 20)
+        reduced_colors = self.cr.color_reducer(filtered_colors, self.min_distance)
 
         print("Reduced colors (" + str(len(reduced_colors)) + "):")
         print_palette([hsl_to_rgb(c) for c in reduced_colors], size=2)

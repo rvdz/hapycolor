@@ -197,7 +197,7 @@ class ColorFilter():
             return False
 
 
-    def is_too_saturated(self, hsl_color):
+    def is_saturated_enough(self, hsl_color):
         """ Checks if the color is saturated enough. The first step consist in finding the
             closest discretised luminosity and then, analyzing the interpolation of the
             (saturations, hues) for the previous luminosity. """
@@ -206,4 +206,4 @@ class ColorFilter():
         x, y =  self.__polar_to_cartesian(hsl_color[0], hsl_color[1])
         for l in self.grey_interpolation:
             if abs(l - hsl_color[2]) < epsilon:
-                return self.__is_in_saturated_area(x, y, self.grey_interpolation[l])
+                return not self.__is_in_saturated_area(x, y, self.grey_interpolation[l])
