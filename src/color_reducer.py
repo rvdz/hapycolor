@@ -3,21 +3,27 @@ from colormath.color_objects import LabColor, HSLColor
 from colormath.color_conversions import convert_color
 from platform import system
 from ctypes import cdll, c_uint, c_wchar_p
-import utils
 import os
 
 class ColorReducer():
 
     def __init__(self):
-        # TODO: Should not depend on the directory from where the python script is called
-        # Generate a shared object of the algorithm
-        os.system("make")
-
-        # Library defining a maximal clique algorithm
+        """ Compiling if necessary and loading the library defining a maximal
+            clique algorithm """
+        library  = "libcolor_reducer"
+        source   = "color_reducer.cpp"
+        compiler = "g++"
+        options  = "-std=c++11 -O3"
         if system() == "Darwin":
-            self.lib = cdll.LoadLibrary("./libcolor_reducer.dylib")
+            options = options + " -dynamiclib -o"
+            library = library + ".dylib"
         else:
-            self.lib = cdll.LoadLibrary("./libcolor_reducer.so")
+            options = options + " -fPIC -shared -o"
+            library = library + ".so"
+
+        if not os.path.isfile(library):
+            os.system(compiler + " " + options + " " + library + " " + source)
+        self.lib = cdll.LoadLibrary(library)
 
     def __distance(self, c1, c2):
         """ The employed distance between colors is the CIEDE2000
