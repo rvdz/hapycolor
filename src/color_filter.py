@@ -190,7 +190,10 @@ class ColorFilter():
                 Y.append(interpolation[1][i])
 
         Y.sort()
-        return Y[0] < y and y < Y[1]
+        try:
+            return Y[0] < y and y < Y[1]
+        except IndexError:
+            return False
 
 
     def is_too_saturated(self, hsl_color):
