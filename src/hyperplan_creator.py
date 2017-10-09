@@ -1,14 +1,21 @@
+import color_filter
 import cv2
 import utils
 import numpy as np
-import json
-from pathlib import Path
 import random
 import argparse
-
+import os.path
+from math import sqrt, cos, sin
+from config import Config, FilterEnum
+from enum import IntEnum
 
 class HyperplanCreator():
-    def __init__(self, out_file):
+    def __init__(self, filter_type, is_calibrating):
+        # Values: "bright", "dark", "saturation"
+        self.filter_type        = filter_type
+        self.is_calibrating     = is_calibrating
+        self.calibration_points = 10
+
         self.MIN_HUE        = 0
         self.MAX_HUE        = 359
         self.SIZE_HUE       = 10
@@ -27,28 +34,34 @@ class HyperplanCreator():
         self.WIDTH          = 700
         self.HEIGHT         = 800
 
-        self.keys_file      = "keys.json"
-        self.hyperplan_file = out_file
-        self.keys           = self.__init_keys()
+        self.hyperplan_file = Config.get_hyperplan_file(filter_type)
+        self.Key            = self.__init_keys()
 
+    def run(self):
+        if not self.is_calibrating and (self.filter_type == FilterEnum.DARK or \
+                                        self.filter_type == FilterEnum.BRIGHT):
+            hc.luminosity_hyperplan()
 
-    def __load_keys(self):
-        with open(self.keys_file, 'r') as f:
-            return json.load(f)
+        elif not self.is_calibrating and self.filter_type == FilterEnum.SATURATION:
+            hc.saturation_hyperplan()
 
+        elif self.is_calibrating and (self.filter_type == FilterEnum.DARK or \
+                                      self.filter_type == FilterEnum.BRIGHT):
+            hc.calibrate_luminosity_hyperplan()
 
     def __init_keys(self):
-        if not Path(self.keys_file).is_file():
-            keys = {}
+        """ Returns an enumeration called 'Key', that matches each key to its openCV's value """
+        keys = {}
+        if not os.path.isfile(Config.keys_file):
             cv2.namedWindow('Key setter', cv2.WINDOW_NORMAL)
             cv2.resizeWindow('HyperplanCreator', 10, 10)
             for k in ["UP", "DOWN", "RIGHT", "LEFT", "RETURN", "DELETE"]:
                 print("Press key: " + str(k))
                 keys[k] = cv2.waitKey(0)
-            utils.save_json(self.keys_file, keys)
-            return keys
+            utils.save_json(Config.keys_file, keys)
         else:
-            return self.__load_keys()
+            keys = utils.load_json(Config.keys_file)
+        return IntEnum("Key", [(k, keys[k]) for k in keys])
 
 
     def __display_image(self, image):
@@ -61,11 +74,23 @@ class HyperplanCreator():
         return key
 
 
-    def __create_image(self, h, s, l):
+    def __add_frame(self, image, color):
+        green = (0, 255, 0)
+        red   = (0, 0, 255)
+
+        if self.filter_type == FilterEnum.BRIGHT:
+            fill_color = red if self.cf.is_too_bright(color) else green
+        elif self.filter_type == FilterEnum.DARK:
+            fill_color = red if self.cf.is_too_dark(color) else green
+        cv2.rectangle(image, (0, 0), (self.WIDTH, self.HEIGHT), fill_color, 5)
+        return image
+
+
+    def __create_image(self, hsl_color):
         """ Creates an image where on top sits a rectangle of the given color
             and on bottom, lays a text which color is the one provided over a
             black background """
-        r, g, b = utils.hsl_to_rgb([h, s, l])
+        r, g, b = utils.hsl_to_rgb(hsl_color)
         image = np.zeros((self.HEIGHT, self.WIDTH, 3), np.uint8)
         image[self.HEIGHT//2:] = (0,0,0)
         cv2.putText(image, "Ben deja on", (20, int(self.HEIGHT//4.0)),
@@ -74,18 +99,21 @@ class HyperplanCreator():
                 fontFace=0, fontScale=3, lineType=2, thickness=3, color=[b,g,r])
         cv2.putText(image, "Notre Rice a nous", (20, int(3*self.HEIGHT//4.0)),
                 fontFace=0, fontScale=3, lineType=2, thickness=3, color=[b,g,r])
+
+        if self.is_calibrating:
+            return self.__add_frame(image, hsl_color)
         return image
 
 
     def __edit_value(self, key, l):
         """ For a given key, increses or decreases the luminosity """
-        if key == self.keys["RIGHT"]:
+        if key == self.Key.RIGHT:
             l += self.STEP_SMALL
-        elif key == self.keys["LEFT"]:
+        elif key == self.Key.LEFT:
             l -= self.STEP_SMALL
-        elif key == self.keys["UP"]:
+        elif key == self.Key.UP:
             l += self.STEP_LARGE
-        elif key == self.keys["DOWN"]:
+        elif key == self.Key.DOWN:
             l -= self.STEP_LARGE
 
         if l < 0: l = 0.0
@@ -96,11 +124,11 @@ class HyperplanCreator():
     def __refresh_image(self, C, value_to_edit):
         """ For a given hue and saturation, loop for different values of
             luminosity until the user accepts a value """
-        image = self.__create_image(C[0], C[1], C[2])
+        image = self.__create_image(C)
         key = self.__display_image(image)
-        if key == self.keys["RETURN"]:
+        if key == self.Key.RETURN:
             return -1
-        elif key == self.keys["DELETE"]:
+        elif key == self.Key.DELETE:
             print("The last confirmed color has been removed")
             return -2
         return self.__edit_value(key, value_to_edit)
@@ -114,6 +142,46 @@ class HyperplanCreator():
         random.shuffle(product)
         return product
 
+
+    def calibrate_luminosity_hyperplan(self):
+        print("Calibrating luminosity")
+        self.cf = color_filter.ColorFilter()
+        colors = []
+        for i in range(self.calibration_points):
+            colors.append((random.randint(0, 360), random.random(), random.random()))
+
+        while colors:
+            h, s, l = colors.pop()
+            while True:
+                res = self.__refresh_image((h, s, l), l)
+                if res == -1:
+                    self.__update_json((h, s, l))
+                    break
+                else:
+                    l = res
+
+
+    def __update_json(self, color):
+        """ Finds nearest point to 'color' and update its luminosity """
+        colors = utils.load_json(self.hyperplan_file)
+        distances = {}
+        for c in colors:
+            distances[tuple(c)] = self.__distance(c[:2], color[:2])
+
+        old_color = min(distances, key=distances.get)
+        del distances[old_color]
+
+        new_colors = list(distances)
+        new_colors.append((old_color[0], old_color[1], c[2]))
+        # TODO: In debug phase, do not alter the hyperplan file
+        utils.save_json(self.hyperplan_file, new_colors)
+
+
+    def __distance(self, P1, P2):
+        """ Distance between two points in cylidrical coordinates """
+        r1, t1 = P1
+        r2, t2 = P2
+        return sqrt(r1**2 + r2**2 - 2*r1*r2*(cos(t1)*cos(t2) - sin(t1)*sin(t2)))
 
     def luminosity_hyperplan(self):
         saturations = np.linspace(self.MIN_SAT, self.MAX_SAT, self.SIZE_SAT)
@@ -160,14 +228,25 @@ class HyperplanCreator():
                     s = res
         utils.save_json(self.hyperplan_file, colors)
 
+
+def filter_type(t):
+    if t == "bright":
+        return FilterEnum.BRIGHT
+    elif t == "dark":
+        return FilterEnum.DARK
+    elif t == "saturation":
+        return FilterEnum.SATURATION
+    else:
+        raise argparse.ArgumentTypeError("Filter type must be 'dark'|'bright'|'saturation'")
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="Path of the output file", required=True)
-    ap.add_argument("-t", "--type", help="L for luminosity, S for saturation", required=True)
-    args = vars(ap.parse_args())
+    ap.add_argument("-t", "--type", help="Filter type: 'dark'|'bright'|'saturation'", type=filter_type, \
+                    required=True)
+    ap.add_argument("-c", "--calibrate", help="Calibrate an existing hyperplan", \
+                    required=False, action="store_true")
 
-    hc = HyperplanCreator(args['file'])
-    if args['type'] == 'L':
-        hc.luminosity_hyperplan()
-    elif args['type'] == 'S':
-        hc.saturation_hyperplan()
+    args = vars(ap.parse_args())
+    hc = HyperplanCreator(args['type'], args['calibrate'])
+    hc.run()
