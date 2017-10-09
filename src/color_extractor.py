@@ -9,6 +9,7 @@ import re
 class ColorExtractor():
 
     def __init__(self, image, num_colors):
+
         self.cf = color_filter.ColorFilter()
         self.cr = color_reducer.ColorReducer()
         self.image = image
