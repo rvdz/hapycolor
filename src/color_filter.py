@@ -1,58 +1,64 @@
 from scipy import interpolate
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+# TODO: remove: from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sys
 import utils
+from config import Config, FilterEnum
 
 class ColorFilter():
 
-    def __init__(self):
-        dark_hyperplan   = "../hyperplan_robin/dark.json"
-        bright_hyperplan = "../hyperplan_robin/light.json"
-        grey_hyperplan   = "../hyperplan_yann/saturations.json"
 
+    def __init__(self):
         # Set up grid
         grid_x, grid_y = np.mgrid[-1:1:100j, -1:1:100j]
         self.X         = [x[0] for x in grid_x]
         self.Y         = grid_y[0]
 
-        # TODO: The following steps could be avoided if the generated hyperplan was stored in the disk
-        # and then loaded entirely when creating an object of this class
+        self.dark_Z = self.__generate_luminosity_hyperplan(             \
+                            Config.get_hyperplan_file(FilterEnum.DARK), \
+                            grid_x, grid_y)
 
+        self.bright_Z = self.__generate_luminosity_hyperplan(
+                            Config.get_hyperplan_file(FilterEnum.BRIGHT), \
+                            grid_x, grid_y)
+
+        self.grey_interpolation = self.__generate_saturation_hyperplan( \
+                                        Config.get_hyperplan_file(FilterEnum.SATURATION))
+
+
+    def __generate_luminosity_hyperplan(self, json_file, grid_x, grid_y):
+        """ Generates a data structures that represent the interpolated luminosity hyperplan (dark or bright)
+            TODO: This should be replaced by a function that only load a json file where
+            that contains the interpolated points instead of regenating them each time """
         # Load the provided points
-        dark_data   = utils.load_json(dark_hyperplan)
-        bright_data = utils.load_json(bright_hyperplan)
-        grey_data   = utils.load_json(grey_hyperplan)
+        data   = utils.load_json(json_file)
 
         # Convert points to catesian
-        dark_points   = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in dark_data])
-        dark_values   = [e[2] for e in dark_data]
-
-        bright_points = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in bright_data])
-        bright_values = [e[2] for e in bright_data]
+        points   = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in data])
+        values   = [e[2] for e in data]
 
         # Interpolate the data
-        self.dark_Z   = interpolate.griddata(dark_points, dark_values, \
-                                        (grid_x, grid_y),              \
-                                        method='linear')
-
-        self.bright_Z = interpolate.griddata(bright_points, \
-                                        bright_values,      \
-                                        (grid_x, grid_y),   \
-                                        method='linear')
-
-        self.grey_interpolation = self.__interpolate_saturations([e[0] for e in grey_data],   \
-                                                                   [e[1] for e in grey_data], \
-                                                                   [e[2] for e in grey_data])
+        return interpolate.griddata(points, values, (grid_x, grid_y), method='linear')
 
 
-    def __interpolate_saturations(self, H, S, L):
+    def __generate_saturation_hyperplan(self, json_file):
         """ Interpolate saturation's cylinder with the provided colors. It starts by interpolating
             the saturation for the different luminosities and for a fixed hue. Then, it loops over a
             discretisation of the luminosity and for each of these values, it generates set(H) couples
             (sat,hue) with the functions defined in the previous step. With these couples, it finally
-            interpolates a 2D deformed circle over the plan (x,y,z = l). """
+            interpolates a 2D deformed circle over the plan (x,y,z = l).
+            TODO: This should be replaced by a function that only load a json file where
+            that contains the interpolated points instead of regenating them each time """
+
+        # Load the provided points
+        grey_data   = utils.load_json(json_file)
+
+        # Interpolate the data
+        H = [e[0] for e in grey_data]
+        S = [e[1] for e in grey_data]
+        L = [e[2] for e in grey_data]
+
         # Generates a function which for a fixed hue returns the image of the luminosity: f(l) = s
         F = []
         for h in set(H):
