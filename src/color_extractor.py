@@ -47,6 +47,18 @@ class ColorExtractor():
 
         # Convert colors to hsl and pick the best ones
         hsl_colors = [rgb_to_hsl(col) for col in magic_colors]
+
+        # Extract the background and foreground
+        foreground = hsl_to_rgb(max(hsl_colors, key=lambda c:c[2]))
+        background = hsl_to_rgb(min(hsl_colors, key=lambda c:c[2]))
+
+        final_colors = {}
+        final_colors["special"] = {}
+        final_colors["colors"]  = {}
+        final_colors["special"]["foreground"] = rgb_to_hex(foreground)
+        final_colors["special"]["cursor"]     = rgb_to_hex(foreground)
+        final_colors["special"]["background"] = rgb_to_hex(background)
+
         filtered_colors = []
         for col in hsl_colors:
             if not self.cf.is_too_dark(col)              \
@@ -89,7 +101,10 @@ class ColorExtractor():
                 i += 1
 
         hex_colors = [rgb_to_hex(col) for col in rgb_colors]
-        return hex_colors
+        for i, c in enumerate(hex_colors):
+            final_colors["colors"]["color%s" % i] = c
+
+        return final_colors
 
     def __label_colors(self, colors):
         """ Sort colors by labels """
