@@ -28,8 +28,8 @@ if __name__ == '__main__':
     args = vars(ap.parse_args())
 
     extractor = ColorExtractor(args["file"], num_colors=200)
-    colors = extractor.get_colors()
-    rgbcols = [hex_to_rgb(col) for col in colors]
+    colors_dic = extractor.get_colors()["colors"]
+    rgbcols = [hex_to_rgb(colors_dic[k]) for k in colors_dic]
     print("\nFinal palette (" + str(len(rgbcols)) + "):")
     print_palette(rgbcols, size=2)
-    colors_to_file(colors, "palette.png")
+    colors_to_file([colors_dic[k] for k in colors_dic], "palette.png")
