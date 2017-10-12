@@ -23,7 +23,7 @@ class ColorExtractor():
         self.min_saturation = 0.10
 
         # Reduction distance
-        self.min_distance = 20
+        self.min_distance = 10
 
     def get_colors(self):
         """ This method tries to extract the most various colors in an image
@@ -91,16 +91,10 @@ class ColorExtractor():
         print("\nColors by label (" + str(len(rgb_colors)) + "):")
         print_palette(rgb_colors, size=2)
 
-        diff_contrast = 30
-        i = 0
-        while i < len(rgb_colors)-1:
-            if contrast_norm(rgb_colors[i], rgb_colors[i+1]) < diff_contrast:
-                rgb_colors.remove(rgb_colors[i+1])
-                i -= 1
-            else:
-                i += 1
-
         hex_colors = [rgb_to_hex(col) for col in rgb_colors]
+        while (len(hex_colors) < 16):
+            hex_colors.append(hex_colors[-1])
+
         for i, c in enumerate(hex_colors):
             final_colors["colors"]["color%s" % i] = c
 
