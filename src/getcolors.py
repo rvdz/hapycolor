@@ -1,6 +1,6 @@
-from visual import print_palette
-from utils import hex_to_rgb
-from color_extractor import ColorExtractor
+import visual
+import utils
+import color_extractor
 from PIL import Image, ImageDraw
 import argparse
 import config
@@ -27,9 +27,18 @@ if __name__ == '__main__':
     ap.add_argument("-f", "--file", help="File path to the image", required=False)
     args = vars(ap.parse_args())
 
-    extractor = ColorExtractor(args["file"], num_colors=200)
-    colors_dic = extractor.get_colors()["colors"]
-    rgbcols = [hex_to_rgb(colors_dic[k]) for k in colors_dic]
+    extractor = color_extractor.ColorExtractor(args["file"], num_colors=200)
+    colors = extractor.get_colors()
+    fg = colors["special"]["foreground"]
+    bg = colors["special"]["background"]
+    others = colors["colors"]
+
+    rgbcols = [utils.hex_to_rgb(others[k]) for k in others]
     print("\nFinal palette (" + str(len(rgbcols)) + "):")
-    print_palette(rgbcols, size=2)
-    colors_to_file([colors_dic[k] for k in colors_dic], "palette.png")
+    visual.print_palette(rgbcols, size=2)
+    print("\Foreground color:")
+    visual.print_palette([utils.hex_to_rgb(fg)], size=4)
+    print("\Background color:")
+    visual.print_palette([utils.hex_to_rgb(bg)], size=4)
+    colors_to_file([others[k] for k in others], "palette.png")
+    utils.save_json("palette.json", colors)

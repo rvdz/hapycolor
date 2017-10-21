@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import sys
 import utils
-from config import Config, FilterEnum
+import config
 
 class ColorFilter():
 
@@ -16,15 +16,15 @@ class ColorFilter():
         self.Y         = grid_y[0]
 
         self.dark_Z = self.__generate_luminosity_hyperplan(             \
-                            Config.get_hyperplan_file(FilterEnum.DARK), \
+                            config.Config.get_hyperplan_file(config.FilterEnum.DARK), \
                             grid_x, grid_y)
 
         self.bright_Z = self.__generate_luminosity_hyperplan(
-                            Config.get_hyperplan_file(FilterEnum.BRIGHT), \
+                            config.Config.get_hyperplan_file(config.FilterEnum.BRIGHT), \
                             grid_x, grid_y)
 
         self.grey_interpolation = self.__generate_saturation_hyperplan( \
-                                        Config.get_hyperplan_file(FilterEnum.SATURATION))
+                                        config.Config.get_hyperplan_file(config.FilterEnum.SATURATION))
 
 
     def __generate_luminosity_hyperplan(self, json_file, grid_x, grid_y):
