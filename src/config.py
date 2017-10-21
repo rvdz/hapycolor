@@ -12,6 +12,9 @@ class FilterEnum(Enum):
 class Config:
     APP_NAME  = "hapycolor"
     keys_file = "keys.json"
+    ITERM_CONFIG = "/Users/yanncolina/Documents/com.googlecode.iterm2.plist"
+    ITERM_TEMPLATE = "template.xml"
+    COLORSCHEME_VIM = "/Users/yanncolina/.vim_runtime/sources_non_forked/hapycolor/colors/hapycolor.vim"
 
     def get_hyperplan_file(filter_type):
         if filter_type == FilterEnum.DARK:

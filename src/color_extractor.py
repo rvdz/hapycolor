@@ -60,11 +60,9 @@ class ColorExtractor():
 
         final_colors = {}
         final_colors["wallpaper"] = self.image
-        final_colors["special"] = {}
-        final_colors["colors"]  = {}
-        final_colors["special"]["foreground"] = utils.rgb_to_hex(utils.hsl_to_rgb(fg))
-        final_colors["special"]["cursor"]     = utils.rgb_to_hex(utils.hsl_to_rgb(fg))
-        final_colors["special"]["background"] = utils.rgb_to_hex(utils.hsl_to_rgb(bg))
+        final_colors["colors"]  = []
+        final_colors["foreground"] = utils.hsl_to_rgb(fg)
+        final_colors["background"] = utils.hsl_to_rgb(bg)
 
         filtered_magic = magic_colors[:]
         filtered_colors = []

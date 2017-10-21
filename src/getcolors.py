@@ -1,7 +1,9 @@
 import visual
 import utils
 import color_extractor
+import export
 from PIL import Image, ImageDraw
+import platform
 import argparse
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
@@ -26,9 +28,6 @@ if __name__ == '__main__':
 
     extractor = color_extractor.ColorExtractor(args["file"], num_colors=250)
     colors = extractor.get_colors()
-    fg = colors["special"]["foreground"]
-    bg = colors["special"]["background"]
-    others = colors["colors"]
 
     rgbcols = [utils.hex_to_rgb(others[k]) for k in others]
 
