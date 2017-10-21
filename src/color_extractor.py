@@ -66,42 +66,45 @@ class ColorExtractor():
         final_colors["special"]["cursor"]     = utils.rgb_to_hex(utils.hsl_to_rgb(fg))
         final_colors["special"]["background"] = utils.rgb_to_hex(utils.hsl_to_rgb(bg))
 
+        filtered_magic = magic_colors[:]
         filtered_colors = []
-        for col in hsl_colors:
+        for i, col in enumerate(hsl_colors):
             if not self.cf.is_too_dark(col)              \
                     and not self.cf.is_too_bright(col)   \
                     and self.cf.is_saturated_enough(col):
                 filtered_colors.append(col)
+            else:
+                filtered_magic[i] = (0,0,0)
 
-        print("Filtered colors (" + str(len(filtered_colors)) + "):")
-        visual.print_palette([utils.hsl_to_rgb(c) for c in filtered_colors], size=2)
+        print("\nFiltered colors (" + str(len(filtered_colors)) + "):")
+        visual.print_palette(filtered_magic, size=1)
 
         # Remove close colors
         reduced_colors = self.cr.color_reducer(filtered_colors, self.min_distance)
 
-        print("Reduced colors (" + str(len(reduced_colors)) + "):")
+        print("\nReduced colors (" + str(len(reduced_colors)) + "):")
         visual.print_palette([utils.hsl_to_rgb(c) for c in reduced_colors], size=2)
+
         # Sort colors by label
         labeled_colors = self.__label_colors(reduced_colors)
-
-        # Pick two colors for each label (if possible)
-        for i, l in enumerate(labeled_colors):
-            if len(l) >= 2:
-                l.sort(key=lambda c: c[2])
-                labeled_colors[i] = [max(l[:len(l)//2], key=lambda c: c[1]),
-                        max(l[len(l)//2:], key=lambda c: c[1])]
+        #print("Labels :")
+        #for i, l in enumerate(labeled_colors):
+        #    visual.print_palette([utils.hsl_to_rgb(c) for c in l], size=1)
 
         # Flatten the list and convert colors to rgb format
         all_colors = [col for label in labeled_colors for col in label]
         rgb_colors = [utils.hsl_to_rgb(col) for col in all_colors]
+        #print("\nColors by label (" + str(len(rgb_colors)) + "):")
+        #visual.print_palette(rgb_colors, size=2)
 
-        print("\nColors by label (" + str(len(rgb_colors)) + "):")
-        visual.print_palette(rgb_colors, size=2)
-
+        # Ensure that the final palette contains at least 16 colors
+        # FIXME to be improved, we could repeat different colors from different label
+        # instead of just the last one
         hex_colors = [utils.rgb_to_hex(col) for col in rgb_colors]
         while (len(hex_colors) < 16):
             hex_colors.append(hex_colors[-1])
 
+        # FIXME we shouldn't use a dictionnary to store this type of data (plz no random)
         for i, c in enumerate(hex_colors):
             final_colors["colors"]["color%s" % i] = c
 
