@@ -1,9 +1,9 @@
-from enum import auto, Enum
+from enum import Enum
 
 class FilterEnum(Enum):
-    BRIGHT     = auto()
-    DARK       = auto()
-    SATURATION = auto()
+    BRIGHT     = 1
+    DARK       = 2
+    SATURATION = 3
 
 class Config:
     APP_NAME  = "hapycolor"
