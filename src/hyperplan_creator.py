@@ -6,7 +6,7 @@ import random
 import argparse
 import os.path
 from math import sqrt, cos, sin
-from config import Config, FilterEnum
+import config
 from enum import IntEnum
 
 class HyperplanCreator():
@@ -34,33 +34,33 @@ class HyperplanCreator():
         self.WIDTH          = 700
         self.HEIGHT         = 800
 
-        self.hyperplan_file = Config.get_hyperplan_file(filter_type)
+        self.hyperplan_file = config.Config.get_hyperplan_file(filter_type)
         self.Key            = self.__init_keys()
 
     def run(self):
-        if not self.is_calibrating and (self.filter_type == FilterEnum.DARK or \
-                                        self.filter_type == FilterEnum.BRIGHT):
+        if not self.is_calibrating and (self.filter_type == config.FilterEnum.DARK or \
+                                        self.filter_type == config.FilterEnum.BRIGHT):
             hc.luminosity_hyperplan()
 
-        elif not self.is_calibrating and self.filter_type == FilterEnum.SATURATION:
+        elif not self.is_calibrating and self.filter_type == config.FilterEnum.SATURATION:
             hc.saturation_hyperplan()
 
-        elif self.is_calibrating and (self.filter_type == FilterEnum.DARK or \
-                                      self.filter_type == FilterEnum.BRIGHT):
+        elif self.is_calibrating and (self.filter_type == config.FilterEnum.DARK or \
+                                      self.filter_type == config.FilterEnum.BRIGHT):
             hc.calibrate_luminosity_hyperplan()
 
     def __init_keys(self):
         """ Returns an enumeration called 'Key', that matches each key to its openCV's value """
         keys = {}
-        if not os.path.isfile(Config.keys_file):
+        if not os.path.isfile(config.Config.keys_file):
             cv2.namedWindow('Key setter', cv2.WINDOW_NORMAL)
             cv2.resizeWindow('HyperplanCreator', 10, 10)
             for k in ["UP", "DOWN", "RIGHT", "LEFT", "RETURN", "DELETE"]:
                 print("Press key: " + str(k))
                 keys[k] = cv2.waitKey(0)
-            utils.save_json(Config.keys_file, keys)
+            utils.save_json(config.Config.keys_file, keys)
         else:
-            keys = utils.load_json(Config.keys_file)
+            keys = utils.load_json(config.Config.keys_file)
         return IntEnum("Key", [(k, keys[k]) for k in keys])
 
 
@@ -78,9 +78,9 @@ class HyperplanCreator():
         green = (0, 255, 0)
         red   = (0, 0, 255)
 
-        if self.filter_type == FilterEnum.BRIGHT:
+        if self.filter_type == config.FilterEnum.BRIGHT:
             fill_color = red if self.cf.is_too_bright(color) else green
-        elif self.filter_type == FilterEnum.DARK:
+        elif self.filter_type == config.FilterEnum.DARK:
             fill_color = red if self.cf.is_too_dark(color) else green
         cv2.rectangle(image, (0, 0), (self.WIDTH, self.HEIGHT), fill_color, 5)
         return image
@@ -231,11 +231,11 @@ class HyperplanCreator():
 
 def filter_type(t):
     if t == "bright":
-        return FilterEnum.BRIGHT
+        return config.FilterEnum.BRIGHT
     elif t == "dark":
-        return FilterEnum.DARK
+        return config.FilterEnum.DARK
     elif t == "saturation":
-        return FilterEnum.SATURATION
+        return config.FilterEnum.SATURATION
     else:
         raise argparse.ArgumentTypeError("Filter type must be 'dark'|'bright'|'saturation'")
 
