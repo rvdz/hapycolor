@@ -1,6 +1,6 @@
-import utils
-import color_filter
-import color_reducer
+import helpers
+import color.filter
+import color.reducer
 import visual
 from ast import literal_eval as make_tuple
 import subprocess as sp
@@ -10,8 +10,8 @@ class ColorExtractor():
 
     def __init__(self, image, num_colors):
 
-        self.cf = color_filter.ColorFilter()
-        self.cr = color_reducer.ColorReducer()
+        self.cf = color.filter.ColorFilter()
+        self.cr = color.reducer.ColorReducer()
         self.image = image
         self.num_colors = num_colors
         self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
@@ -46,7 +46,7 @@ class ColorExtractor():
         visual.print_palette(magic_colors, size=1)
 
         # Convert colors to hsl and pick the best ones
-        hsl_colors = [utils.rgb_to_hsl(col) for col in magic_colors]
+        hsl_colors = [helpers.rgb_to_hsl(col) for col in magic_colors]
 
         # Extract the background and foreground
         fg = max(hsl_colors, key=lambda c:c[2])
@@ -61,8 +61,8 @@ class ColorExtractor():
         final_colors = {}
         final_colors["wallpaper"] = self.image
         final_colors["colors"]  = []
-        final_colors["foreground"] = utils.hsl_to_rgb(fg)
-        final_colors["background"] = utils.hsl_to_rgb(bg)
+        final_colors["foreground"] = helpers.hsl_to_rgb(fg)
+        final_colors["background"] = helpers.hsl_to_rgb(bg)
 
         filtered_magic = magic_colors[:]
         filtered_colors = []
@@ -78,7 +78,7 @@ class ColorExtractor():
         visual.print_palette(filtered_magic, size=1)
 
         # Remove close colors
-        reduced_colors = self.cr.color_reducer(filtered_colors, self.min_distance)
+        reduced_colors = self.cr.reduce(filtered_colors, self.min_distance)
 
         print("\nReduced colors (" + str(len(reduced_colors)) + "):")
         visual.print_palette([utils.hsl_to_rgb(c) for c in reduced_colors], size=2)

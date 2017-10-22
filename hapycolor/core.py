@@ -1,9 +1,8 @@
 import visual
-import utils
-import color_extractor
-import export
+import color.extractor
+import export.vim
+import export.iterm
 from PIL import Image, ImageDraw
-import platform
 import argparse
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):

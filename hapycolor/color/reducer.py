@@ -1,18 +1,24 @@
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import LabColor, HSLColor
 from colormath.color_conversions import convert_color
+<<<<<<< HEAD:src/color_reducer.py
 from platform import system
 from ctypes import cdll, c_uint, c_wchar_p
 import os
 import sys
 
 dirname = os.path.dirname(os.path.realpath(sys.argv[0]))
+=======
+from ctypes import c_uint, c_wchar_p
+import config
+>>>>>>> [structure] Structuring project:hapycolor/color/reducer.py
 
 class ColorReducer():
 
     def __init__(self):
         """ Compiling if necessary and loading the library defining a maximal
             clique algorithm """
+<<<<<<< HEAD:src/color_reducer.py
         library  = "libcolor_reducer"
         source   = dirname + "/color_reducer.cpp"
         compiler = "g++"
@@ -28,6 +34,9 @@ class ColorReducer():
         if not os.path.isfile(library):
             os.system(compiler + " " + options + " " + library_path + " " + source)
         self.lib = cdll.LoadLibrary(library_path)
+=======
+        self.lib = config.get_library()
+>>>>>>> [structure] Structuring project:hapycolor/color/reducer.py
 
     def __distance(self, c1, c2):
         """ The employed distance between colors is the CIEDE2000
@@ -38,7 +47,7 @@ class ColorReducer():
         lab2 = convert_color(hsl2, LabColor)
         return delta_e_cie2000(lab1, lab2)
 
-    def color_reducer(self, colors, threshold):
+    def reduce(self, colors, threshold):
         """ The argument must be a list of colors defined in base HSL.
             The output result contains the maximal number of colors of
             the provided list where each color is at at least a distane
@@ -60,7 +69,7 @@ class ColorReducer():
         out_string = c_wchar_p('\x00' * (len(colors_set) * 2 + 1))
         number_color_in = c_uint(len(graph) // 2)
 
-        self.lib.color_reducer(in_string, number_color_in, out_string)
+        self.lib.reduce(in_string, number_color_in, out_string)
 
         return [colors_set[i] for i in self.__decode_colors_id(out_string.value)]
 
