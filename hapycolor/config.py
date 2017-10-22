@@ -104,8 +104,6 @@ def init_configs():
     for e in filter(f, Feature):
         res = input("Enable " + e.value["name"] + "? (y/n) :")
         is_enabled = False
-        if res.capitalize() == "N":
-            is_enabled = False
         if res.capitalize() == "Y":
             e.value["save"]()
             is_enabled = True
