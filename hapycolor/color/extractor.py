@@ -84,7 +84,7 @@ class Extractor():
         reduced_colors = self.cr.reduce(filtered_colors, self.min_distance)
 
         print("\nReduced colors (" + str(len(reduced_colors)) + "):")
-        visual.print_palette([utils.hsl_to_rgb(c) for c in reduced_colors], size=2)
+        visual.print_palette([helpers.hsl_to_rgb(c) for c in reduced_colors], size=2)
 
         # Sort colors by label
         labeled_colors = self.__label_colors(reduced_colors)
