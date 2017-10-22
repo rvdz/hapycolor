@@ -1,25 +1,20 @@
+from hapycolor import  helpers
+from hapycolor import config
+from hapycolor.color import refine
+
+import pathlib
 import unittest
-import color_filter
-from config import Config, FilterEnum
-import os
-import helpers
 
-class FilterUnitTest(unittest.TestCase):
+class RefineUnitTest(unittest.TestCase):
     def setUp(self):
-        self.cf = color_filter.ColorFilter()
-
-
-    def test_manual_hypeplan_point_exist(self):
-        """ Checks if manual hyperplan point's file exists """
-        for filter_type in FilterEnum:
-            self.assertTrue(os.path.isfile(Config.get_hyperplan_file(filter_type)))
+        self.cf = refine.Refine()
 
 
     def test_json_manual_points(self):
         """ Checks if the provided point from which are generated the hyperplans
             are valid """
-        for filter_type in FilterEnum:
-            self.__test_json_manual_points_single(Config.get_hyperplan_file(filter_type))
+        for filter_type in config.Filter:
+            self.__test_json_manual_points_single(config.hyperplan_file(filter_type))
 
 
     def __test_json_manual_points_single(self, json_file):
