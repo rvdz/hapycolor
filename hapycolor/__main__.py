@@ -47,7 +47,7 @@ def main(args=None):
     for f in config.export_functions():
         f(colors, name)
 
-    print("\nFinal palette (" + str(len(rgbcols)) + "):")
+    print("\nFinal palette (" + str(len(colors["colors"])) + "):")
     visual.print_palette(colors["colors"], size=2)
 
     print("\Foreground color:")

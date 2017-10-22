@@ -1,4 +1,5 @@
 from colormath.color_diff import delta_e_cie2000
+from colormath.color_conversions import convert_color
 from colormath.color_objects import LabColor, HSLColor
 from ctypes import c_uint, c_wchar_p
 
