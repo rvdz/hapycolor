@@ -17,17 +17,17 @@ class OS(enum.Flag):
     LINUX  = 0
     DARWIN = 1
 
+def input_path(prompt):
+    return pathlib.Path(input(prompt)).expanduser()
+
 def save_vim():
     """ Creates the path where the colorscheme will be generated, and stores it
         in the configuration file """
-    plugin_path = input("Path to vim's custom plugins directory: ")
-    p = pathlib.Path(plugin_path).expanduser()
+    p = input_path("Path to vim's custom plugins directory: ")
     if not p.is_absolute():
         p = p.resolve()
 
     if not p.is_dir():
-        # TODO: error management
-        print("ERROR: Path does not exist")
         raise NotImplementedError
 
     p = p / "hapycolor" / "colors"
@@ -39,17 +39,12 @@ def save_vim():
 def save_iterm():
     """ Checks if the iTerm preferences file is correct and save it in the
         configuration file """
-    preferences_path = input("Path to iTerm config file: ")
-    p = pathlib.Path(preferences_path).expanduser()
+    p = input_path("Path to iTerm config file: ")
     if not p.is_absolute():
         p = p.resolve()
     if p.name != "com.googlecode.iterm2.plist":
-        # TODO: error management
-        print("ERROR: incorrect file " + p.as_posix())
         raise NotImplementedError
     if not p.is_file():
-        # TODO: error management
-        print("ERROR: no such file: " + p.as_posix())
         raise NotImplementedError
     save_config("export", "iterm_config", p.as_posix())
 
