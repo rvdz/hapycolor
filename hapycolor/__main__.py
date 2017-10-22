@@ -39,8 +39,9 @@ def main(args=None):
     ap.add_argument("-f", "--file", help="File path to the image", required=True)
     args = vars(ap.parse_args())
 
-    colors = color_extractor.ColorExtractor(args["file"], num_colors=250).get_colors()
     config.init_configs()
+
+    colors = extractor.Extractor(args["file"], num_colors=250).get_colors()
 
     name = colors["wallpaper"].split("/")[-1].split(".")[0]
     for f in config.export_functions():
