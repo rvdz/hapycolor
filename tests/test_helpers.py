@@ -1,5 +1,5 @@
 import unittest
-import utils
+import helpers
 
 class UtilsTest(unittest.TestCase):
     def setUp(self):
@@ -12,7 +12,7 @@ class UtilsTest(unittest.TestCase):
         colors.append((22, 0.111111111111, 0.99999))
 
         for c in colors:
-            self.__test_rgb_color(utils.hsl_to_rgb(c))
+            self.__test_rgb_color(helpers.hsl_to_rgb(c))
 
     def __test_rgb_color(self, color):
         self.assertEqual(len(color), 3)
@@ -33,4 +33,4 @@ class UtilsTest(unittest.TestCase):
         colors.append((12, 3, 5))
 
         for c in colors:
-            self.__test_hsl_color(utils.rgb_to_hsl(c))
+            self.__test_hsl_color(helpers.rgb_to_hsl(c))

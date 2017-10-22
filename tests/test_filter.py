@@ -2,7 +2,7 @@ import unittest
 import color_filter
 from config import Config, FilterEnum
 import os
-import utils
+import helpers
 
 class FilterUnitTest(unittest.TestCase):
     def setUp(self):
@@ -23,7 +23,7 @@ class FilterUnitTest(unittest.TestCase):
 
 
     def __test_json_manual_points_single(self, json_file):
-        data = utils.load_json(json_file)
+        data = helpers.load_json(json_file)
         self.assertTrue(len(data) >= 100)
         H = [e[0] for e in data]
         S = [e[1] for e in data]

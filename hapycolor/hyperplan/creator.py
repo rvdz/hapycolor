@@ -1,6 +1,6 @@
-import color_filter
+import color.filter
 import cv2
-import utils
+import helpers
 import numpy as np
 import random
 import argparse
@@ -52,15 +52,15 @@ class HyperplanCreator():
     def __init_keys(self):
         """ Returns an enumeration called 'Key', that matches each key to its openCV's value """
         keys = {}
-        if not os.path.isfile(config.Config.keys_file):
+        if not os.path.isfile(config.get_keys()):
             cv2.namedWindow('Key setter', cv2.WINDOW_NORMAL)
             cv2.resizeWindow('HyperplanCreator', 10, 10)
             for k in ["UP", "DOWN", "RIGHT", "LEFT", "RETURN", "DELETE"]:
                 print("Press key: " + str(k))
                 keys[k] = cv2.waitKey(0)
-            utils.save_json(config.Config.keys_file, keys)
+            helpers.save_json(config.get_keys(), keys)
         else:
-            keys = utils.load_json(config.Config.keys_file)
+            keys = helpers.load_json(config.get_keys())
         return IntEnum("Key", [(k, keys[k]) for k in keys])
 
 
@@ -90,7 +90,7 @@ class HyperplanCreator():
         """ Creates an image where on top sits a rectangle of the given color
             and on bottom, lays a text which color is the one provided over a
             black background """
-        r, g, b = utils.hsl_to_rgb(hsl_color)
+        r, g, b = helpers.hsl_to_rgb(hsl_color)
         image = np.zeros((self.HEIGHT, self.WIDTH, 3), np.uint8)
         image[self.HEIGHT//2:] = (0,0,0)
         cv2.putText(image, "Ben deja on", (20, int(self.HEIGHT//4.0)),
@@ -145,7 +145,7 @@ class HyperplanCreator():
 
     def calibrate_luminosity_hyperplan(self):
         print("Calibrating luminosity")
-        self.cf = color_filter.ColorFilter()
+        self.cf = color.filter.ColorFilter()
         colors = []
         for i in range(self.calibration_points):
             colors.append((random.randint(0, 360), random.random(), random.random()))
@@ -163,7 +163,7 @@ class HyperplanCreator():
 
     def __update_json(self, color):
         """ Finds nearest point to 'color' and update its luminosity """
-        colors = utils.load_json(self.hyperplan_file)
+        colors = helpers.load_json(self.hyperplan_file)
         distances = {}
         for c in colors:
             distances[tuple(c)] = self.__distance(c[:2], color[:2])
@@ -174,7 +174,7 @@ class HyperplanCreator():
         new_colors = list(distances)
         new_colors.append((old_color[0], old_color[1], c[2]))
         # TODO: In debug phase, do not alter the hyperplan file
-        utils.save_json(self.hyperplan_file, new_colors)
+        helpers.save_json(self.hyperplan_file, new_colors)
 
 
     def __distance(self, P1, P2):
@@ -196,14 +196,14 @@ class HyperplanCreator():
                 res = self.__refresh_image((h, s, l), l)
                 if res == -1:
                     colors.append((h, s, l))
-                    utils.save_json(self.hyperplan_file, colors)
+                    helpers.save_json(self.hyperplan_file, colors)
                     break
                 elif res == -2 and colors:
                     tmp_h, tmp_s, _ = colors.pop()
                     sources.append((tmp_h, tmp_s))
                 else:
                     l = res
-        utils.save_json(self.hyperplan_file, colors)
+        helpers.save_json(self.hyperplan_file, colors)
 
 
     def saturation_hyperplan(self):
@@ -219,14 +219,14 @@ class HyperplanCreator():
                 res = self.__refresh_image((h, s, l), s)
                 if res == -1:
                     colors.append((h, s, l))
-                    utils.save_json(self.hyperplan_file, colors)
+                    helpers.save_json(self.hyperplan_file, colors)
                     break
                 elif res == -2 and colors:
                     tmp_h, _, tmp_l = colors.pop()
                     sources.append((tmp_h, tmp_l))
                 else:
                     s = res
-        utils.save_json(self.hyperplan_file, colors)
+        helpers.save_json(self.hyperplan_file, colors)
 
 
 def filter_type(t):
