@@ -32,7 +32,7 @@
 #include <cwchar>
 
 extern "C" {
-  void color_reducer(wchar_t* input_char, uint32_t length, wchar_t* output_char);
+  void reduce(wchar_t* input_char, uint32_t length, wchar_t* output_char);
 }
 
 using namespace std;
@@ -82,7 +82,7 @@ void write_colors(int* results, int size, wchar_t* output_char) {
  * @param length      the number of couple of vertices in the graph having a common edge
  * @param output_char the string in which the encoded result will be stored
  */
-void color_reducer(wchar_t* input_char, uint32_t length, wchar_t* output_char) {
+void reduce(wchar_t* input_char, uint32_t length, wchar_t* output_char) {
   bool **conn;
   int size;
   read_colors(input_char, length, conn, size);

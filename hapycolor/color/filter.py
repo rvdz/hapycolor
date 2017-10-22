@@ -1,9 +1,8 @@
 from scipy import interpolate
 from matplotlib import pyplot as plt
-# TODO: remove: from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sys
-import utils
+import helpers
 import config
 
 class ColorFilter():
@@ -16,15 +15,15 @@ class ColorFilter():
         self.Y         = grid_y[0]
 
         self.dark_Z = self.__generate_luminosity_hyperplan(             \
-                            config.Config.get_hyperplan_file(config.FilterEnum.DARK), \
+                            config.hyperplan_file(config.Filter.DARK), \
                             grid_x, grid_y)
 
         self.bright_Z = self.__generate_luminosity_hyperplan(
-                            config.Config.get_hyperplan_file(config.FilterEnum.BRIGHT), \
+                            config.hyperplan_file(config.Filter.BRIGHT), \
                             grid_x, grid_y)
 
         self.grey_interpolation = self.__generate_saturation_hyperplan( \
-                                        config.Config.get_hyperplan_file(config.FilterEnum.SATURATION))
+                                        config.hyperplan_file(config.Filter.SATURATION))
 
 
     def __generate_luminosity_hyperplan(self, json_file, grid_x, grid_y):
@@ -32,7 +31,7 @@ class ColorFilter():
             TODO: This should be replaced by a function that only load a json file where
             that contains the interpolated points instead of regenating them each time """
         # Load the provided points
-        data   = utils.load_json(json_file)
+        data   = helpers.load_json(json_file)
 
         # Convert points to catesian
         points   = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in data])
@@ -52,7 +51,7 @@ class ColorFilter():
             that contains the interpolated points instead of regenating them each time """
 
         # Load the provided points
-        grey_data   = utils.load_json(json_file)
+        grey_data   = helpers.load_json(json_file)
 
         # Interpolate the data
         H = [e[0] for e in grey_data]
