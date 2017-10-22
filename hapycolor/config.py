@@ -18,11 +18,12 @@ class OS(enum.Flag):
     DARWIN = 1
 
 def input_path(prompt):
+    """ Prompts the user and retrives a 'Path' object """
     return pathlib.Path(input(prompt)).expanduser()
 
 def save_vim():
     """ Creates the path where the colorscheme will be generated, and stores it
-        in the configuration file """
+        in the project configuration file """
     p = input_path("Path to vim's custom plugins directory: ")
     if not p.is_absolute():
         p = p.resolve()
@@ -38,7 +39,7 @@ def save_vim():
 
 def save_iterm():
     """ Checks if the iTerm preferences file is correct and save it in the
-        configuration file """
+        project configuration file """
     p = input_path("Path to iTerm config file: ")
     if not p.is_absolute():
         p = p.resolve()
@@ -56,42 +57,59 @@ def save_config(section, key, value):
     with open(project_config, "w") as f:
         config.write(f)
 
-
 class Feature(enum.Enum):
-    """ Links the name, system compatibility, configuration save function,
-        export function and configuration key to a feature """
-    VIM            = {"name"    : "Vim",
-                      "os"      : OS.LINUX | OS.DARWIN,
-                      "save"    : save_vim,
-                      "export"  : iterm.Iterm.profile,
-                      "key"     : "colorscheme_vim"}
+    """ Links each feature with its:
+            - name
+            - system compatibility
+            - configuration save function
+            - export function
+            - boolean indicating if the feature has been enabled
+            - configuration value's key
+                                    """
 
-    ITERM          = {"name"    : "iTerm",
-                      "os"      : OS.DARWIN,
-                      "save"    : save_iterm,
-                      "export"  : vim.Vim.profile,
-                      "key"     : "iterm_config"}
+    VIM            = {"name"     : "Vim",
+                      "os"       : OS.LINUX | OS.DARWIN,
+                      "save"     : save_vim,
+                      "export"   : iterm.Iterm.profile,
+                      "support"  : "vim_support",
+                      "key"      : "colorscheme_vim"}
 
-    GNOME_TERMINAL = {"name"    : "gnome-terminal",
-                      "os"      : OS.LINUX,
-                      "save"    : NotImplemented,
-                      "export"  : NotImplemented,
-                      "key"     : "gnome"}
+    ITERM          = {"name"     : "iTerm",
+                      "os"       : OS.DARWIN,
+                      "save"     : save_iterm,
+                      "export"   : vim.Vim.profile,
+                      "support"  : "iterm_support",
+                      "key"      : "iterm_config"}
+
+    GNOME_TERMINAL = {"name"     : "gnome-terminal",
+                      "os"       : OS.LINUX,
+                      "save"     : NotImplemented,
+                      "export"   : NotImplemented,
+                      "support"  : "gnome_terminal_support",
+                      "key"      : "gnome"}
 
 def init_configs():
+    """ Intializes the features that are compatible and not disabled """
     config = load_config("export")
 
     readline.set_completer_delims(' \t\n;')
     readline.parse_and_bind("tab: complete")
     readline.set_completer(readline.get_completer())
 
-    # Filters undefined compatible features
-    f = lambda x: x.value["os"] == os() and x.value["key"] not in config
+    # Filters undefined compatible and not disabled features
+    f = lambda x: x.value["os"] == os() \
+            and (x.value["support"] not in config or config[x.value["support"]] != "False") \
+            and x.value["key"] not in config
 
     for e in filter(f, Feature):
         res = input("Enable " + e.value["name"] + "? (y/n) :")
+        is_enabled = False
+        if res.capitalize() == "N":
+            is_enabled = False
         if res.capitalize() == "Y":
             e.value["save"]()
+            is_enabled = True
+        save_config("export", e.value["support"], str(is_enabled))
 
 
 ############################# Access Config ####################################
@@ -152,13 +170,13 @@ def get_reduce_library():
     return ctypes.cdll.LoadLibrary(config["library"] + library_type)
 
 def export_functions():
-    """ Retrives the export functions for features enabled """
+    """ Retrives the export functions for the enabled features """
     config = load_config("export")
-    f = lambda x: x.value["os"] == os() and x.value["key"] in config
+    f = lambda x: x.value["os"] == os() and config[x.value["support"]] == "True"
     return map(lambda x : x.value["export"], filter(f, Feature))
 
 ############################# Color Filter #####################################
 class Filter(enum.Enum):
-    BRIGHT     = 0
-    DARK       = 1
-    SATURATION = 2
+    BRIGHT     = 1
+    DARK       = 2
+    SATURATION = 3
