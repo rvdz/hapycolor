@@ -4,6 +4,9 @@ from colormath.color_conversions import convert_color
 from platform import system
 from ctypes import cdll, c_uint, c_wchar_p
 import os
+import sys
+
+dirname = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 class ColorReducer():
 
@@ -11,7 +14,7 @@ class ColorReducer():
         """ Compiling if necessary and loading the library defining a maximal
             clique algorithm """
         library  = "libcolor_reducer"
-        source   = "color_reducer.cpp"
+        source   = dirname + "/color_reducer.cpp"
         compiler = "g++"
         options  = "-std=c++11 -O3"
         if system() == "Darwin":
@@ -21,9 +24,10 @@ class ColorReducer():
             options = options + " -fPIC -shared -o"
             library = library + ".so"
 
+        library_path = dirname + "/" + library
         if not os.path.isfile(library):
-            os.system(compiler + " " + options + " " + library + " " + source)
-        self.lib = cdll.LoadLibrary("./" + library)
+            os.system(compiler + " " + options + " " + library_path + " " + source)
+        self.lib = cdll.LoadLibrary(library_path)
 
     def __distance(self, c1, c2):
         """ The employed distance between colors is the CIEDE2000
