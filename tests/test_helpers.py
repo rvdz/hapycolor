@@ -1,7 +1,8 @@
-import unittest
-import helpers
+from hapycolor import helpers
 
-class UtilsTest(unittest.TestCase):
+import unittest
+
+class HelpersTest(unittest.TestCase):
     def setUp(self):
         pass
 
