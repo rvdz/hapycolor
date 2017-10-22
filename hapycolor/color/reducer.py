@@ -1,42 +1,15 @@
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import LabColor, HSLColor
-from colormath.color_conversions import convert_color
-<<<<<<< HEAD:src/color_reducer.py
-from platform import system
-from ctypes import cdll, c_uint, c_wchar_p
-import os
-import sys
-
-dirname = os.path.dirname(os.path.realpath(sys.argv[0]))
-=======
 from ctypes import c_uint, c_wchar_p
-import config
->>>>>>> [structure] Structuring project:hapycolor/color/reducer.py
 
-class ColorReducer():
+from hapycolor import config
+
+class Reducer():
 
     def __init__(self):
         """ Compiling if necessary and loading the library defining a maximal
             clique algorithm """
-<<<<<<< HEAD:src/color_reducer.py
-        library  = "libcolor_reducer"
-        source   = dirname + "/color_reducer.cpp"
-        compiler = "g++"
-        options  = "-std=c++11 -O3"
-        if system() == "Darwin":
-            options = options + " -dynamiclib -o"
-            library = library + ".dylib"
-        else:
-            options = options + " -fPIC -shared -o"
-            library = library + ".so"
-
-        library_path = dirname + "/" + library
-        if not os.path.isfile(library):
-            os.system(compiler + " " + options + " " + library_path + " " + source)
-        self.lib = cdll.LoadLibrary(library_path)
-=======
-        self.lib = config.get_library()
->>>>>>> [structure] Structuring project:hapycolor/color/reducer.py
+        self.lib = config.get_reduce_library()
 
     def __distance(self, c1, c2):
         """ The employed distance between colors is the CIEDE2000

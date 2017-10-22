@@ -1,4 +1,5 @@
 import json
+
 """ Utilitary methods to convert color types  """
 
 def contrast(rgbcolor):
