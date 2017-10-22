@@ -90,24 +90,25 @@ class Extractor():
         labeled_colors = self.__label_colors(reduced_colors)
         #print("Labels :")
         #for i, l in enumerate(labeled_colors):
-        #    visual.print_palette([utils.hsl_to_rgb(c) for c in l], size=1)
+        #    visual.print_palette([helpers.hsl_to_rgb(c) for c in l], size=1)
 
         # Flatten the list and convert colors to rgb format
         all_colors = [col for label in labeled_colors for col in label]
-        rgb_colors = [utils.hsl_to_rgb(col) for col in all_colors]
+        rgb_colors = [helpers.hsl_to_rgb(col) for col in all_colors]
         #print("\nColors by label (" + str(len(rgb_colors)) + "):")
         #visual.print_palette(rgb_colors, size=2)
 
         # Ensure that the final palette contains at least 16 colors
         # FIXME to be improved, we could repeat different colors from different label
         # instead of just the last one
-        hex_colors = [utils.rgb_to_hex(col) for col in rgb_colors]
-        while (len(hex_colors) < 16):
-            hex_colors.append(hex_colors[-1])
+        while (len(rgb_colors) < 16):
+            rgb_colors.append(rgb_colors[-1])
 
-        # FIXME we shouldn't use a dictionnary to store this type of data (plz no random)
-        for i, c in enumerate(hex_colors):
-            final_colors["colors"]["color%s" % i] = c
+        # TODO: What do we do if there are n > 16 colors?
+        if len(rgb_colors) > 16:
+            final_colors["colors"] = rgb_colors[:16]
+        else:
+            final_colors["colors"] = rgb_colors[:]
 
         return final_colors
 
