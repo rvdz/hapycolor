@@ -8,10 +8,13 @@ import readline
 import pathlib
 import platform
 import subprocess
+import os.path
+import os.path as pth
 
 ########################## Initialize Config ###################################
 
-project_config = "hapycolor/config.ini"
+ROOT_DIR = pth.dirname(pth.abspath(__file__))
+project_config = ROOT_DIR + "/config.ini"
 
 class OS(enum.Flag):
     LINUX  = 0
@@ -70,14 +73,14 @@ class Feature(enum.Enum):
     VIM            = {"name"     : "Vim",
                       "os"       : OS.LINUX | OS.DARWIN,
                       "save"     : save_vim,
-                      "export"   : iterm.Iterm.profile,
+                      "export"   : vim.Vim.profile,
                       "support"  : "vim_support",
                       "key"      : "colorscheme_vim"}
 
     ITERM          = {"name"     : "iTerm",
                       "os"       : OS.DARWIN,
                       "save"     : save_iterm,
-                      "export"   : vim.Vim.profile,
+                      "export"   : iterm.Iterm.profile,
                       "support"  : "iterm_support",
                       "key"      : "iterm_config"}
 
@@ -123,7 +126,7 @@ def load_config(section):
     return config[section]
 
 def get_keys():
-    return load_config("hyerplan")["keys"]
+    return ROOT_DIR + load_config("hyerplan")["keys"]
 
 def os():
     if platform.system() == "Darwin":
@@ -132,21 +135,23 @@ def os():
         return OS.LINUX
 
 def iterm_template():
-    return load_config("export")["iterm_template"]
+    return ROOT_DIR + "/" + load_config("export")["iterm_template"]
 
 def iterm_config():
     return load_config("export")["iterm_config"]
 
 def hyperplan_file(filter_type):
     config = load_config("hyperplan")
+    path = ROOT_DIR + "/"
     if filter_type == Filter.DARK:
-        return config["dark"]
+        path += config["dark"]
     elif filter_type == Filter.BRIGHT:
-        return config["bright"]
+        path += config["bright"]
     elif filter_type == Filter.SATURATION:
-        return config["saturation"]
+        path += config["saturation"]
     else:
         raise AttributeError("Unknown filter type")
+    return path
 
 def get_reduce_library():
     """ Compiles if necessary and load the reducer library """
@@ -161,16 +166,16 @@ def get_reduce_library():
         library_type = ".so"
 
     command = [[config["compiler"]], config["options"].split(), system_options, \
-               ["-o"], [config["library"] + library_type], [config["source"]]]
-    if not pathlib.Path(config["library"] + library_type).is_file():
+               ["-o"], [ROOT_DIR + "/" + config["library"] + library_type], [ROOT_DIR + "/" + config["source"]]]
+    if not pathlib.Path(ROOT_DIR + "/" + config["library"] + library_type).is_file():
         p = subprocess.Popen([item for sublist in command for item in sublist])
         p.wait()
-    return ctypes.cdll.LoadLibrary(config["library"] + library_type)
+    return ctypes.cdll.LoadLibrary(ROOT_DIR + "/" + config["library"] + library_type)
 
 def export_functions():
     """ Retrives the export functions for the enabled features """
     config = load_config("export")
-    f = lambda x: x.value["os"] == os() and config[x.value["support"]] == "True"
+    f = lambda x: (x.value["os"] == os()) and (config[x.value["support"]] == "True")
     return map(lambda x : x.value["export"], filter(f, Feature))
 
 ############################# Color Filter #####################################

@@ -3,7 +3,8 @@ Generates beautiful color palettes from images.
 
 hapycolor uses imagemagick and various filter algorithms to select the best colors from a picture.
 
-## Requirements
+## Usage
+### Requirements
 - Debian Stretch or macOS Sierra
 
 ### Dependencies
@@ -24,4 +25,16 @@ __Other__:
 __Install python dependencies with pip__(> 9.0.1):
 ```sh
 pip3 install colormath scipy matplotlib numpy Pillow
+```
+
+### Installation
+In order to install this project, run:
+```sh
+python3 setup.py install
+```
+
+### Run
+To run the program execute:
+```sh
+hapycolor -f [path/to/file]
 ```

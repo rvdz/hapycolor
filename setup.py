@@ -73,8 +73,7 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    py_modules=['hapycolor'],
-    # packages=find_packages(exclude=('tests',)),
+    packages=find_packages(exclude=('tests',)),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
