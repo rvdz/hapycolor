@@ -1,1 +1,4 @@
-include README.md LICENCE hapycolor setup.py
+include README.md LICENCE setup.py
+include hapycolor/hyperplan/*
+include hapycolor/export/*
+include hapycolor/color/*
