@@ -1,11 +1,12 @@
-from scipy import interpolate
+from hapycolor import config
+from hapycolor import helpers
+
 from matplotlib import pyplot as plt
+from scipy import interpolate
 import numpy as np
 import sys
-import helpers
-import config
 
-class ColorFilter():
+class Refine():
 
 
     def __init__(self):
