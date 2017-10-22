@@ -1,9 +1,11 @@
-import json
-import xml.etree.ElementTree as ET
+from hapycolor import config
+from hapycolor import helpers
+
 import enum
+import json
 import re
-import helpers
-import config
+import xml.etree.ElementTree as ET
+
 
 class Iterm:
 
