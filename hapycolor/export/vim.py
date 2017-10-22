@@ -1,6 +1,5 @@
-import helpers
-import config
-# import export.target as trgt
+from hapycolor import config
+from hapycolor import helpers
 
 class Vim:
     header = '''
@@ -29,9 +28,9 @@ let g:colors_name = "hapycolor"'''
                    ["Label","Operator"]]
 
     @staticmethod
-    def profile(palette):
+    def profile(palette, name):
         assert(len(palette["colors"]) == len(Vim.groups))
-        with open(config.vim(), "w") as f:
+        with open(config.vim(), "w+") as f:
             f.write(Vim.header + "\n\n")
             l = ["hi " + Vim.foreground, "guifg=" + helpers.rgb_to_hex(palette["foreground"]) + "\n"]
             f.write("{: <20}  {: <20}".format(*l))

@@ -1,13 +1,14 @@
-import color.filter
-import cv2
-import helpers
-import numpy as np
-import random
-import argparse
-import os.path
-from math import sqrt, cos, sin
-import config
+from . import color.filter
+from . import config
+from . import helpers
+
 from enum import IntEnum
+from math import sqrt, cos, sin
+import argparse
+import cv2
+import numpy as np
+import pathlib
+import random
 
 class HyperplanCreator():
     def __init__(self, filter_type, is_calibrating):
@@ -52,7 +53,7 @@ class HyperplanCreator():
     def __init_keys(self):
         """ Returns an enumeration called 'Key', that matches each key to its openCV's value """
         keys = {}
-        if not os.path.isfile(config.get_keys()):
+        if not pathlib.Path(config.get_keys().is_file()):
             cv2.namedWindow('Key setter', cv2.WINDOW_NORMAL)
             cv2.resizeWindow('HyperplanCreator', 10, 10)
             for k in ["UP", "DOWN", "RIGHT", "LEFT", "RETURN", "DELETE"]:

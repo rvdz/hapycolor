@@ -1,17 +1,20 @@
-import helpers
-import color.filter
-import color.reducer
-import visual
-from ast import literal_eval as make_tuple
-import subprocess as sp
-import re
+# TODO: Find a synonym of filter
+from hapycolor import helpers
+from hapycolor import visual
 
-class ColorExtractor():
+from . import refine
+from . import reducer
+
+from ast import literal_eval as make_tuple
+import re
+import subprocess as sp
+
+class Extractor():
 
     def __init__(self, image, num_colors):
 
-        self.cf = color.filter.ColorFilter()
-        self.cr = color.reducer.ColorReducer()
+        self.cf = refine.Refine()
+        self.cr = reducer.Reducer()
         self.image = image
         self.num_colors = num_colors
         self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
