@@ -25,3 +25,9 @@ __Install python dependencies with pip__(> 9.0.1):
 ```sh
 pip3 install colormath scipy matplotlib numpy Pillow
 ```
+
+#### Comments
+- Check if you have force_color_prompt=no in your .bashrc
+- Remove any wal calls in your .bashrc or .zshrc
+- zshrc themes does not interfer with hapycolor
+- Uncheck the "use system colors" box in gnome terminal color options
