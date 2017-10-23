@@ -16,7 +16,7 @@ import os.path as pth
 ROOT_DIR = pth.dirname(pth.abspath(__file__))
 project_config = ROOT_DIR + "/config.ini"
 
-class OS(enum.Flag):
+class OS(enum.Enum):
     LINUX  = 0
     DARWIN = 1
 
@@ -60,51 +60,58 @@ def save_config(section, key, value):
     with open(project_config, "w") as f:
         config.write(f)
 
-class Feature(enum.Enum):
-    """ Links each feature with its:
+class Target(enum.Enum):
+    """ Links each target with its:
             - name
             - system compatibility
             - configuration save function
             - export function
-            - boolean indicating if the feature has been enabled
+            - boolean indicating if the target has been enabled
             - configuration value's key
                                     """
 
     VIM            = {"name"     : "Vim",
-                      "os"       : OS.LINUX | OS.DARWIN,
+                      "os"       : [OS.LINUX, OS.DARWIN],
                       "save"     : save_vim,
                       "export"   : vim.Vim.profile,
                       "support"  : "vim_support",
                       "key"      : "colorscheme_vim"}
 
     ITERM          = {"name"     : "iTerm",
-                      "os"       : OS.DARWIN,
+                      "os"       : [OS.DARWIN],
                       "save"     : save_iterm,
                       "export"   : iterm.Iterm.profile,
                       "support"  : "iterm_support",
                       "key"      : "iterm_config"}
 
     GNOME_TERMINAL = {"name"     : "gnome-terminal",
-                      "os"       : OS.LINUX,
+                      "os"       : [OS.LINUX],
                       "save"     : NotImplemented,
                       "export"   : NotImplemented,
                       "support"  : "gnome_terminal_support",
                       "key"      : "gnome"}
 
+    # WALLPAPER       = {"name"    : "wallpaper",
+    #                   "os"       : [OS.LINUX, OS.DARWIN],
+    #                    "save"    : NotImplemented,
+    #                    "export"  : NotImplemented,
+    #                    "support" : "wallpaper_support",
+    #                    "key"     : NotImplemented}
+
 def init_configs():
-    """ Intializes the features that are compatible and not disabled """
+    """ Intializes the target that are compatible and not disabled """
     config = load_config("export")
 
     readline.set_completer_delims(' \t\n;')
     readline.parse_and_bind("tab: complete")
     readline.set_completer(readline.get_completer())
 
-    # Filters undefined compatible and not disabled features
-    f = lambda x: x.value["os"] == os() \
+    # Filters undefined compatible and not disabled target
+    f = lambda x: os() in x.value["os"] \
             and (x.value["support"] not in config or config[x.value["support"]] != "False") \
             and x.value["key"] not in config
 
-    for e in filter(f, Feature):
+    for e in filter(f, Target):
         res = input("Enable " + e.value["name"] + "? (y/n) :")
         is_enabled = False
         if res.capitalize() == "Y":
@@ -173,10 +180,10 @@ def get_reduce_library():
     return ctypes.cdll.LoadLibrary(ROOT_DIR + "/" + config["library"] + library_type)
 
 def export_functions():
-    """ Retrives the export functions for the enabled features """
+    """ Retrives the export functions for the enabled target """
     config = load_config("export")
-    f = lambda x: (x.value["os"] == os()) and (config[x.value["support"]] == "True")
-    return map(lambda x : x.value["export"], filter(f, Feature))
+    f = lambda x: (os() in x.value["os"]) and (config[x.value["support"]] == "True")
+    return map(lambda x : x.value["export"], filter(f, Target))
 
 ############################# Color Filter #####################################
 class Filter(enum.Enum):

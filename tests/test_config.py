@@ -38,17 +38,17 @@ class ConifgTest(unittest.TestCase):
             config.save_iterm()
 
 
-    # This test could be removed if the Feature dictionnaries were correctly typed
+    # This test could be removed if the Target dictionnaries were correctly typed
     def test_features(self):
-        """ Assert that the Feature enum is correctly defined """
+        """ Assert that the Target enum is correctly defined """
         import types
 
         keys = ["name", "os", "save", "export", "key"]
-        for e in config.Feature:
+        for e in config.Target:
             for k in keys:
                 self.assertTrue(k in e.value)
                 if k == "os":
-                    self.assertTrue(e.value[k] in config.OS)
+                    self.assertTrue(all([(os in config.OS) for os in e.value[k]]))
                 if k == "save" or k == "export":
                     self.assertTrue(type(e.value[k]) == types.FunctionType \
                                         or e.value[k] == NotImplemented)
