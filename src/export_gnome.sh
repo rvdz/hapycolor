@@ -55,58 +55,26 @@ dlist_append() {
     "$DCONF" write "$key" "[$entries]"
 }
 
+if [[ "$1" -eq "-h" ]]; then
+	echo "usage: bash export_gnome.sh <Profile Name> <path/to/tmp/file> [<path/to/terminal/profiles> | ]"
+	exit 0
+fi
 
-##### TEST LINES
-COLOR_01="#000000"           # HOST
-COLOR_02="#e52222"           # SYNTAX_STRING
-COLOR_03="#a6e32d"           # COMMAND
-COLOR_04="#fc951e"           # COMMAND_COLOR2
-COLOR_05="#c48dff"           # PATH
-COLOR_06="#fa2573"           # SYNTAX_VAR
-COLOR_07="#67d9f0"           # PROMP
-COLOR_08="#f2f2f2"           #
+# first argument is profile name
+PROFILE_NAME=$1; shift
+# second argument is tmp file with colors
+i=1
+while IFS='' read -r line || [[ -n "$line" ]]; do
+	declare "COLOR_$i=$(gnome_color \"$line\")"
+	((i++))
+done < "$1"
+# first before last one is background
+BACKGROUND_COLOR=$COLOR_17
+# last is foreground
+FOREGROUND_COLOR=$COLOR_18
 
-COLOR_09="#555555"           #
-COLOR_10="#ff5555"           # COMMAND_ERROR
-COLOR_11="#55ff55"           # EXEC
-COLOR_12="#ffff55"           #
-COLOR_13="#5555ff"           # FOLDER
-COLOR_14="#ff55ff"           #
-COLOR_15="#55ffff"           #
-COLOR_16="#ffffff"           #
-
-BACKGROUND_COLOR="#000000"   # Background Color
-FOREGROUND_COLOR="#555555"   # Text
-CURSOR_COLOR="$FOREGROUND_COLOR" # Cursor
-PROFILE_NAME="TEST"
-##### END TEST
-
-# |
-# | Applying values on gnome-terminal
-# | ===========================================
-BACKGROUND_COLOR=$(gnome_color $BACKGROUND_COLOR)
-FOREGROUND_COLOR=$(gnome_color $FOREGROUND_COLOR)
-COLOR_01=$(gnome_color $COLOR_01)
-COLOR_02=$(gnome_color $COLOR_02)
-COLOR_03=$(gnome_color $COLOR_03)
-COLOR_04=$(gnome_color $COLOR_04)
-COLOR_05=$(gnome_color $COLOR_05)
-COLOR_06=$(gnome_color $COLOR_06)
-COLOR_07=$(gnome_color $COLOR_07)
-COLOR_08=$(gnome_color $COLOR_08)
-COLOR_09=$(gnome_color $COLOR_09)
-COLOR_10=$(gnome_color $COLOR_10)
-COLOR_11=$(gnome_color $COLOR_11)
-COLOR_12=$(gnome_color $COLOR_12)
-COLOR_13=$(gnome_color $COLOR_13)
-COLOR_14=$(gnome_color $COLOR_14)
-COLOR_15=$(gnome_color $COLOR_15)
-COLOR_16=$(gnome_color $COLOR_16)
-
-
-# |
-# | Apply Variables
-# | ===========================================
+shift; BASE_KEY_NEW=$1
+[[ -z "$BASE_KEY_NEW" ]] && BASE_KEY_NEW=/org/gnome/terminal/legacy/profiles:
 
 [[ -z "$PROFILE_NAME" ]] && PROFILE_NAME="Default"
 [[ -z "$PROFILE_SLUG" ]] && PROFILE_SLUG="Default"
@@ -115,22 +83,27 @@ COLOR_16=$(gnome_color $COLOR_16)
 
 # Newest versions of gnome-terminal use dconf
 if which "$DCONF" > /dev/null 2>&1; then
-	[[ -z "$BASE_KEY_NEW" ]] && BASE_KEY_NEW=/org/gnome/terminal/legacy/profiles:
 
-	if [[ -n "`$DCONF list $BASE_KEY_NEW/`" ]]; then
-		if which "$UUIDGEN" > /dev/null 2>&1; then
-			PROFILE_SLUG=`uuidgen`
-		fi
+    if which "$UUIDGEN" > /dev/null 2>&1; then
+        PROFILE_SLUG=`uuidgen`
+    fi
 
-		if [[ -n "`$DCONF read $BASE_KEY_NEW/default`" ]]; then
-			DEFAULT_SLUG=`$DCONF read $BASE_KEY_NEW/default | tr -d \'`
-		else
-			DEFAULT_SLUG=`$DCONF list $BASE_KEY_NEW/ | grep '^:' | head -n1 | tr -d :/`
-		fi
+    if [[ -n "`$DCONF read $BASE_KEY_NEW/default`" ]]; then
+        DEFAULT_SLUG=`$DCONF read $BASE_KEY_NEW/default | tr -d \'`
+    else
+        DEFAULT_SLUG=`$DCONF list $BASE_KEY_NEW/ | grep '^:' | head -n1 | tr -d :/`
+    fi
 
-		DEFAULT_KEY="$BASE_KEY_NEW/:$DEFAULT_SLUG"
-		PROFILE_KEY="$BASE_KEY_NEW/:$PROFILE_SLUG"
+    DEFAULT_KEY="$BASE_KEY_NEW/:$DEFAULT_SLUG"
+    PROFILE_KEY="$BASE_KEY_NEW/:$PROFILE_SLUG"
 
+    # because list is empty after reset
+	if [[ ! -n "`$DCONF list $BASE_KEY_NEW/`" ]]; then
+        dset use-theme-colors "true"
+        dset use-theme-colors "false"
+    fi
+
+    if [[ -n "'$DCONF list $BASE_KEY_NEW/'" ]]; then
 		# copy existing settings from default profile
 		$DCONF dump "$DEFAULT_KEY/" | $DCONF load "$PROFILE_KEY/"
 
@@ -143,6 +116,9 @@ if which "$DCONF" > /dev/null 2>&1; then
 
         unset PROFILE_NAME
 		unset PROFILE_SLUG
+        unset PROFILE_KEY
+        unset DEFAULT_KEY
+        unset BASE_KEY_NEW
 		unset DCONF
 		unset UUIDGEN
 		exit 0
