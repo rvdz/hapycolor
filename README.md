@@ -43,3 +43,8 @@ To run the program execute:
 ```sh
 hapycolor -f [path/to/file]
 ```
+#### Comments
+- Check if you have force_color_prompt=no in your .bashrc
+- Remove any wal calls in your .bashrc or .zshrc
+- zshrc themes does not interfer with hapycolor
+- Uncheck the "use system colors" box in gnome terminal color options
