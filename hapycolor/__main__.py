@@ -44,7 +44,7 @@ def main(args=None):
     colors = extractor.Extractor(args["file"], num_colors=250).get_colors()
 
     name = colors["wallpaper"].split("/")[-1].split(".")[0]
-    for f in config.export_functions():
+    for f in config.get_export_functions():
         f(colors, name)
 
     print("\nFinal palette (" + str(len(colors["colors"])) + "):")

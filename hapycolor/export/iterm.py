@@ -73,15 +73,15 @@ class Iterm:
         # Retrieves all the profiles' guids
 
         profiles = root
-        for i, n in enumerate(root):
+        for n in root:
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                profiles = root[i+1]
+                profiles = next(n)
 
         guids = []
         for p in profiles:
-            for i, n in enumerate(p):
+            for n in p:
                 if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.GUID:
-                    guid = p[i+1].text.split("-")
+                    guid = next(n).text.split("-")
                     guids.append([int(i, 16) for i in guid])
 
         assert(len(guids) > 0)
@@ -167,12 +167,11 @@ class Iterm:
         Iterm.__set_guid(template_root, root)
 
         # Append profile to profile list
-        for i, n in enumerate(root):
+        for n in root:
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                root[i+1].text = "\n\t\t"
-                root[i+1].append(template_root)
+                next(n).text = "\n\t\t"
+                next(n).append(template_root)
 
         # Save changes
         with open(config.iterm_config(), "wb") as f:
             f.write(ET.tostring(config_tree.getroot()))
-

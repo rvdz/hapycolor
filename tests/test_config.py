@@ -16,25 +16,25 @@ class ConifgTest(unittest.TestCase):
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./README.md").expanduser())
     def test_vim_file(self, input):
         """ Assert that 'save_vim' fails when a file is provided """
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(config.WrongInputError):
             config.save_vim()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("~").expanduser())
     def test_iterm_fail_with_directory(self, input):
         """ Assert that 'save_iterm' fails when a directory is provided """
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(config.WrongInputError):
             config.save_iterm()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./com.googlecode.iterm2.plist").expanduser())
     def test_iterm_fail_with_incorrect_file_1(self, input):
         """ Assert that 'save_iterm' fails when an unexisting file is provided """
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(config.WrongInputError):
             config.save_iterm()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./README.md").expanduser())
     def test_iterm_fail_with_incorrect_file_2(self, input):
         """ Assert that 'save_iterm' fails when an unexisting file is provided """
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(config.WrongInputError):
             config.save_iterm()
 
 
