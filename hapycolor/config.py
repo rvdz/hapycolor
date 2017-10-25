@@ -1,5 +1,7 @@
 from .export import iterm
 from .export import vim
+from .export import gnome
+from .export import yabar
 
 import configparser
 import ctypes
@@ -52,6 +54,7 @@ def save_iterm():
         raise NotImplementedError
     save_config("export", "iterm_config", p.as_posix())
 
+
 def save_config(section, key, value):
     """ Save a new entry in the config file """
     config = configparser.ConfigParser()
@@ -87,9 +90,16 @@ class Target(enum.Enum):
     GNOME_TERMINAL = {"name"     : "gnome-terminal",
                       "os"       : [OS.LINUX],
                       "save"     : NotImplemented,
-                      "export"   : NotImplemented,
+                      "export"   : gnome.Gnome.profile,
                       "support"  : "gnome_terminal_support",
-                      "key"      : "gnome"}
+                      "key"      : NotImplemented}
+
+    YABAR          = {"name"     : "yabar",
+                      "os"       : [OS.LINUX],
+                      "save"     : NotImplemented,
+                      "export"   : yabar.Yabar.profile,
+                      "support"  : "yabar_support",
+                      "key"      : NotImplemented}
 
     # WALLPAPER       = {"name"    : "wallpaper",
     #                   "os"       : [OS.LINUX, OS.DARWIN],
@@ -146,6 +156,9 @@ def iterm_template():
 
 def iterm_config():
     return load_config("export")["iterm_config"]
+
+def yabar_config():
+    return load_config("export")["yabar_config"]
 
 def hyperplan_file(filter_type):
     config = load_config("hyperplan")
