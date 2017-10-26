@@ -40,12 +40,16 @@ class Reducer():
                     graph.extend([i1, i2])
 
         in_string = c_wchar_p(self.__encode_colors_id(graph))
-        out_string = c_wchar_p('\x00' * (len(colors_set) * 2 + 1))
+
+        # Would be better to create a list of \x00 so that only the portion of the list filled by the reducer
+        # algorithm would be decoded, but because c_wchar_p('\x00') fails on some versions of python3.5
+        # that cannot be done and the decoded list contains duplicates
+        out_string = c_wchar_p('\x01' * (len(colors_set) * 2 + 1))
         number_color_in = c_uint(len(graph) // 2)
 
         self.lib.reduce(in_string, number_color_in, out_string)
 
-        return [colors_set[i] for i in self.__decode_colors_id(out_string.value)]
+        return list(set([colors_set[i] for i in self.__decode_colors_id(out_string.value)]))
 
     def __decode_colors_id(self, string):
         """ Subtract one in order to get the original values of the color identifiers """
