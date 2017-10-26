@@ -52,7 +52,7 @@ def save_vim():
     p = p / "hapycolor" / "colors"
     if not p.exists():
         p.mkdir(parents=True)
-    save_config("export", VIM.value["key"], (p / "hapycolor.vim").as_posix())
+    save_config("export", Target.VIM.value["key"], (p / "hapycolor.vim").as_posix())
 
 
 def save_iterm():
@@ -101,12 +101,12 @@ class Target(enum.Enum):
                       "enabled"  : "iterm_enabled",
                       "key"      : "iterm_config"}
 
-    GNOME_TERMINAL = {"name"     : "gnome-terminal",
-                      "os"       : [OS.LINUX],
-                      "save"     : NotImplemented,
-                      "export"   : NotImplemented,
-                      "enabled"  : "gnome_terminal_enabled",
-                      "key"      : "gnome"}
+    # GNOME_TERMINAL = {"name"     : "gnome-terminal",
+    #                   "os"       : [OS.LINUX],
+    #                   "save"     : NotImplemented,
+    #                   "export"   : NotImplemented,
+    #                   "enabled"  : "gnome_terminal_enabled",
+    #                   "key"      : "gnome"}
 
 def init_configs():
     """ Intializes the target that are compatible and not disabled """
