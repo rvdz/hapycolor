@@ -28,7 +28,7 @@ let g:colors_name = "hapycolor"'''
                    ["Label","Operator"]]
 
     @staticmethod
-    def profile(palette, name):
+    def profile(palette, name, img):
         assert(len(palette["colors"]) == len(Vim.groups))
         with open(config.vim(), "w+") as f:
             f.write(Vim.header + "\n\n")

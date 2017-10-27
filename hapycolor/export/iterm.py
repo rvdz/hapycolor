@@ -61,7 +61,7 @@ class Iterm:
 
     @staticmethod
     def __set_ansi_colors(colors, root):
-        assert(len(colors) == 16)
+        assert(len(colors) >= 16)
         p = re.compile(r"Ansi [0-9]* Color")
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and p.match(n.text):
@@ -73,15 +73,14 @@ class Iterm:
         # Retrieves all the profiles' guids
 
         profiles = root
-        for n in root:
+        for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                profiles = next(n)
-
+                profiles = root[i+1]
         guids = []
         for p in profiles:
-            for n in p:
+            for i, n in enumerate(p):
                 if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.GUID:
-                    guid = next(n).text.split("-")
+                    guid = p[i+1].text.split("-")
                     guids.append([int(i, 16) for i in guid])
 
         assert(len(guids) > 0)
@@ -145,7 +144,7 @@ class Iterm:
 
 
     @staticmethod
-    def profile(palette, name):
+    def profile(palette, name, img):
         """ Creates an iterm's profile which is added to the terminal preferences' file.
             It requires a palette of 16 colors in rgb format and a for the new profile. """
 
@@ -167,10 +166,10 @@ class Iterm:
         Iterm.__set_guid(template_root, root)
 
         # Append profile to profile list
-        for n in root:
+        for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                next(n).text = "\n\t\t"
-                next(n).append(template_root)
+                root[i+1].text = "\n\t\t"
+                root[i+1].append(template_root)
 
         # Save changes
         with open(config.iterm_config(), "wb") as f:
