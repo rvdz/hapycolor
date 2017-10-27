@@ -1,5 +1,6 @@
 from .export import iterm
 from .export import vim
+from .export import wallpaper
 
 import configparser
 import ctypes
@@ -35,6 +36,13 @@ class OS(enum.Enum):
     LINUX  = 0
     DARWIN = 1
 
+def os():
+    if platform.system() == "Darwin":
+        return OS.DARWIN
+    else:
+        return OS.LINUX
+
+
 def input_path(prompt):
     """ Prompts the user and retrives a 'Path' object """
     return pathlib.Path(input(prompt)).expanduser()
@@ -65,7 +73,7 @@ def save_iterm():
         raise WrongInputError("Entered path does not lead to a file")
     if p.name != "com.googlecode.iterm2.plist":
         raise WrongInputError("The file does not match an iTerm configuration file")
-    save_config("export", ITERM.value["key"], p.as_posix())
+    save_config("export", Target.ITERM.value["key"], p.as_posix())
 
 def save_config(section, key, value):
     """ Save a new entry in the config file """
@@ -86,7 +94,6 @@ class Target(enum.Enum):
             - boolean indicating if the target has been enabled
             - configuration value's key
                                     """
-
     VIM            = {"name"     : "Vim",
                       "os"       : [OS.LINUX, OS.DARWIN],
                       "save"     : save_vim,
@@ -101,12 +108,12 @@ class Target(enum.Enum):
                       "enabled"  : "iterm_enabled",
                       "key"      : "iterm_config"}
 
-    # GNOME_TERMINAL = {"name"     : "gnome-terminal",
-    #                   "os"       : [OS.LINUX],
-    #                   "save"     : NotImplemented,
-    #                   "export"   : NotImplemented,
-    #                   "enabled"  : "gnome_terminal_enabled",
-    #                   "key"      : "gnome"}
+    WALLPAPER      = {"name"     : "Wallpaper",
+                      "os"       : [OS.DARWIN, OS.LINUX],
+                      "save"     : None,
+                      "export"   : wallpaper.Wallpaper.set_macos,
+                      "enabled"  : "wallpaper_enabled",
+                      "key"      : "wallpaper_macos"}
 
 def init_configs():
     """ Intializes the target that are compatible and not disabled """
@@ -150,12 +157,6 @@ def load_config(section):
 
 def get_keys():
     return ROOT_DIR + load_config("hyerplan")["keys"]
-
-def os():
-    if platform.system() == "Darwin":
-        return OS.DARWIN
-    else:
-        return OS.LINUX
 
 def iterm_template():
     return ROOT_DIR + "/" + load_config("export")["iterm_template"]

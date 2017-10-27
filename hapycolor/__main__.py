@@ -43,9 +43,9 @@ def main(args=None):
 
     colors = extractor.Extractor(args["file"], num_colors=250).get_colors()
 
-    name = colors["wallpaper"].split("/")[-1].split(".")[0]
+    name = args["file"].split("/")[-1].split(".")[0]
     for f in config.get_export_functions():
-        f(colors, name)
+        f(colors, name, args["file"])
 
     print("\nFinal palette (" + str(len(colors["colors"])) + "):")
     visual.print_palette(colors["colors"], size=2)
