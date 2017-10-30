@@ -146,7 +146,7 @@ class HyperplanCreator():
 
     def calibrate_luminosity_hyperplan(self):
         print("Calibrating luminosity")
-        self.cf = refine.Refine()
+        self.cf = refine.Filter()
         colors = []
         for i in range(self.calibration_points):
             colors.append((random.randint(0, 360), random.random(), random.random()))
