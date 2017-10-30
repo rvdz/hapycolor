@@ -30,7 +30,7 @@ class TestConfiguration(unittest.TestCase):
         with self.assertRaises(exceptions.WrongInputError):
             config.save_iterm()
 
-    @patch('hapycolor.config.input_path', return_value=pathlib.Path("./com.googlecode.iterm2.plist").expanduser())
+    @patch('hapycolor.config.input_path', return_value=pathlib.Path("./com.googlecode.iterm2.plist"))
     def test_iterm_fail_with_incorrect_file_1(self, input):
         """ Assert that 'save_iterm' fails when an unexisting file is provided """
         with self.assertRaises(exceptions.WrongInputError):

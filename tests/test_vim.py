@@ -24,7 +24,7 @@ def vimtesting():
     mock_vim_path = config.ROOT_DIR + "/../tests/test_targets_vim.vim"
     with patch('hapycolor.config.vim', return_value=mock_vim_path):
         yield
-    if pathlib.Path(mock_vim_path).resolve().exists():
+    if pathlib.Path(mock_vim_path).exists():
         os.remove(mock_vim_path)
 
 class TestVim(unittest.TestCase):
