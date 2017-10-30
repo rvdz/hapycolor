@@ -57,7 +57,7 @@ def save_iterm():
     """ Checks if the iTerm preferences file is correct and save it in the
         project configuration file """
     p = input_path("Path to iTerm configuration file: ")
-    if not p.is_absolute():
+    if not p.is_absolute() and p.is_file():
         p = p.resolve()
     if not p.is_file():
         raise exceptions.WrongInputError("Entered path does not lead to a file")
@@ -128,7 +128,7 @@ def initialize_target(target, is_enabled):
         try:
             target.value["save"]()
         except exceptions.WrongInputError as e:
-            print(e.mssg)
+            print(e.msg)
         else:
             break
         if input("\nAbort? (y/n): ").capitalize() == "Y":
