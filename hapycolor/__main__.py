@@ -33,13 +33,16 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
     del draw
     pal.save(filename, "PNG")
 
-def main(args=None):
-
+def parse_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", help="File path to the image", required=True)
-    args = vars(ap.parse_args())
+    return vars(ap.parse_args())
 
-    config.init_configs()
+def main(args=None):
+
+    args = parse_arguments()
+
+    config.initialize()
 
     colors = extractor.Extractor(args["file"], num_colors=250).get_colors()
 
@@ -47,17 +50,17 @@ def main(args=None):
     for f in config.get_export_functions():
         f(colors, name, args["file"])
 
-    print("\nFinal palette (" + str(len(colors["colors"])) + "):")
-    visual.print_palette(colors["colors"], size=2)
+    print("\nFinal palette (" + str(len(colors.colors)) + "):")
+    visual.print_palette(colors.colors, size=2)
 
     print("\Foreground color:")
-    visual.print_palette([colors["foreground"]], size=4)
+    visual.print_palette([colors.foreground], size=4)
 
     print("\Background color:")
-    visual.print_palette([colors["background"]], size=4)
+    visual.print_palette([colors.background], size=4)
 
-    colors_to_file([c for c in colors["colors"]], "palette.png")
-    helpers.save_json("palette.json", colors["colors"])
+    colors_to_file([c for c in colors.colors], "palette.png")
+    helpers.save_json("palette.json", colors.colors)
 
 if __name__ == '__main__':
     main()

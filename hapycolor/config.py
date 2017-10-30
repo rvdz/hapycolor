@@ -1,6 +1,7 @@
 from .export import iterm
 from .export import vim
 from .export import wallpaper
+from . import exceptions
 
 import configparser
 import ctypes
@@ -15,32 +16,21 @@ import os.path as pth
 ########################## Initialize Config ###################################
 
 ROOT_DIR = pth.dirname(pth.abspath(__file__))
-project_config = ROOT_DIR + "/config.ini"
-
-class WrongInputError(Exception):
-    def __init__(self, mssg):
-        self.mssg = mssg
-    def __str__(self):
-        return repr(self.mssg)
-
-class ExportTargetFailure(Exception):
-    def __init__(self, mssg, target):
-        self.mssg = mssg
-        self.target = target
-    def __str__(self):
-        return repr(self.mssg)
-    def disable_target(self):
-        save_config("export", self.target.value["enabled"], str(False))
+def get_config():
+    return ROOT_DIR + "/config.ini"
 
 class OS(enum.Enum):
     LINUX  = 0
     DARWIN = 1
 
 def os():
-    if platform.system() == "Darwin":
+    platform_os = platform.system()
+    if platform_os == "Darwin":
         return OS.DARWIN
-    else:
+    elif platform_os == "Linux":
         return OS.LINUX
+    else:
+        raise exceptions.PlatformNotSupportedError()
 
 
 def input_path(prompt):
@@ -55,7 +45,7 @@ def save_vim():
         p = p.resolve()
 
     if not p.is_dir():
-        raise WrongInputError("Must be a directory")
+        raise exceptions.WrongInputError("Must be a directory")
 
     p = p / "hapycolor" / "colors"
     if not p.exists():
@@ -70,17 +60,17 @@ def save_iterm():
     if not p.is_absolute():
         p = p.resolve()
     if not p.is_file():
-        raise WrongInputError("Entered path does not lead to a file")
+        raise exceptions.WrongInputError("Entered path does not lead to a file")
     if p.name != "com.googlecode.iterm2.plist":
-        raise WrongInputError("The file does not match an iTerm configuration file")
+        raise exceptions.WrongInputError("The file does not match an iTerm configuration file")
     save_config("export", Target.ITERM.value["key"], p.as_posix())
 
 def save_config(section, key, value):
     """ Save a new entry in the config file """
     config = configparser.ConfigParser()
-    config.read(project_config)
+    config.read(get_config())
     config[section][key] = value
-    with open(project_config, "w") as f:
+    with open(get_config(), "w") as f:
         config.write(f)
 
 
@@ -109,13 +99,14 @@ class Target(enum.Enum):
                       "key"      : "iterm_config"}
 
     WALLPAPER      = {"name"     : "Wallpaper",
-                      "os"       : [OS.DARWIN, OS.LINUX],
+                      "os"       : [OS.DARWIN],
                       "save"     : None,
                       "export"   : wallpaper.Wallpaper.set_macos,
                       "enabled"  : "wallpaper_enabled",
                       "key"      : "wallpaper_macos"}
 
-def init_configs():
+
+def initialize():
     """ Intializes the target that are compatible and not disabled """
     config = load_config("export")
 
@@ -127,21 +118,24 @@ def init_configs():
     f = lambda x: os() in x.value["os"] \
             and (x.value["enabled"] not in config)
 
-    for e in filter(f, Target):
-        res = input("Enable " + e.value["name"] + "? (y/n) :")
-        is_enabled = res.capitalize() == "Y"
-        correct_entry = False
-        while e.value["save"] and is_enabled and not correct_entry:
-            try:
-                e.value["save"]()
-            except WrongInputError as err:
-                print(err.mssg)
-            else:
-                break
-            if input("\nAbort? (y/n): ").capitalize() == "Y":
-                is_enabled = False
-                correct_entry = True
-        save_config("export", e.value["enabled"], str(is_enabled))
+    for t in filter(f, Target):
+        res = input("Enable " + t.value["name"] + "? (y/n) :")
+        initialize_target(t, res.capitalize() == "Y")
+
+def initialize_target(target, is_enabled):
+    correct_entry = False
+    while target.value["save"] and is_enabled and not correct_entry:
+        try:
+            target.value["save"]()
+        except exceptions.WrongInputError as e:
+            print(e.mssg)
+        else:
+            break
+        if input("\nAbort? (y/n): ").capitalize() == "Y":
+            is_enabled = False
+            correct_entry = True
+    save_config("export", target.value["enabled"], str(is_enabled))
+
 
 ############################# Access Config ####################################
 def app_name():
@@ -152,7 +146,7 @@ def vim():
 
 def load_config(section):
     config = configparser.ConfigParser()
-    config.read(project_config)
+    config.read(get_config())
     return config[section]
 
 def get_keys():
@@ -177,7 +171,7 @@ def hyperplan_file(filter_type):
     elif filter_type == Filter.SATURATION:
         path += config["saturation"]
     else:
-        raise AttributeError("Unknown filter type")
+        raise exceptions.UnknownFilterTypeError("Unknown filter type")
     return path
 
 def get_reduce_library():
@@ -201,8 +195,8 @@ def get_reduce_library():
 
 def get_export_functions():
     """ Retrives the export functions for the enabled target """
-    config = load_config("export")
-    f = lambda x: (os() in x.value["os"]) and (config[x.value["enabled"]] == "True")
+    target_config = load_config("export")
+    f = lambda x: (os() in x.value["os"]) and (target_config[x.value["enabled"]] == "True")
     return map(lambda x : x.value["export"], filter(f, Target))
 
 ############################# Color Filter #####################################

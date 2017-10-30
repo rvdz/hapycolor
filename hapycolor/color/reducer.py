@@ -3,7 +3,9 @@ from colormath.color_conversions import convert_color
 from colormath.color_objects import LabColor, HSLColor
 from ctypes import c_uint, c_wchar_p
 
+from hapycolor import helpers
 from hapycolor import config
+from hapycolor import exceptions
 
 class Reducer():
 
@@ -26,6 +28,11 @@ class Reducer():
             The output result contains the maximal number of colors of
             the provided list where each color is at at least a distane
             threshold from the others. """
+
+        if colors.__class__ != list or len(colors) == 0:
+            raise exceptions.ReducerArgumentsError("'colors' must be a list of at least one hsl color")
+        if not all([helpers.can_be_hsl(c) for c in colors]):
+            raise exceptions.ColorFormatError("'colors' must be a list of hsl colors")
 
         # TODO: Fixup when only one color is given
         if len(colors) == 1:

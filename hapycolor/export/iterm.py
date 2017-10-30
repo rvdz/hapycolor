@@ -1,10 +1,94 @@
 from hapycolor import config
 from hapycolor import helpers
+from hapycolor.export import vim
 
+from hapycolor import exceptions
+from hapycolor import palette
+
+import random
 import enum
+import uuid
 import json
 import re
 import xml.etree.ElementTree as ET
+
+
+class TermColorManager():
+    """ This class manages the terminal colors and defines a method that, for an 'Ansi Color' number,
+        returns the appropriate rgb color """
+    def __init__(self, colors):
+        if colors.__class__ != list or len(colors) == 0:
+            raise exceptions.EmptyListError("'colors' list must contain at least one element")
+        if not all([helpers.can_be_rgb(c) for c in colors]):
+            raise exceptions.ColorFormatError("'colors' must be defined in the rgb base")
+        # Convert to hsl
+        hsl_colors = [helpers.rgb_to_hsl(c) for c in colors]
+        self.colors = TermColorManager.analyze_colors(hsl_colors)
+
+    @staticmethod
+    def get_label(hsl_color):
+        """ Returns a 'TermColorEnum' according to the color's hue """
+        for l in TermColorEnum:
+            if l.value[0] and l.value[0][0] <= hsl_color[0] and hsl_color[0] <= l.value[0][1]:
+                return l
+        return TermColorEnum.RED
+
+    @staticmethod
+    def analyze_colors(colors):
+        """ Creates a dictionary which labelize each color with one enum from 'TermColorEnum' """
+        # Sort by hue
+        colors.sort(key=lambda c : c[0])
+
+        # Create a dictionary where each term is associated to the right color extracted
+        term_colors = {}
+        for c in colors:
+            label = TermColorManager.get_label(c)
+            if label not in term_colors:
+                term_colors[label] = []
+            term_colors[label].append(c)
+        term_colors[TermColorEnum.BLACK] = [(0, 0, 0)]
+        term_colors[TermColorEnum.WHITE] = [(0, 0, 1)]
+
+        return term_colors
+
+    def get_color(self, index):
+        """ Takes an 'Ansi Color' number and retrives the appropriate rgb color """
+        if index.__class__ != int or index < 0 or index > 15:
+            raise exceptions.InvalidValueError("Ansi color values are described by integers starting from 0 up to 15")
+
+        if self.colors.__class__ != dict or len(self.colors) == 0:
+            raise exceptions.UninitializedError("TermColorManager's instance has not been initialized properly")
+
+        for tc in TermColorEnum:
+            if index in tc.value[1]:
+                # If the provided index corresponds to this TermColor enum
+                if tc not in self.colors:
+                    # If there are no colors for this label, returns a random one
+                    label = random.choice(list(self.colors))
+                    while not self.colors[label]:
+                        # If the label is empty, pick another one
+                        label = random.choice(list(self.colors))
+                    return helpers.hsl_to_rgb(random.choice(self.colors[label]))
+                if max(tc.value[1]) == index:
+                    # Return the brightest color of the label
+                    return helpers.hsl_to_rgb(max(self.colors[tc], key=lambda c : c[2]))
+                # Return the darkest color of the label
+                return helpers.hsl_to_rgb(min(self.colors[tc], key=lambda c : c[2]))
+
+class TermColorEnum(enum.Enum):
+    """
+        Defines six enumerates which represent a label of the 'hue' dimension
+        - First list defines the hue's range
+        - Second list defines to which terminal's 'Ansi Color' number the label is related
+    """
+    BLACK   = [[], [0, 8]]
+    WHITE   = [[], [7, 15]]
+    RED     = [[345, 25], [4,12]]
+    YELLOW  = [[25, 60], [6,14]]
+    GREEN   = [[60, 160], [2,10]]
+    CYAN    = [[160, 200], [3,11]]
+    BLUE    = [[200, 260], [1,9]]
+    MAGENTA = [[260, 345], [5,13]]
 
 
 class Iterm:
@@ -14,38 +98,43 @@ class Iterm:
             for k in key_values:
                 setattr(Iterm, k, key_values[k])
 
-    Tag = Enumeration({"DICT": "dict",
-                       "REAL": "real",
-                       "KEY": "key",
-                       "STRING": "string"})
+    Tag = Enumeration({
+                       "DICT"   : "dict",
+                       "REAL"   : "real",
+                       "KEY"    : "key",
+                       "STRING" : "string"
+                      })
 
-    Key = Enumeration({"NEW_BOOKMARKS": "New Bookmarks",
-                       "GUID": "Guid",
-                       "NAME": "Name",
-                       "TRANSPARENCY": "Transparency",
-                       "BACKGROUND_COLOR": "Background Color",
-                       "FOREGROUND_COLOR": "Foreground Color",
-                       "CURSOR_TEXT_COLOR": "Cursor Text Color",
-                       "CURSOR_COLOR": "Cursor Color"})
+    Key = Enumeration({
+                       "NEW_BOOKMARKS"     : "New Bookmarks",
+                       "GUID"              : "Guid",
+                       "NAME"              : "Name",
+                       "TRANSPARENCY"      : "Transparency",
+                       "BACKGROUND_COLOR"  : "Background Color",
+                       "FOREGROUND_COLOR"  : "Foreground Color",
+                       "CURSOR_TEXT_COLOR" : "Cursor Text Color",
+                       "CURSOR_COLOR"      : "Cursor Color"
+                      })
 
-    @staticmethod
     def __create_color_bloc(color):
-        assert(len(color) == 3)
+        """ Creates a Color bloc. Requires a color in the rgb format """
+        if color.__class__ != tuple or len(color) != 3 or not helpers.can_be_rgb(color):
+            raise exceptions.ColorFormatError("Requires a color un the rgb format")
 
-        new_line = "\n\t\t"
-        red_key = ET.Element(Iterm.Tag.KEY)
-        red_key.text = "Red Component"
-        red_key.tail = new_line
-        green_key = ET.Element(Iterm.Tag.KEY)
+        new_line       = "\n\t\t"
+        red_key        = ET.Element(Iterm.Tag.KEY)
+        red_key.text   = "Red Component"
+        red_key.tail   = new_line
+        green_key      = ET.Element(Iterm.Tag.KEY)
         green_key.text = "Green Component"
         green_key.tail = new_line
-        blue_key = ET.Element(Iterm.Tag.KEY)
-        blue_key.text = "Blue Component"
-        blue_key.tail = new_line
+        blue_key       = ET.Element(Iterm.Tag.KEY)
+        blue_key.text  = "Blue Component"
+        blue_key.tail  = new_line
 
         color_keys = [blue_key, green_key, red_key]
 
-        bloc = ET.Element(Iterm.Tag.DICT)
+        bloc      = ET.Element(Iterm.Tag.DICT)
         bloc.text = new_line
         bloc.tail = "\n\t"
         for i, c in enumerate(color):
@@ -59,83 +148,58 @@ class Iterm:
             bloc.append(r)
         return bloc
 
-    @staticmethod
     def __set_ansi_colors(colors, root):
-        assert(len(colors) >= 16)
+        tc = TermColorManager(colors)
         p = re.compile(r"Ansi [0-9]* Color")
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and p.match(n.text):
-                root.insert(i+1, Iterm.__create_color_bloc(colors.pop(0)))
+                ansi_number = int(n.text.split()[1])
+                root.insert(i+1, Iterm.__create_color_bloc(tc.get_color(ansi_number)))
 
 
-    @staticmethod
     def __set_guid(template, root):
-        # Retrieves all the profiles' guids
-
-        profiles = root
-        for i, n in enumerate(root):
-            if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                profiles = root[i+1]
-        guids = []
-        for p in profiles:
-            for i, n in enumerate(p):
-                if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.GUID:
-                    guid = p[i+1].text.split("-")
-                    guids.append([int(i, 16) for i in guid])
-
-        assert(len(guids) > 0)
-        guid = guids[0][:]
-
-        # Generates a new guid
-        # The maximal value of the last integer of a guid
-        max_id = 281474976710656
-        while guid[-1] in [g[-1] for g in guids]:
-            guid[-1] = (guid[-1] + 1) % max_id
-
-        # Insert new guid into the template
+        """ Insert new guid into the template """
         guid_element = ET.Element(Iterm.Tag.STRING)
 
-        guid_string = ["%X" % i for i in guid]
-        guid_element.text = "-".join(guid_string)
+        guid_element.text = str(uuid.uuid1()).upper()
         guid_element.tail = "\n\t"
         for i, n in enumerate(template):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.GUID:
                 template.insert(i+1, guid_element)
 
-    @staticmethod
     def __set_background_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.BACKGROUND_COLOR, color_element, root)
 
-    @staticmethod
+
     def __set_cursor_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.CURSOR_TEXT_COLOR, color_element, root)
 
-    @staticmethod
+
     def __set_cursor_text_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.CURSOR_COLOR, color_element, root)
 
-    @staticmethod
+
     def __set_foreground_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.FOREGROUND_COLOR, color_element, root)
 
-    @staticmethod
+
     def __set_transparency(value, root):
         element = ET.Element(Iterm.Tag.REAL)
         element.text = str(value)
         Iterm.__set_element(Iterm.Key.TRANSPARENCY, element, root)
 
-    @staticmethod
+
     def __set_name(name, root):
-        name_element = ET.Element(Iterm.Tag.STRING)
+        name_element      = ET.Element(Iterm.Tag.STRING)
         name_element.text = name
         name_element.tail = "\n\t"
         Iterm.__set_element(Iterm.Key.NAME, name_element, root)
 
-    @staticmethod
+
     def __set_element(element_name, element, root):
         """ Finds the key named 'element_name' in 'root' and appends 'element' after it """
         for i, n in enumerate(root):
@@ -144,20 +208,24 @@ class Iterm:
 
 
     @staticmethod
-    def profile(palette, name, img):
+    def profile(pltte, name, img=None):
         """ Creates an iterm's profile which is added to the terminal preferences' file.
             It requires a palette of 16 colors in rgb format and a for the new profile. """
 
+        if pltte.__class__ != palette.Palette or not pltte.is_initialized:
+            raise exceptions.PaletteFormatError("The palette has not been correctly initialized")
+
         template_tree = ET.parse(config.iterm_template())
+
         template_root = template_tree.getroot()
 
-        Iterm.__set_ansi_colors(palette["colors"][:], template_root)
+        Iterm.__set_ansi_colors(pltte.colors, template_root)
         Iterm.__set_name(name, template_root)
 
-        Iterm.__set_background_color(palette["background"], template_root)
-        Iterm.__set_foreground_color(palette["foreground"], template_root)
-        Iterm.__set_cursor_text_color(palette["foreground"], template_root)
-        Iterm.__set_cursor_color(palette["foreground"], template_root)
+        Iterm.__set_background_color(pltte.background, template_root)
+        Iterm.__set_foreground_color(pltte.foreground, template_root)
+        Iterm.__set_cursor_text_color(pltte.foreground, template_root)
+        Iterm.__set_cursor_color(pltte.foreground, template_root)
         Iterm.__set_transparency(0.2, template_root)
 
         config_tree = ET.parse(config.iterm_config())

@@ -1,0 +1,12 @@
+# Usage: coverage run tests/run_suite.py -v [0-3]
+[run]
+branch = True
+omit =
+    *__init__.py
+    *__version__.py
+    *hyperplan/*
+
+source = ./hapycolor
+
+[html]
+title = Hapycolor Coverage Report
