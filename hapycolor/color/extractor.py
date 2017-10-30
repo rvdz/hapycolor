@@ -92,8 +92,8 @@ class Extractor():
 
         for i, col in enumerate(hsl_colors):
             if not self.cf.is_too_dark(col)              \
-                    and not self.cf.is_too_bright(col)   \
-                    and self.cf.is_saturated_enough(col):
+                    and not self.cf.is_too_bright(col):
+                    # and self.cf.is_saturated_enough(col):
                 filtered_colors.append(col)
             else:
                 filtered_magic[i] = (0,0,0)
