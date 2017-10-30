@@ -1,6 +1,6 @@
 from hapycolor import config
 from hapycolor import helpers
-import hapycolor.exceptions
+from hapycolor import exceptions
 
 from matplotlib import pyplot as plt
 from scipy import interpolate
