@@ -3,22 +3,30 @@
     <true/>
     <key>Ambiguous Double Width</key>
     <false/>
+    <!-- Black -->
     <key>Ansi 0 Color</key>
-    <key>Ansi 1 Color</key>
-    <key>Ansi 10 Color</key>
-    <key>Ansi 11 Color</key>
-    <key>Ansi 12 Color</key>
-    <key>Ansi 13 Color</key>
     <key>Ansi 14 Color</key>
+    <!-- Red -->
+    <key>Ansi 1 Color</key>
     <key>Ansi 15 Color</key>
+    <!-- Green -->
     <key>Ansi 2 Color</key>
-    <key>Ansi 3 Color</key>
-    <key>Ansi 4 Color</key>
-    <key>Ansi 5 Color</key>
-    <key>Ansi 6 Color</key>
-    <key>Ansi 7 Color</key>
     <key>Ansi 8 Color</key>
+    <!-- Yellow -->
+    <key>Ansi 3 Color</key>
     <key>Ansi 9 Color</key>
+    <!-- Blue -->
+    <key>Ansi 4 Color</key>
+    <key>Ansi 10 Color</key>
+    <!-- Magenta -->
+    <key>Ansi 5 Color</key>
+    <key>Ansi 11 Color</key>
+    <!-- Cyan -->
+    <key>Ansi 6 Color</key>
+    <key>Ansi 12 Color</key>
+    <!-- White -->
+    <key>Ansi 7 Color</key>
+    <key>Ansi 13 Color</key>
     <key>BM Growl</key>
     <true/>
     <key>Background Color</key>

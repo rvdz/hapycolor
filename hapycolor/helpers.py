@@ -1,6 +1,23 @@
 import json
+from hapycolor import exceptions
 
 """ Utilitary methods to convert color types  """
+
+def can_be_hsl(color):
+    if color.__class__ != tuple or len(color) != 3:
+        return False
+    if (0 <= color[0] and color[0] < 360)         \
+            and (0 <= color[1] and color[1] <= 1) \
+            and (0 <= color[2] and color[2] <= 1):
+        return True
+    return False
+
+def can_be_rgb(color):
+    if color.__class__ != tuple or len(color) != 3:
+        return False
+    if all([(0 <= e and e <= 255) and (e.__class__ == int) for e in color]):
+        return True
+    return False
 
 def contrast(rgbcolor):
     return (299*rgbcolor[0] + 587*rgbcolor[1] + 114*rgbcolor[2]) / 1000
@@ -9,6 +26,8 @@ def contrast_norm(rgbcol1, rgbcol2):
     return abs(contrast(rgbcol1) - contrast(rgbcol2))
 
 def rgb_to_hex(colrgb):
+    if not can_be_rgb(colrgb):
+        raise exceptions.ColorFormatError("The input color must be defined in the rgb base")
     return '#%02x%02x%02x' % (colrgb[0], colrgb[1], colrgb[2])
 
 def hex_to_rgb(hexcol):
@@ -20,12 +39,12 @@ def hsl_to_hex(colhsl):
     return rgb_to_hex(colrgb)
 
 def rgb_to_hsl(colrgb):
-    r = colrgb[0] / 255.
-    g = colrgb[1] / 255.
-    b = colrgb[2] / 255.
+    r      = colrgb[0] / 255.
+    g      = colrgb[1] / 255.
+    b      = colrgb[2] / 255.
     maxrgb = float(max(r,g,b))
     minrgb = float(min(r,g,b))
-    l = (minrgb + maxrgb) / 2
+    l      = (minrgb + maxrgb) / 2
     if minrgb == maxrgb:
         return 0, 0.0, l
 

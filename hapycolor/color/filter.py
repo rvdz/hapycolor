@@ -1,13 +1,13 @@
 from hapycolor import config
 from hapycolor import helpers
+import hapycolor.exceptions
 
 from matplotlib import pyplot as plt
 from scipy import interpolate
 import numpy as np
 import sys
 
-class Refine():
-
+class Filter():
 
     def __init__(self):
         # Set up grid
@@ -32,11 +32,11 @@ class Refine():
             TODO: This should be replaced by a function that only load a json file where
             that contains the interpolated points instead of regenating them each time """
         # Load the provided points
-        data   = helpers.load_json(json_file)
+        data = helpers.load_json(json_file)
 
         # Convert points to catesian
-        points   = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in data])
-        values   = [e[2] for e in data]
+        points = np.asarray([self.__polar_to_cartesian(e[0], e[1]) for e in data])
+        values = [e[2] for e in data]
 
         # Interpolate the data
         return interpolate.griddata(points, values, (grid_x, grid_y), method='linear')
@@ -52,7 +52,7 @@ class Refine():
             that contains the interpolated points instead of regenating them each time """
 
         # Load the provided points
-        grey_data   = helpers.load_json(json_file)
+        grey_data = helpers.load_json(json_file)
 
         # Interpolate the data
         H = [e[0] for e in grey_data]
@@ -84,8 +84,8 @@ class Refine():
             y.append(y[0])
 
             # Interpolate circle: https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.splprep.html
-            tck, u = interpolate.splprep([x, y], s=0)
-            unew = np.arange(0, 1.01, 0.01)
+            tck, u           = interpolate.splprep([x, y], s = 0)
+            unew             = np.arange(0, 1.01, 0.01)
             interpolation[l] = interpolate.splev(unew, tck)
         return interpolation
 
@@ -97,7 +97,7 @@ class Refine():
     def display_interpolation(self, X, Y, Z):
         """ Displays the wireframe of a surface """
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        ax  = fig.add_subplot(111, projection = '3d')
         ax.plot_wireframe(X, Y, Z) #, cmap=plt.cm.YlGnBu_r)
         plt.show()
 
@@ -106,7 +106,7 @@ class Refine():
         """ Displays a scatter plot where each color is represented by a
         a color of the given list """
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        ax  = fig.add_subplot(111, projection = '3d')
         ax.scatter(X, Y, Z)
         plt.show()
 
@@ -199,8 +199,8 @@ class Refine():
         Y.sort()
         try:
             return Y[0] < y and y < Y[1]
-        except IndexError:
-            return False
+        except IndexError as e:
+            raise exceptions.FilterError("An error occured when filtering the saturations", e)
 
 
     def is_saturated_enough(self, hsl_color):
