@@ -14,32 +14,55 @@ import xml.etree.ElementTree as ET
 
 
 class TermColorManager():
-    """ This class manages the terminal colors and defines a method that, for an 'Ansi Color' number,
-        returns the appropriate rgb color """
+    """
+    This class manages the terminal colors and defines a method that, for a
+    standard of high-intensity terminal color's number, returns the
+    appropriate rgb color of the provided palette.
+    For more details about standard and high-intensity terminal colors, see:
+    `<https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit/>`
+    """
     def __init__(self, colors):
+        """
+        Initializes a TermColorManager's instance with a list of colors.
+
+        Keyword arguments:
+        colors -- a list of rgb colors
+        """
         if colors.__class__ != list or len(colors) == 0:
-            raise exceptions.EmptyListError("'colors' list must contain at least one element")
+            msg = "'colors' list must contain at least one element"
+            raise exceptions.EmptyListError(msg)
         if not all([helpers.can_be_rgb(c) for c in colors]):
-            raise exceptions.ColorFormatError("'colors' must be defined in the rgb base")
+            msg = "'colors' must be defined in the rgb base"
+            raise exceptions.ColorFormatError(msg)
         # Convert to hsl
         hsl_colors = [helpers.rgb_to_hsl(c) for c in colors]
         self.colors = TermColorManager.analyze_colors(hsl_colors)
 
     @staticmethod
     def get_label(hsl_color):
-        """ Returns a 'TermColorEnum' according to the color's hue """
+        """ Returns a 'TermColorEnum' according to the color's hue
+
+        Keyword arguments:
+        hsl_color -- a tuple representing a color defined in the hsl base
+        """
         for l in TermColorEnum:
-            if l.value[0] and l.value[0][0] <= hsl_color[0] and hsl_color[0] <= l.value[0][1]:
+            if l.value[0] \
+                    and l.value[0][0] <= hsl_color[0] \
+                    and hsl_color[0] <= l.value[0][1]:
                 return l
         return TermColorEnum.RED
 
     @staticmethod
     def analyze_colors(colors):
-        """ Creates a dictionary which labelize each color with one enum from 'TermColorEnum' """
+        """
+        Creates a dictionary which labelize each color with a respective enum
+        from 'TermColorEnum'.
+        """
         # Sort by hue
-        colors.sort(key=lambda c : c[0])
+        colors.sort(key=lambda c: c[0])
 
-        # Create a dictionary where each term is associated to the right color extracted
+        # Create a dictionary where each term is associated to the right
+        # color extracted
         term_colors = {}
         for c in colors:
             label = TermColorManager.get_label(c)
@@ -52,12 +75,21 @@ class TermColorManager():
         return term_colors
 
     def get_color(self, index):
-        """ Takes an 'Ansi Color' number and retrives the appropriate rgb color """
+        """
+        Takes standard or high-intensity terminal color's number and retrives the
+        appropriate rgb color.
+
+        Keyword arguments:
+        index -- an integer between 0 and 15
+        """
         if index.__class__ != int or index < 0 or index > 15:
-            raise exceptions.InvalidValueError("Ansi color values are described by integers starting from 0 up to 15")
+            msg = "Ansi color values are described by integers starting from" \
+                  + " 0 up to 15"
+            raise exceptions.InvalidValueError(msg)
 
         if self.colors.__class__ != dict or len(self.colors) == 0:
-            raise exceptions.UninitializedError("TermColorManager's instance has not been initialized properly")
+            msg = "TermColorManager's instance has not been initialized properly"
+            raise exceptions.UninitializedError(msg)
 
         for tc in TermColorEnum:
             if index in tc.value[1]:
@@ -65,30 +97,39 @@ class TermColorManager():
                 if tc not in self.colors:
                     # If there are no colors for this label, returns a random one
                     label = random.choice(list(self.colors))
+
                     while not self.colors[label]:
                         # If the label is empty, pick another one
                         label = random.choice(list(self.colors))
                     return helpers.hsl_to_rgb(random.choice(self.colors[label]))
+
                 if max(tc.value[1]) == index:
                     # Return the brightest color of the label
-                    return helpers.hsl_to_rgb(max(self.colors[tc], key=lambda c : c[2]))
+                    brightest_color = max(self.colors[tc], key=lambda c: c[2])
+                    return helpers.hsl_to_rgb(brightest_color)
+
                 # Return the darkest color of the label
-                return helpers.hsl_to_rgb(min(self.colors[tc], key=lambda c : c[2]))
+                darkest_color = min(self.colors[tc], key=lambda c: c[2])
+                return helpers.hsl_to_rgb(darkest_color)
+
 
 class TermColorEnum(enum.Enum):
     """
-        Defines six enumerates which represent a label of the 'hue' dimension
-        - First list defines the hue's range
-        - Second list defines to which terminal's 'Ansi Color' number the label is related
+    Defines six enumerates which represent a label of the 'hue' dimension
+    - First list defines the hue's range in degrees
+    - Second list defines to which terminal's standard and high-intensity
+      color's number the label is related.
+    For more details about standard and high-intensity terminal colors see:
+    `<https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit/>`
     """
-    BLACK   = [[], [0, 8]]
-    WHITE   = [[], [7, 15]]
-    RED     = [[345, 25], [4,12]]
-    YELLOW  = [[25, 60], [6,14]]
-    GREEN   = [[60, 160], [2,10]]
-    CYAN    = [[160, 200], [3,11]]
-    BLUE    = [[200, 260], [1,9]]
-    MAGENTA = [[260, 345], [5,13]]
+    BLACK   = [  [ ],         [ 0, 8]]
+    WHITE   = [  [ ],         [ 7, 15]]
+    RED     = [  [ 345, 25],  [ 4, 12]]
+    YELLOW  = [  [ 25, 60],   [ 6, 14]]
+    GREEN   = [  [ 60, 160],  [ 2, 10]]
+    CYAN    = [  [ 160, 200], [ 3, 11]]
+    BLUE    = [  [ 200, 260], [ 1, 9]]
+    MAGENTA = [  [ 260, 345], [ 5, 13]]
 
 
 class Iterm:
@@ -118,8 +159,11 @@ class Iterm:
 
     def __create_color_bloc(color):
         """ Creates a Color bloc. Requires a color in the rgb format """
-        if color.__class__ != tuple or len(color) != 3 or not helpers.can_be_rgb(color):
-            raise exceptions.ColorFormatError("Requires a color un the rgb format")
+        if color.__class__ != tuple \
+                or len(color) != 3 \
+                or not helpers.can_be_rgb(color):
+            msg = "Requires a color un the rgb format"
+            raise exceptions.ColorFormatError(msg)
 
         new_line       = "\n\t\t"
         red_key        = ET.Element(Iterm.Tag.KEY)
@@ -154,8 +198,8 @@ class Iterm:
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and p.match(n.text):
                 ansi_number = int(n.text.split()[1])
-                root.insert(i+1, Iterm.__create_color_bloc(tc.get_color(ansi_number)))
-
+                color = tc.get_color(ansi_number)
+                root.insert(i+1, Iterm.__create_color_bloc(color))
 
     def __set_guid(template, root):
         """ Insert new guid into the template """
@@ -171,27 +215,22 @@ class Iterm:
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.BACKGROUND_COLOR, color_element, root)
 
-
     def __set_cursor_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.CURSOR_TEXT_COLOR, color_element, root)
-
 
     def __set_cursor_text_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.CURSOR_COLOR, color_element, root)
 
-
     def __set_foreground_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
         Iterm.__set_element(Iterm.Key.FOREGROUND_COLOR, color_element, root)
-
 
     def __set_transparency(value, root):
         element = ET.Element(Iterm.Tag.REAL)
         element.text = str(value)
         Iterm.__set_element(Iterm.Key.TRANSPARENCY, element, root)
-
 
     def __set_name(name, root):
         name_element      = ET.Element(Iterm.Tag.STRING)
@@ -199,21 +238,29 @@ class Iterm:
         name_element.tail = "\n\t"
         Iterm.__set_element(Iterm.Key.NAME, name_element, root)
 
-
     def __set_element(element_name, element, root):
-        """ Finds the key named 'element_name' in 'root' and appends 'element' after it """
+        """
+        Finds the key named 'element_name' in 'root' and appends 'element'
+        after it.
+        """
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and n.text == element_name:
                 root.insert(i + 1, element)
 
-
     @staticmethod
     def profile(pltte, name, img=None):
-        """ Creates an iterm's profile which is added to the terminal preferences' file.
-            It requires a palette of 16 colors in rgb format and a for the new profile. """
+        """
+        Creates an iterm's profile which is added to the terminal preferences'
+        file. It requires a palette of 16 colors defined in the rgb format and
+        a name for the new profile.
+
+        pltte -- an instance of the class 'hapycolor.palette.Palette'
+        name -- a string which will be used to name the newly created profile
+        """
 
         if pltte.__class__ != palette.Palette or not pltte.is_initialized:
-            raise exceptions.PaletteFormatError("The palette has not been correctly initialized")
+            msg = "The palette has not been correctly initialized"
+            raise exceptions.PaletteFormatError(msg)
 
         template_tree = ET.parse(config.iterm_template())
 
@@ -239,6 +286,6 @@ class Iterm:
                 root[i+1].text = "\n\t\t"
                 root[i+1].append(template_root)
 
-        # Save changes
+        # Save changes
         with open(config.iterm_config(), "wb") as f:
             f.write(ET.tostring(config_tree.getroot()))
