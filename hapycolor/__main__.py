@@ -18,6 +18,7 @@ from .color import extractor
 from PIL import Image, ImageDraw
 import argparse
 
+
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
     """ Creates a color palette and saves it to file """
     pal = Image.new('RGB', (swatchsize*len(colors) + 10, swatchsize))
@@ -33,10 +34,12 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
     del draw
     pal.save(filename, "PNG")
 
+
 def parse_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", help="File path to the image", required=True)
     return vars(ap.parse_args())
+
 
 def main(args=None):
 
@@ -61,6 +64,7 @@ def main(args=None):
 
     colors_to_file([c for c in colors.colors], "palette.png")
     helpers.save_json("palette.json", colors.colors)
+
 
 if __name__ == '__main__':
     main()
