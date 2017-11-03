@@ -50,8 +50,8 @@ class TestFilter(unittest.TestCase):
         """ Tests some limit cases for 'is_too_bright' """
         colors = {
                   (0, 0, 0)     : False,
-                  (0, 0, 1)     : True,
-                  (359, 0, 0.3) : False
+                  (255, 255, 255)     : True,
+                  (77, 77, 77) : False
                  }
         self.__test_hyperplan(colors, self.fltr.is_too_bright)
 
@@ -60,16 +60,16 @@ class TestFilter(unittest.TestCase):
         """ Tests some limit cases for 'is_too_dark' """
         colors = {
                   (0, 0, 0)     : True,
-                  (0, 0, 1)     : False,
-                  (359, 0, 0.8) : False
+                  (255, 255, 255)     : False,
+                  (204, 204, 204) : False
                  }
         self.__test_hyperplan(colors, self.fltr.is_too_dark)
 
     def test_is_saturated_enough(self):
         """ Tests some limit cases for 'is_saturated_enough' """
         colors = {
-                  (359, 1, 0.5)   : True,
-                  # (250, 0, 0.5) : False,
-                  (250, 0.8, 0.5) : True
+                  (255, 0, 4)   : True,
+                  # (128, 128, 128) : False,
+                  (59, 26, 230) : True
                  }
         self.__test_hyperplan(colors, self.fltr.is_saturated_enough)

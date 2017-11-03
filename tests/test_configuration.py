@@ -19,25 +19,25 @@ class TestConfiguration(unittest.TestCase):
             self.assertTrue(pathlib.Path(config.hyperplan_file(filter_type)).is_file())
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./README.md").expanduser())
-    def test_vim_file(self, input):
+    def test_vim_file(self, mock_input):
         """ Assert that 'save_vim' fails when a file is provided """
         with self.assertRaises(exceptions.WrongInputError):
             config.save_vim()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("~").expanduser())
-    def test_iterm_fail_with_directory(self, input):
+    def test_iterm_fail_with_directory(self, mock_input):
         """ Assert that 'save_iterm' fails when a directory is provided """
         with self.assertRaises(exceptions.WrongInputError):
             config.save_iterm()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./com.googlecode.iterm2.plist"))
-    def test_iterm_fail_with_incorrect_file_1(self, input):
+    def test_iterm_fail_with_incorrect_file_1(self, mock_input):
         """ Assert that 'save_iterm' fails when an unexisting file is provided """
         with self.assertRaises(exceptions.WrongInputError):
             config.save_iterm()
 
     @patch('hapycolor.config.input_path', return_value=pathlib.Path("./README.md").expanduser())
-    def test_iterm_fail_with_incorrect_file_2(self, input):
+    def test_iterm_fail_with_incorrect_file_2(self, mock_input):
         """ Assert that 'save_iterm' fails when an unexisting file is provided """
         with self.assertRaises(exceptions.WrongInputError):
             config.save_iterm()
@@ -67,31 +67,9 @@ class TestConfiguration(unittest.TestCase):
 
         configuration = configparser.ConfigParser()
         configuration.read(config.get_config())
-        expected_sections = ["core", "export", "reducer", "hyperplan"]
+        expected_sections = ["core", "export", "hyperplan"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))
 
-    mock_library = {"source"   : "./color/reducer.cpp",
-                    "library"  : "../tests/lib_reducer",
-                    "compiler" : "g++",
-                    "options"  : "-std=c++11 -O3"}
-
-    @patch('hapycolor.config.load_config', return_value=mock_library)
-    def test_reduce_library_compilation(self, get_library):
-        """ Tests the library's compilation on the current platform """
-        import os
-        library = config.get_reduce_library()
-        with self.assertRaises(AttributeError):
-            library.foo
-        self.assertTrue(callable(library.reduce))
-
-        library_path = config.ROOT_DIR + "/" + get_library()["library"]
-        if config.os() == config.OS.DARWIN:
-            library_path = library_path + ".dylib"
-        elif config.os() == config.OS.LINUX:
-            library_path = library_path + ".so"
-
-        self.assertTrue(pathlib.Path(library_path).resolve().exists())
-        os.remove(library_path)
 
     @patch('platform.system', return_value="Windows")
     def test_not_supported_operating_system(self, get_os):
@@ -195,37 +173,37 @@ class IntegrationTest(unittest.TestCase):
     @patch('builtins.input', side_effect=["y", "./tests", "y", "./tests/com.googlecode.iterm2.plist", "y"])
     @patch('hapycolor.config.os', return_value=config.OS.DARWIN)
     @configurationtesting()
-    def test_config_initialization_macos_target_enabled(self, input, os):
+    def test_config_initialization_macos_target_enabled(self, mock_input, os):
         """ Testing the configuration initialization when all the targets compatible
             with macOs are enabled """
-        self.__test_configuration_initialization_targets_enabled(input, os)
+        self.__test_configuration_initialization_targets_enabled(mock_input, os)
 
 
     @patch('builtins.input', side_effect=["n", "n", "n"])
     @patch('hapycolor.config.os', return_value=config.OS.DARWIN)
     @configurationtesting()
-    def test_config_initialization_linux_target_disabled(self, input, os):
+    def test_config_initialization_linux_target_disabled(self, mock_input, os):
         """ Testing the configuration initialization when all the targets compatible
             with macOs are disabled """
-        self.__test_configuration_initialization_target_diabled(input, os)
+        self.__test_configuration_initialization_target_diabled(mock_input, os)
 
 
     @patch('builtins.input', side_effect=["y", "./tests"])
     @patch('hapycolor.config.os', return_value=config.OS.LINUX)
     @configurationtesting()
-    def test_config_initialization_linux_targets_enabled(self, input, os):
+    def test_config_initialization_linux_targets_enabled(self, mock_input, os):
         """ Testing the configuration initialization when all the targets compatible
             with linux are enabled """
-        self.__test_configuration_initialization_targets_enabled(input, os)
+        self.__test_configuration_initialization_targets_enabled(mock_input, os)
 
 
     @patch('builtins.input', side_effect=["n"])
     @patch('hapycolor.config.os', return_value=config.OS.LINUX)
     @configurationtesting()
-    def test_config_initialization_linux_target_disabled(self, input, os):
+    def test_config_initialization_linux_target_disabled(self, mock_input, os):
         """ Testing the configuration initialization when all the targets compatible
             with linux are disabled """
-        self.__test_configuration_initialization_target_diabled(input, os)
+        self.__test_configuration_initialization_target_diabled(mock_input, os)
 
     @patch.dict('hapycolor.config.Target.ITERM.value', {"save" : 3})
     @patch.dict('hapycolor.config.Target.VIM.value', {"save" : 3})
@@ -238,3 +216,27 @@ class IntegrationTest(unittest.TestCase):
         with patch('hapycolor.config.os', return_value=config.OS.LINUX):
             with self.assertRaises(TypeError):
                 config.initialize_target(config.Target.VIM, is_enabled=True)
+
+    @patch('builtins.input', side_effect=["./foo", "y"])
+    @patch('builtins.print')
+    @configurationtesting()
+    def test_vim_intialization_failed_attempt_and_abort(self, mock_input, mock_print):
+        target = config.Target.VIM
+        try:
+            config.initialize_target(target)
+        except Exception as e:
+            self.fail(str(e))
+        target_config = config.load_config("export")
+        self.assertTrue(target_config[target.value["enabled"]] == str(False))
+
+    @patch('builtins.input', side_effect=["./foo", "n", "./bar", "y"])
+    @patch('builtins.print')
+    @configurationtesting()
+    def test_vim_intialization_two_failed_attempts_and_abort(self, mock_input, mock_print):
+        target = config.Target.VIM
+        try:
+            config.initialize_target(target)
+        except Exception as e:
+            self.fail(str(e))
+        target_config = config.load_config("export")
+        self.assertTrue(target_config[target.value["enabled"]] == str(False))

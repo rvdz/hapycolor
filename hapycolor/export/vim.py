@@ -3,6 +3,7 @@ from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette
 
+
 class Vim:
     foreground = "Normal"
     groups = [["Comment"],
@@ -37,7 +38,8 @@ class Vim:
     @staticmethod
     def profile(pltte, name=None, img=None):
         if pltte.__class__ != palette.Palette or not pltte.is_initialized:
-            raise exceptions.PaletteFormatError("The palette does not respect the appropriate structure")
+            msg = "The palette does not respect the appropriate structure"
+            raise exceptions.PaletteFormatError(msg)
 
         with open(config.vim(), "w+") as f:
             Vim.__print_header(f)
@@ -56,18 +58,17 @@ let g:colors_name = "%s"''' % config.app_name()
 
     @staticmethod
     def __print_foreground(fg, f):
-            l = ["hi " + Vim.foreground,
+            line = ["hi " + Vim.foreground,
                     "guifg=" + fg + "\n"]
-            f.write("{: <20}  {: <20}".format(*l))
+            f.write("{: <20}  {: <20}".format(*line))
 
     @staticmethod
     def __print_body(vim_colors, f):
         for i, G in enumerate(Vim.groups):
             color = vim_colors.get_color(i)
             for g in G:
-                l = ["hi " + g, "guifg=" + helpers.rgb_to_hex(color) + "\n"]
-                f.write("{: <20}  {: <20}".format(*l))
-
+                line = ["hi " + g, "guifg=" + helpers.rgb_to_hex(color) + "\n"]
+                f.write("{: <20}  {: <20}".format(*line))
 
 
 class VimColorManager:
@@ -75,11 +76,13 @@ class VimColorManager:
     def __init__(self, rgb_colors):
         if rgb_colors.__class__ != list or len(rgb_colors) == 0 \
                 or not all([helpers.can_be_rgb(c) for c in rgb_colors]):
-            raise exceptions.ColorFormatError("The colors must be defined in the rgb base")
+            msg = "The colors must be defined in the rgb base"
+            raise exceptions.ColorFormatError(msg)
         self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
-        self.labels.append([345, 15]) # Special case for red
+        self.labels.append([345, 15])       # Special case for red
 
-        self.colors = self.__label_colors([helpers.rgb_to_hsl(c) for c in rgb_colors])
+        hsl_colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
+        self.colors = self.__label_colors(hsl_colors)
 
     def __label_colors(self, colors):
         """ Sorts a list of hsl colors by labels """
@@ -96,9 +99,12 @@ class VimColorManager:
         return -1
 
     def get_color(self, index):
-        """ Considering a sequence of incrementing indexes, this function will return the first color
-            of each label. Once all the labels' first values have been returned,
-            it retrives the seconds and so on. Once all the colors will been used, it repeates the pattern """
+        """
+        Considering a sequence of incrementing indexes, this function will
+        return the first color of each label. Once all the labels' first
+        values have been returned, it retrives the seconds and so on.
+        Once all the colors will been used, it repeates the pattern.
+        """
         label = index % len(self.colors)
         while len(self.colors[label]) == 0:
             label = (label + 1) % len(self.colors)
