@@ -44,6 +44,14 @@ hapycolor\.palette module
     :undoc-members:
     :show-inheritance:
 
+hapycolor\.target module
+------------------------
+
+.. automodule:: hapycolor.target
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 hapycolor\.visual module
 ------------------------
 

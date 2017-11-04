@@ -17,6 +17,11 @@ class WrongInputError(HapycolorError, ValueError):
         self.msg = msg
 
 
+class CallingAbstractMethodError(HapycolorError):
+    def __init__(self, msg):
+        super(CallingAbstractMethodError, self).__init__(msg)
+        self.msg = msg
+
 class ExportTargetFailure(HapycolorError):
     def __init__(self, msg, target):
         super(ExportTargetFailure, self).__init__(msg)
@@ -24,7 +29,7 @@ class ExportTargetFailure(HapycolorError):
         self.msg = msg
 
     def disable_target(self):
-        save_config("export", self.target.value["enabled"], str(False))
+        self.target.disable()
 
 
 class PlatformNotSupportedError(HapycolorError):
@@ -55,15 +60,15 @@ class InvalidImageError(HapycolorError):
         self.msg = msg
 
 
-class FilterError(HapycolorError):
+class HslFilterError(HapycolorError):
     def __init__(self, msg, wrapped_exc):
-        super(FilterError, self).__init__(msg + " - " + str(wrapped_exc))
+        super(HslFilterError, self).__init__(msg + " - " + str(wrapped_exc))
         self.msg = msg + " - " + str(wrapped_exc)
 
 
-class UnknownFilterTypeError(HapycolorError):
+class UnknownLuminosityFilterTypeError(HapycolorError):
     def __init__(self, msg):
-        super(UnknownFilterTypeError, self).__init__(msg)
+        super(UnknownLuminosityFilterTypeError, self).__init__(msg)
         self.msg = msg
 
 

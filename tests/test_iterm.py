@@ -1,88 +1,80 @@
-from hapycolor import config
 from hapycolor import exceptions
-from hapycolor import palette
 from hapycolor import helpers
-from hapycolor.export.iterm import Iterm, TermColorManager, TermColorEnum
-from shutil import copyfile
+from hapycolor import palette
+from hapycolor.targets.iterm import Iterm, TermColorManager, TermColorEnum
+from tests.helpers import generate_palette, itermtesting, configurationtesting
 from unittest.mock import patch
 
-import contextlib
 import unittest
 
-def get_palette(size):
-    pltte = palette.Palette()
-    pltte.foreground = (0,0,0)
-    pltte.background = (0,0,0)
-    pltte.colors = [(c,c,c) for c in range(size)]
-    return pltte
-
-
-@contextlib.contextmanager
-def itermtesting():
-    import os
-    test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.plist"
-    tmp_test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.tmp"
-    copyfile(test_config_path, tmp_test_config_path)
-    with patch('hapycolor.config.iterm_config', return_value=tmp_test_config_path):
-        yield
-    os.remove(tmp_test_config_path)
 
 class TestIterm(unittest.TestCase):
     def test_valid_template(self):
         """ Checks that the template file is valid """
         import xml.etree.ElementTree as ET
         try:
-            root = ET.parse(config.iterm_template())
+            root = ET.parse(Iterm.load_config()[Iterm.template_key])
         except ET.ParseError as err:
             self.fail(str(err))
 
     @itermtesting()
-    def test_profile(self):
+    @configurationtesting()
+    def test_export(self):
         """ iTerm Integration test: provides a valid set of colors to the main function and check if it does not
             fail """
+        try:
+            Iterm.initialize_config()
+            self.assertTrue(Iterm.is_config_initialized())
+        except Exception as e:
+            self.fail(str(e))
+
         pltte = palette.Palette()
         pltte.foreground = (0,0,0)
         pltte.background = (0,0,0)
         hsl_colors =  ([(16  , 0.54 , 0.45) , (28  , 0.77 , 0.64) , (45  , 0.94 , 0.66) , (52  , 0.38 , 0.53) , (59  , 0.97 , 0.67) , (98  , 0.82 , 0.69) , (147 , 0.70 , 0.48) , (162 , 0.60 , 0.42) , (172 , 0.85 , 0.54) , (177 , 0.64 , 0.39) , (182 , 0.78 , 0.50) , (202 , 0.57 , 0.57) , (227 , 0.05 , 0.65) , (239 , 0.44 , 0.50) , (305 , 0.70 , 0.50) , (319 , 0.32 , 0.50) , (333 , 0.57 , 0.42) , (338 , 0.57 , 0.60) , (342 , 0.57 , 0.44) , (344 , 0.60 , 0.5)  , (348 , 0.92 , 0.62)])
         pltte.colors = [helpers.hsl_to_rgb(c) for c in hsl_colors]
+
         try:
-            Iterm.profile(pltte, "iterm_test", "wallpaper_path")
+            Iterm.export(pltte, "iterm_test")
         except Exception as e:
             self.fail(str(e))
 
     @itermtesting()
+    @configurationtesting()
     def test_valid_basic_configuration(self):
         """ Checks that the basic configuration file is valid """
         import xml.etree.ElementTree as ET
         try:
-            root = ET.parse(config.iterm_config())
+            root = ET.parse(Iterm.load_config()[Iterm.preferences_key])
         except ET.ParseError as err:
             self.fail(str(err))
 
     @itermtesting()
     def test_export_iterm_0_color_palette(self):
         with self.assertRaises(exceptions.ColorFormatError):
-            Iterm.profile(get_palette(0), "iterm_test", "wallpaper_path")
+            Iterm.export(generate_palette(0), "iterm_test")
 
     @itermtesting()
-    @unittest.skip("Still needs to implement palette management for iterm")
+    @configurationtesting()
     def test_export_iterm_1_color_palette(self):
         try:
-            Iterm.profile(get_palette(1), "iterm_test", "wallpaper_path")
+            Iterm.export(generate_palette(1), "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
     @itermtesting()
+    @configurationtesting()
     def test_export_iterm_16_color_palette(self):
         try:
-            Iterm.profile(get_palette(16), "iterm_test", "wallpaper_path")
+            Iterm.export(generate_palette(16), "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
     @itermtesting()
+    @configurationtesting()
     def test_export_iterm_200_color_palette(self):
         try:
-            Iterm.profile(get_palette(200), "iterm_test", "wallpaper_path")
+            Iterm.export(generate_palette(200), "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
