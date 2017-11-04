@@ -1,5 +1,6 @@
 import json
 from hapycolor import exceptions
+import pathlib
 
 """ Utilitary methods to convert color types  """
 
@@ -48,6 +49,9 @@ def hsl_to_hex(colhsl):
 
 
 def rgb_to_hsl(colrgb):
+    if not can_be_rgb(colrgb):
+        raise exceptions.ColorFormatError("The input color must be defined in"
+                                          + " the rgb base")
     r      = colrgb[0] / 255.
     g      = colrgb[1] / 255.
     b      = colrgb[2] / 255.

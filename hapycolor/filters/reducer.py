@@ -6,9 +6,12 @@ import networkx as nx
 from hapycolor import helpers
 from hapycolor import config
 from hapycolor import exceptions
+from . import base
 
 
-class Reducer():
+class Reducer(base.Filter):
+
+    threshold = 15
 
     @staticmethod
     def __distance(c1, c2):
@@ -16,9 +19,8 @@ class Reducer():
         Returns the CIEDE2000 distance of the two provided colors.
         `see <https://en.wikipedia.org/wiki/Color_difference/>`_
 
-        Keyword arguments:
-        c1 -- a tuple representing an hsl color
-        c2 -- a tuple representing an hsl color
+        :arg c1: a tuple representing an hsl color
+        :arg c2: a tuple representing an hsl color
         """
         rgb1 = sRGBColor(c1[0], c1[1], c1[2])
         rgb2 = sRGBColor(c2[0], c2[1], c2[2])
@@ -27,34 +29,21 @@ class Reducer():
         return delta_e_cie2000(lab1, lab2)
 
     @staticmethod
-    def apply(colors, threshold):
+    def apply(palette):
         """
         Returns a reduced list of rgb colors. The output result contains the
         maximal number of colors of the provided list, where each color is at
         at least a distance threshold from the others.
 
-        Keyword arguments:
-        colors -- a list of colors defined in base RGB
-        threshold -- a positive integer defining the minimal `CIEL2000
+        arg: colors: a list of colors defined in base RGB
+        arg: threshold: a positive integer defining the minimal `CIEL2000
         <https://en.wikipedia.org/wiki/Color_difference>`_ distance between
         colors.
         """
-        if colors.__class__ != list or len(colors) == 0:
-            msg = "'colors' must be a list of at least one rgn color"
-            raise exceptions.ReducerArgumentsError(msg)
-        if not all([helpers.can_be_rgb(c) for c in colors]):
-            msg = "'colors' must be a list of rgb colors"
-            raise exceptions.ColorFormatError(msg)
-
-        # TODO: Fixup when only one color is given
-        if len(colors) == 1:
-            return colors
-
-        in_colors_set = list(set(colors))
-
-        edges = Reducer.get_edges(in_colors_set, threshold)
+        edges = Reducer.get_edges(palette.colors, Reducer.threshold)
         maximum_clique = Reducer.get_maximum_clique(edges)
-        return [in_colors_set[i] for i in maximum_clique]
+        palette.colors = [palette.colors[i] for i in maximum_clique]
+        return palette
 
     @staticmethod
     def get_edges(colors, threshold):

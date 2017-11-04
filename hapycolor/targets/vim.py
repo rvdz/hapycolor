@@ -1,10 +1,21 @@
 from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
-from hapycolor import palette
+from hapycolor import palette as pltte
+from . import base
 
 
-class Vim:
+class Vim(base.Target):
+    """
+    Generates a colorscheme with the provided palette. This colorscheme will
+    be named 'hapycolor' and will be located in the directory provided when
+    initializing the target.
+
+    Currently it only generates a colorscheme by setting 24bit colors, so it
+    only works with versions of newer than Vim > 7.4 (TODO: To be confirmed)
+    after enabling the option: 'set termguicolor'.
+    """
+
     foreground = "Normal"
     groups = [["Comment"],
               ["Boolean"],
@@ -35,16 +46,44 @@ class Vim:
               ["Label"],
               ["Operator"]]
 
-    @staticmethod
-    def profile(pltte, name=None, img=None):
-        if pltte.__class__ != palette.Palette or not pltte.is_initialized:
+    configuration_key = "colorscheme_vim"
+
+    def is_config_initialized():
+        try:
+            is_init = Vim.configuration_key in Vim.load_config()
+        except exceptions.InvalidConfigKeyError:
+            return False
+        return is_init
+
+    def initialize_config():
+        """
+        Creates the path where the colorscheme will be generated, and stores it in
+        the project's configuration file.
+        """
+        p = config.input_path("Path to vim's custom plugins directory: ")
+        if not p.is_absolute():
+            p = p.resolve()
+
+        if not p.is_dir():
+            raise exceptions.WrongInputError("Must be a directory")
+
+        p = p / "hapycolor" / "colors"
+        if not p.exists():
+            p.mkdir(parents=True)
+        Vim.save_config({Vim.configuration_key : (p / "hapycolor.vim").as_posix()})
+
+    def compatible_os():
+        return [config.OS.LINUX, config.OS.DARWIN]
+
+    def export(palette, image_path):
+        if palette.__class__ != pltte.Palette or not palette.is_initialized:
             msg = "The palette does not respect the appropriate structure"
             raise exceptions.PaletteFormatError(msg)
 
-        with open(config.vim(), "w+") as f:
+        with open(Vim.load_config()[Vim.configuration_key], "w+") as f:
             Vim.__print_header(f)
-            Vim.__print_foreground(helpers.rgb_to_hex(pltte.foreground), f)
-            Vim.__print_body(VimColorManager(pltte.colors), f)
+            Vim.__print_foreground(helpers.rgb_to_hex(palette.foreground), f)
+            Vim.__print_body(VimColorManager(palette.colors), f)
 
     @staticmethod
     def __print_header(f):
