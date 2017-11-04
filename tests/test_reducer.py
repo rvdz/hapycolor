@@ -1,5 +1,5 @@
 import unittest
-from hapycolor.color.reducer import Reducer
+from hapycolor.filters.reducer import Reducer
 
 class TestReducer(unittest.TestCase):
     def test_reducer_valid_entry(self):

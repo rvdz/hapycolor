@@ -4,10 +4,11 @@ from hapycolor import exceptions
 
 class Palette:
     """ A palette is defined by rgb tuples stored in three attributes:
+
         - foreground
         - background
         - colors: an unordered list of colors
-         """
+     """
 
     def __init__(self):
         self._foreground = None
