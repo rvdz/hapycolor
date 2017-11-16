@@ -39,8 +39,15 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 def parse_arguments():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="File path to the image", required=True)
-    return vars(ap.parse_args())
+    ap.add_argument("-f", "--file", help="File path to the image")
+    ap.add_argument("-d", "--dir", help="File directory to the image "
+            + "(this option will NOT export variables, use -f instead).")
+    ap.add_argument("-j", "--json", help="Saves output as a Json format "
+            + " and do not export variables")
+    args = vars(ap.parse_args())
+    if not (args.file or args.dir):
+        ap.error('No action requested, add -f or -d')
+    return args
 
 def display_palette(palette):
     print("\nFinal palette (" + str(len(palette.colors)) + "):")
@@ -66,9 +73,12 @@ def main(args=None):
 
     palette = filters.apply(palette)
 
-    targets.export(palette, args["file"])
-
-    display_palette(palette)
+    if args["json"]:
+        # TODO Saves to Json
+        return
+    else:
+        targets.export(palette, args["file"])
+        display_palette(palette)
 
 
 if __name__ == '__main__':
