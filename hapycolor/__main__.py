@@ -19,6 +19,7 @@ from . import filters
 
 from PIL import Image, ImageDraw
 import argparse
+import os
 
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
@@ -40,13 +41,16 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 def parse_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", help="File path to the image")
+    # TODO directory handling
     ap.add_argument("-d", "--dir", help="File directory to the image "
             + "(this option will NOT export variables, use -f instead).")
-    ap.add_argument("-j", "--json", help="Saves output as a Json format "
-            + " and do not export variables")
+    ap.add_argument("-j", "--json", action="store_true", help="Saves output "
+              "as a Json format instead of exporting variables")
     args = vars(ap.parse_args())
-    if not (args.file or args.dir):
-        ap.error('No action requested, add -f or -d')
+    if not (args["file"] or args["dir"]):
+        ap.error('expected either argument -f or -d')
+    if args["file"] and args["dir"]:
+        ap.error('cannot use simultaneaously option -f and -d')
     return args
 
 def display_palette(palette):
@@ -62,24 +66,25 @@ def display_palette(palette):
     colors_to_file([c for c in palette.colors], "palette.png")
     helpers.save_json("palette.json", palette.colors)
 
+def add_palette_json(img_name, palette):
+    data_dict = {img_name: palette.colors}
+    helpers.update_json("palettes.json", data_dict)
 
 def main(args=None):
 
     args = parse_arguments()
 
-    targets.initialize()
+    img_name = args["file"]
 
-    palette = raw_colors.get(args["file"], num_colors=150)
-
+    palette = raw_colors.get(img_name, num_colors=150)
     palette = filters.apply(palette)
 
     if args["json"]:
-        # TODO Saves to Json
-        return
+        add_palette_json(os.path.abspath(img_name), palette)
     else:
+        targets.initialize()
         targets.export(palette, args["file"])
         display_palette(palette)
-
 
 if __name__ == '__main__':
     main()

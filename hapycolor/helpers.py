@@ -1,6 +1,6 @@
 import json
 from hapycolor import exceptions
-import pathlib
+import os
 
 """ Utilitary methods to convert color types  """
 
@@ -115,3 +115,16 @@ def load_json(file_path):
 def save_json(data_file, data_object):
     with open(data_file, 'w') as f:
         json.dump(data_object, f, indent=4)
+
+def update_json(data_file, data_object):
+    if not os.path.exists(data_file):
+        with open(data_file, 'wt') as inFile:
+            inFile.write("{}")
+        data = data_object
+    else:
+        with open(data_file) as f:
+            data = json.load(f)
+        data.update(data_object)
+
+    with open(data_file, 'w') as f:
+        json.dump(data, f, indent=2)
