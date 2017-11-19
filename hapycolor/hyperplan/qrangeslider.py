@@ -153,6 +153,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     minValueChanged = QtCore.pyqtSignal(int)
     startValueChanged = QtCore.pyqtSignal(int)
     saturationChanged = QtCore.pyqtSignal(int)
+    colorsChanged = QtCore.pyqtSignal(int)
 
     _SPLIT_START    = 1
     _SPLIT_END      = 2
@@ -186,6 +187,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self.tail = Tail(self._tail, main=self)
         self._tail_layout.addWidget(self.tail)
         self.saturationChanged.connect(self._handleSaturation)
+        self.colorsChanged.connect(self._setLinearGradientBgStyle)
         self.setMin(0)
         self.setMax(100)
         self.setStart(0)
@@ -211,9 +213,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         newEndHSL = (self.hue(), sat, hex_to_hsl(self.colorEnd())[2])
         self.setColorStart(hsl_to_hex(newStartHSL))
         self.setColorEnd(hsl_to_hex(newEndHSL))
-        self.setHeadBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorMin() +', stop:1 ' + self.colorStart() + ');')
-        self.handle.setStyleSheet('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorStart() +', stop:1 ' + self.colorEnd() +');')
-        self.setTailBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorEnd() +', stop:1 ' + self.colorMax() + ');')
+        self.colorsChanged.emit(0)
 
     def hue(self):
         return hex_to_hsl(getattr(self, '__color_median', None))[0]
@@ -223,6 +223,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
     def setColorMedian(self, value):
         setattr(self, '__color_median', value)
+        self.colorsChanged.emit(value)
 
     def colorMin(self):
         return self._COLOR_MIN
@@ -232,9 +233,11 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
     def setColorMin(self, value):
         self._COLOR_MIN = value
+        self.colorsChanged.emit(value)
 
     def setColorMax(self, value):
         self._COLOR_MAX = value
+        self.colorsChanged.emit(value)
 
     def colorStart(self):
         return getattr(self, '__color_start', None)
@@ -244,6 +247,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
     def setColorStart(self, value):
         setattr(self, '__color_start', value)
+        self.colorsChanged.emit(value)
 
     def _setColorStart(self, pos):
         ratio = (float(pos) - self.min()) / (self.max() - self.min())
@@ -257,6 +261,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
     def setColorEnd(self, value):
         setattr(self, '__color_end', value)
+        self.colorsChanged.emit(value)
 
     def min(self):
         return getattr(self, '__min', None)
@@ -332,14 +337,48 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self._tail.setStyleSheet(style)
         self._head.setStyleSheet(style)
 
-    def setHeadBackgroundStyle(self, style):
+    def setHeadBgStyle(self, style):
         self._head.setStyleSheet(style)
 
-    def setTailBackgroundStyle(self, style):
+    def setTailBgStyle(self, style):
         self._tail.setStyleSheet(style)
 
     def setSpanStyle(self, style):
         self._handle.setStyleSheet(style)
+
+    def _linGradStyle(self, *arg):
+        if len(arg) < 8 or len(arg) % 2 == 1:
+            print('Missing gradient arguments')
+            raise Exception
+        x1, y1, x2, y2 = arg[0], arg[1], arg[2], arg[3]
+        stopStyle = ''
+        for i in range(4, len(arg), 2):
+            stopStyle += ' stop:{} {}'.format(arg[i], arg[i+1])
+        style = 'background: qlineargradient(x1:{}, y1:{}, x2:{}, y2:{},{} );'.format(x1, y1, x2, y2, stopStyle)
+        return style
+
+    def _setLinearGradientBgStyle(self):
+        start, end = self.getRange()
+        middle = (self.max() + self.min()) / 2
+        cMin, cMax = self.colorMin(), self.colorMax()
+        cS, cE, cMed = self.colorStart(), self.colorEnd(), self.colorMedian()
+        if start >= middle:
+            mid = (middle - self.min()) / (start - self.min())
+            self.setHeadBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cMin, mid, cMed, 1, cS))
+            self.setSpanStyle(self._linGradStyle(0, 0, 1, 0, 0, cS, 1, cE))
+            self.setTailBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cE, 1, cMax))
+
+        elif start < middle < end:
+            mid = (middle - start) / (end - start)
+            self.setHeadBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cMin, 1, cS))
+            self.setSpanStyle(self._linGradStyle(0, 0, 1, 0, 0, cS, mid, cMed, 1, cE))
+            self.setTailBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cE, 1, cMax))
+
+        else:
+            mid = (middle - end) / (self.max() - end)
+            self.setHeadBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cMin, 1, cS))
+            self.setSpanStyle(self._linGradStyle(0, 0, 1, 0, 0, cS, 1, cE))
+            self.setTailBgStyle(self._linGradStyle(0, 0, 1, 0, 0, cE, mid, cMed, 1, cMax))
 
     def _valueToPos(self, value):
         return scale(value, (self.min(), self.max()), (0, self.width()))
@@ -373,28 +412,8 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
             w = self.width() - xpos + offset
             self._setColorEnd(v)
             self._setEnd(v)
-
         if self.staticGradient:
-            start, end = self.getRange()
-            middle = (self.max() + self.min()) / 2
-            if start >= middle:
-                mid_ratio = (middle - self.min()) / (start - self.min())
-                self.setHeadBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorMin() +', stop:' + str(mid_ratio) + ' ' + self.colorMedian() + ', stop:1 ' + self.colorStart() + ');')
-                self.handle.setStyleSheet('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorStart() + ', stop:1 ' + self.colorEnd() + ');')
-                self.setTailBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorEnd() + ', stop:1 ' + self.colorMax() + ');')
-
-            elif start < middle < end:
-                mid_ratio = (middle - start) / (end - start)
-                self.setHeadBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorMin() + ', stop:1 ' + self.colorStart() + ');')
-                self.handle.setStyleSheet('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorStart() + ', stop:' + str(mid_ratio) + ' ' + self.colorMedian() + ', stop:1 ' + self.colorEnd() + ');')
-                self.setTailBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorEnd() + ', stop:1 ' + self.colorMax() + ');')
-
-            else:
-                mid_ratio = (middle - end) / (self.max() - end)
-                self.setHeadBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorMin() + ', stop:1 ' + self.colorStart() + ');')
-                self.handle.setStyleSheet('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorStart() + ', stop:1 ' + self.colorEnd() + ');')
-                self.setTailBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 ' + self.colorEnd() + ', stop:' + str(mid_ratio) + ' ' + self.colorMedian() + ', stop:1 ' + self.colorMax() + ');')
-
+            self.colorsChanged.emit(0)
         _unlockWidth(self._tail)
         _unlockWidth(self._head)
         _unlockWidth(self._handle)
