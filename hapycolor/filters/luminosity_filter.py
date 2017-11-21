@@ -3,7 +3,6 @@ from hapycolor import helpers
 from hapycolor import exceptions
 from . import base
 
-from matplotlib import pyplot as plt
 from scipy import interpolate
 import numpy as np
 import sys
