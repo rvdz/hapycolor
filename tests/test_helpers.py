@@ -180,6 +180,7 @@ Nude pagoda careens.""",
             self.fail(str(err))
 
     def test_load_json(self):
+        self.test_save_json()
         try:
             helpers.save_json(TestHelpers.tmp_file, TestHelpers.hello_world)
             self.assertEqual(helpers.load_json(TestHelpers.tmp_file),

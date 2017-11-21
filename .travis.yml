@@ -1,0 +1,13 @@
+language: python
+python:
+  - 3.5
+
+# command to install dependencies
+install:
+  - sudo apt-get install imagemagick
+  - pip3 install pipenv
+  - pipenv install --dev
+
+# command to run tests
+script:
+  - python3 ./tests/run_suite.py -v 3
