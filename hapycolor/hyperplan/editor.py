@@ -10,26 +10,26 @@ from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject
 
 class Communicate(QObject):
 
-    updateBW = pyqtSignal(int)
+    updateSaturation = pyqtSignal(int)
 
 
 class ColorDisplay(QWidget):
 
-    def __init__(self, x, cs_y, hue_step, init_sat, slice_width, slice_height):
+    def __init__(self, x, csY, hueStep, initSat, sliceWidth, sliceHeight):
 
         super().__init__()
 
-        self.HUE_STEP     = hue_step
-        self.SLICE_WIDTH  = slice_width
-        self.SLICE_HEIGHT = slice_height
+        self.hueStep     = hueStep
+        self.sliceWidth  = sliceWidth
+        self.sliceHeight = sliceHeight
         self.X            = x
-        self.CS_Y         = cs_y
+        self.csY         = csY
 
         # Init
         self.gradient     = True
         self.start        = 30
         self.end          = 70
-        self.saturation   = init_sat
+        self.saturation   = initSat
 
         self.sliders      = {}
         self.layouts      = {}
@@ -41,20 +41,25 @@ class ColorDisplay(QWidget):
 
     def initSliders(self):
 
-        for hue in range(0, 360, self.HUE_STEP):
+        for hue in range(0, 360, self.hueStep):
             cMed = hsl_to_hex((hue, self.saturation/100., .5))
-            self.sliders["hue" + str(hue)] = RangeSlider(
+            name = "hue" + str(hue)
+            if hue == 0:
+                name = name[:3] + '0' + name[3:]
+            if hue < 100:
+                name = name[:3] + '0' + name[3:]
+            self.sliders[name] = RangeSlider(
                                 gradient=self.gradient,
                                 colorMedian=cMed,
                                 start=self.start,
                                 end=self.end,
                                 saturation=self.saturation)
-            self.sliders["hue" + str(hue)].setRange(self.start, self.end)
+            self.sliders[name].setRange(self.start, self.end)
 
 
     def initLayout(self):
 
-        for name, slider in sorted(self.sliders.items()):
+        for name in sorted(self.sliders.keys()):
             self.layouts[name] = QHBoxLayout()
             self.layouts[name].addWidget(self.sliders[name])
             self.VLayout.addLayout(self.layouts[name])
@@ -89,52 +94,51 @@ class HyperplanEditor(QWidget):
         self.MAX_SAT        = 100
 
         # Color Slider
-        self.HUE_STEP       = 20
-        self.INIT_SAT       = 100
-        self.SLICE_WIDTH    = 5
-        self.SLICE_HEIGHT   = 20
-        self.CS_Y           = 30
+        self.hueStep       = 20
+        self.initSat       = 100
+        self.sliceWidth    = 5
+        self.sliceHeight   = 20
+        self.csY           = 30
         self.CS_WIDTH       = self.WIDTH
-        self.CS_HEIGHT      = self.SLICE_HEIGHT * 360 / self.HUE_STEP
+        self.CS_HEIGHT      = self.sliceHeight * 360 / self.hueStep
 
         # Classic sliders
         self.S_WIDTH        = 150
         self.S_HEIGHT       = 30
 
-        self.__init_UI()
+        self.__initUI()
 
 
-    def __init_UI(self):
+    def __initUI(self):
 
         slider = QSlider(Qt.Horizontal, self)
         slider.setFocusPolicy(Qt.NoFocus)
         slider.setRange(self.MIN_SAT, self.MAX_SAT)
-        slider.setValue(self.INIT_SAT)
+        slider.setValue(self.initSat)
         slider.setGeometry(self.X_WID, 40, self.S_WIDTH, self.S_HEIGHT)
 
         # Interactive Widget
         self.c = Communicate()
         self.colorSliders = ColorDisplay(
                                 x=self.X_WID,
-                                cs_y=self.CS_Y,
-                                hue_step=self.HUE_STEP,
-                                init_sat=self.INIT_SAT,
-                                slice_width=self.SLICE_WIDTH,
-                                slice_height=self.SLICE_HEIGHT
+                                csY=self.csY,
+                                hueStep=self.hueStep,
+                                initSat=self.initSat,
+                                sliceWidth=self.sliceWidth,
+                                sliceHeight=self.sliceHeight
                                 )
-        self.c.updateBW[int].connect(self.colorSliders.setSaturation)
+        self.c.updateSaturation[int].connect(self.colorSliders.setSaturation)
         slider.valueChanged[int].connect(self.changeSaturation)
 
-        hbox_slider = QHBoxLayout()
-        hbox_slider.addWidget(slider)
+        hboxSliderSat = QHBoxLayout()
+        hboxSliderSat.addWidget(slider)
 
-        hbox_hue = QHBoxLayout()
-        hbox_hue.addWidget(self.colorSliders)
+        hboxColorSliders = QHBoxLayout()
+        hboxColorSliders.addWidget(self.colorSliders)
 
         vbox = QVBoxLayout()
-        vbox.addLayout(hbox_hue, 360 / self.HUE_STEP)
-        vbox.addLayout(hbox_slider, 1)
-        #vbox.addStretch(1)
+        vbox.addLayout(hboxColorSliders, 360 / self.hueStep)
+        vbox.addLayout(hboxSliderSat, 1)
         self.setLayout(vbox)
 
         self.resize(self.WIDTH, self.HEIGHT)
@@ -165,8 +169,7 @@ class HyperplanEditor(QWidget):
 
     def changeSaturation(self, value):
 
-        self.c.updateBW.emit(value)
-        self.colorSliders.repaint()
+        self.c.updateSaturation.emit(value)
 
 
 if __name__ == '__main__':
