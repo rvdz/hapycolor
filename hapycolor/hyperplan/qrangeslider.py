@@ -152,18 +152,18 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     maxValueChanged = QtCore.pyqtSignal(int)
     minValueChanged = QtCore.pyqtSignal(int)
     startValueChanged = QtCore.pyqtSignal(int)
-    saturationChanged = QtCore.pyqtSignal(int)
+    saturationChanged = QtCore.pyqtSignal(float)
     colorsChanged = QtCore.pyqtSignal(int)
 
     _SPLIT_START    = 1
     _SPLIT_END      = 2
     _COLOR_MIN      = '#000000'
     _COLOR_MAX      = '#FFFFFF'
+    _INIT_SAT       = 1.
 
-    staticGradient  = True
-
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, gradient=True, colorMedian='#FF0000', saturation=100, start=30, end=70):
         super(QRangeSlider, self).__init__(parent)
+        self.staticGradient = gradient
         self.setupUi(self)
         self.setMouseTracking(False)
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
@@ -187,16 +187,17 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self.tail = Tail(self._tail, main=self)
         self._tail_layout.addWidget(self.tail)
         self.saturationChanged.connect(self._handleSaturation)
-        self.colorsChanged.connect(self._setLinearGradientBgStyle)
+        if self.staticGradient:
+            self.colorsChanged.connect(self._setLinearGradientBgStyle)
         self.setMin(0)
         self.setMax(100)
-        self.setStart(0)
-        self.setEnd(100)
-        self.setColorStart('#000000')
-        self.setColorEnd('#FFFFFF')
-        self.setColorMedian('#FF0000')
-        self.setSaturation(100)
+        self.setRange(start, end)
+        self._initHue(colorMedian)
+        self.setColorMedian(colorMedian)
+        self.setSaturation(saturation)
         self.setDrawValues(True)
+        self.show()
+        self.setRange(start, end)
 
     def setStaticGradient(self, boolean):
         self.staticGradient = boolean
@@ -205,25 +206,29 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         return getattr(self, '__saturation', None)
 
     def setSaturation(self, value):
-        setattr(self, '__saturation', float(value)/100)
-        self.saturationChanged.emit(value)
+        setattr(self, '__saturation', value/100.)
+        self.saturationChanged.emit(value/100.)
 
     def _handleSaturation(self, sat):
-        newStartHSL = (self.hue(), sat, hex_to_hsl(self.colorStart())[2])
-        newEndHSL = (self.hue(), sat, hex_to_hsl(self.colorEnd())[2])
-        self.setColorStart(hsl_to_hex(newStartHSL))
-        self.setColorEnd(hsl_to_hex(newEndHSL))
-        self.colorsChanged.emit(0)
+        newMedHSL = (self.hue(), sat, hex_to_hsl(self.colorMedian())[2])
+        self.setColorMedian(hsl_to_hex(newMedHSL))
 
     def hue(self):
-        return hex_to_hsl(getattr(self, '__color_median', None))[0]
+        return getattr(self, '__hue', None)
+
+    def _initHue(self, colorMedian):
+        setattr(self, '__hue', hex_to_hsl(colorMedian)[0])
 
     def colorMedian(self):
         return getattr(self, '__color_median', None)
 
     def setColorMedian(self, value):
         setattr(self, '__color_median', value)
-        self.colorsChanged.emit(value)
+        if self.saturation() is None:
+            setattr(self, '__saturation', self._INIT_SAT)
+        start, end = self.getRange()
+        self._setColorStart(start)
+        self._setColorEnd(end)
 
     def colorMin(self):
         return self._COLOR_MIN
@@ -249,6 +254,10 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         setattr(self, '__color_start', value)
         self.colorsChanged.emit(value)
 
+    def setColorEnd(self, value):
+        setattr(self, '__color_end', value)
+        self.colorsChanged.emit(value)
+
     def _setColorStart(self, pos):
         ratio = (float(pos) - self.min()) / (self.max() - self.min())
         hsl_value = (self.hue(), self.saturation(), ratio)
@@ -258,10 +267,6 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         ratio = (float(pos) - self.min()) / (self.max() - self.min())
         hsl_value = (self.hue(), self.saturation(), ratio)
         self.setColorEnd(hsl_to_hex(hsl_value))
-
-    def setColorEnd(self, value):
-        setattr(self, '__color_end', value)
-        self.colorsChanged.emit(value)
 
     def min(self):
         return getattr(self, '__min', None)
@@ -421,7 +426,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
-    rs = QRangeSlider()
+    rs = QRangeSlider(gradient=True)
     rs.show()
     rs.setRange(15, 35)
     rs.setSaturation(100)

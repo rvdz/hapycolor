@@ -1,6 +1,7 @@
 import sys
 
-from hapycolor.helpers import hsl_to_rgb, rgb_to_hsl
+from hapycolor.helpers import hsl_to_hex
+from hapycolor.hyperplan.qrangeslider import QRangeSlider as RangeSlider
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QDesktopWidget, QSlider, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QIcon, QPainter, QColor
@@ -23,35 +24,47 @@ class ColorDisplay(QWidget):
         self.SLICE_HEIGHT = slice_height
         self.X            = x
         self.CS_Y         = cs_y
+
+        # Init
+        self.gradient     = True
+        self.start        = 30
+        self.end          = 70
         self.saturation   = init_sat
+
+        self.sliders      = {}
+        self.layouts      = {}
+        self.VLayout      = QVBoxLayout()
+
+        self.initSliders()
+        self.initLayout()
+
+
+    def initSliders(self):
+
+        for hue in range(0, 360, self.HUE_STEP):
+            cMed = hsl_to_hex((hue, self.saturation/100., .5))
+            self.sliders["hue" + str(hue)] = RangeSlider(
+                                gradient=self.gradient,
+                                colorMedian=cMed,
+                                start=self.start,
+                                end=self.end,
+                                saturation=self.saturation)
+            self.sliders["hue" + str(hue)].setRange(self.start, self.end)
+
+
+    def initLayout(self):
+
+        for name, slider in sorted(self.sliders.items()):
+            self.layouts[name] = QHBoxLayout()
+            self.layouts[name].addWidget(self.sliders[name])
+            self.VLayout.addLayout(self.layouts[name])
+        self.setLayout(self.VLayout)
 
 
     def setSaturation(self, s):
 
-        self.saturation   = s
-
-
-    def paintEvent(self, event):
-
-        painter = QPainter()
-        painter.begin(self)
-        self.drawWidget(painter)
-        painter.end()
-
-
-    def drawWidget(self, painter):
-
-        for i, hue in enumerate(range(0, 360, self.HUE_STEP)):
-
-            for bright in range(101):
-
-                rgb = hsl_to_rgb((hue, self.saturation/100, bright/100.))
-                red, green, blue = rgb[0], rgb[1], rgb[2]
-
-                color = QColor(red, green, blue)
-                painter.setPen(color)  # Outline
-                painter.setBrush(color)  # Fill
-                painter.drawRect(self.X + bright*5, self.CS_Y + i*30, self.SLICE_WIDTH, self.SLICE_HEIGHT)
+        for slider in self.sliders.values():
+            slider.setSaturation(s)
 
 
 class HyperplanEditor(QWidget):
@@ -101,7 +114,7 @@ class HyperplanEditor(QWidget):
 
         # Interactive Widget
         self.c = Communicate()
-        self.colorDisplay = ColorDisplay(
+        self.colorSliders = ColorDisplay(
                                 x=self.X_WID,
                                 cs_y=self.CS_Y,
                                 hue_step=self.HUE_STEP,
@@ -109,18 +122,18 @@ class HyperplanEditor(QWidget):
                                 slice_width=self.SLICE_WIDTH,
                                 slice_height=self.SLICE_HEIGHT
                                 )
-        self.c.updateBW[int].connect(self.colorDisplay.setSaturation)
+        self.c.updateBW[int].connect(self.colorSliders.setSaturation)
         slider.valueChanged[int].connect(self.changeSaturation)
 
         hbox_slider = QHBoxLayout()
         hbox_slider.addWidget(slider)
 
         hbox_hue = QHBoxLayout()
-        hbox_hue.addWidget(self.colorDisplay)
+        hbox_hue.addWidget(self.colorSliders)
 
         vbox = QVBoxLayout()
-        #vbox.addLayout(hbox_hue, 360 / self.HUE_STEP)
-        #vbox.addLayout(hbox_slider, 1)
+        vbox.addLayout(hbox_hue, 360 / self.HUE_STEP)
+        vbox.addLayout(hbox_slider, 1)
         #vbox.addStretch(1)
         self.setLayout(vbox)
 
@@ -153,7 +166,7 @@ class HyperplanEditor(QWidget):
     def changeSaturation(self, value):
 
         self.c.updateBW.emit(value)
-        self.colorDisplay.repaint()
+        self.colorSliders.repaint()
 
 
 if __name__ == '__main__':
