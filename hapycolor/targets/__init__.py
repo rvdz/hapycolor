@@ -15,13 +15,13 @@ def initialize():
     targets = get_compatible()
     uninit_targets = []
     for t in targets:
-        if not t.is_config_initialized():
-            uninit_targets.append(t)
-        else:
-            try:
-                t.is_enabled()
-            except (KeyError, exceptions.InvalidConfigKeyError):
+        try:
+            if not t.is_enabled():
+                continue
+            if not t.is_config_initialized():
                 uninit_targets.append(t)
+        except (KeyError, exceptions.InvalidConfigKeyError):
+            uninit_targets.append(t)
 
     for t in uninit_targets:
         res = input("Enable " + t.__name__ + "? (y/n) :")
