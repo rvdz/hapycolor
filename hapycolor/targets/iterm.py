@@ -272,7 +272,10 @@ class TermColorManager():
                 # If the provided index corresponds to this TermColor enum
                 if tc not in self.colors:
                     # If there are no colors for this label, returns a random one
-                    label = random.choice(list(self.colors))
+                    tmp_colors = {**self.colors}
+                    del tmp_colors[TermColorEnum.BLACK]
+                    del tmp_colors[TermColorEnum.WHITE]
+                    label = random.choice(list(tmp_colors))
 
                     while not self.colors[label]:
                         # If the label is empty, pick another one
