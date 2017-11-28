@@ -4,9 +4,10 @@ from contextlib import redirect_stdout
 from hapycolor.helpers import hsl_to_hex, hex_to_hsl, hex_to_rgb, rgb_to_hsl
 from hapycolor.hyperplan.qrangeslider import QRangeSlider as RangeSlider
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton,
-                            QDesktopWidget, QSlider, QHBoxLayout,
-                            QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
+                            QDesktopWidget, QSlider, QHBoxLayout, \
+                            QVBoxLayout, QMainWindow, QAction, \
+                            QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject
 
@@ -202,14 +203,14 @@ class HyperplanEditor(QMainWindow):
     def openFile(self):
 
         self.fileName = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
-        #try:
-        with open(self.fileName, 'r') as f:
-            points = json.load(f)
-            self.setWindowTitle(self.WINDOW_NAME + ": " + os.path.basename(self.fileName))
-            self.formWidget.colorSliders.setPoints(points)
-            self._saved = True
-        #except:
-        #    return
+        try:
+            with open(self.fileName, 'r') as f:
+                points = json.load(f)
+                self.setWindowTitle(self.WINDOW_NAME + ": " + os.path.basename(self.fileName))
+                self.formWidget.colorSliders.setPoints(points)
+                self._saved = True
+        except:
+            return
 
     def saveFile(self):
 
