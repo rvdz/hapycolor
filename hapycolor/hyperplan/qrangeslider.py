@@ -203,6 +203,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         super(QRangeSlider, self).__init__(parent)
 
         self.staticGradient = gradient
+        self.c = None
         self.setupUi(self)
         self.setMouseTracking(False)
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
@@ -231,8 +232,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
         self.saturationChanged.connect(self._handleSaturation)
         if self.staticGradient:
-            self.colorsChanged.connect(self._setLinearHGradientBgStyle)
-
+            self.colorsChanged.connect(self._updateColors)
         self.setMin(0)
         self.setMax(100)
         self.setRange(start, end)
@@ -243,6 +243,16 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
         self.show()
         self.setRange(start, end)  # TODO not call it twice
+
+    def setCanal(self, c):
+
+        self.c = c
+
+    def _updateColors(self):
+
+        self._setLinearHGradientBgStyle()
+        if self.c is not None:
+            self.c.modification.emit(0)
 
     def setStaticGradient(self, boolean):
 

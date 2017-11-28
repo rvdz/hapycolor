@@ -1,4 +1,4 @@
-import json
+import json, sys, os
 from hapycolor import exceptions
 import pathlib
 
