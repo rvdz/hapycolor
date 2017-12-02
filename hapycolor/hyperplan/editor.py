@@ -1,13 +1,13 @@
 import sys, json, os
-from contextlib import redirect_stdout
+from enum import IntEnum
 
-from hapycolor.helpers import hsl_to_hex, hex_to_hsl, hex_to_rgb, rgb_to_hsl
+from hapycolor.helpers import hsl_to_hex, hex_to_hsl, hex_to_rgb, rgb_to_hsl, rgb_to_hex
 from hapycolor.hyperplan.qrangeslider import QRangeSlider as RangeSlider
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
                             QDesktopWidget, QSlider, QHBoxLayout, \
                             QVBoxLayout, QMainWindow, QAction, \
-                            QMessageBox, QFileDialog
+                            QMessageBox, QFileDialog, QGridLayout
 from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject
 
@@ -22,34 +22,65 @@ class Communicate(QObject):
 class ColorDisplay(QWidget):
 
 
-    def __init__(self, x, csY, hueStep, initSat, sliceWidth, sliceHeight):
+    # Inspired by http://www.procato.com/rgb+index/#
+    class State(IntEnum):
+        ALL = 0
+        RED = 1
+        ORANGE = 2
+        AMBER = 3
+        LIME = 4
+        CHARTREUSE = 5
+        GREEN = 6
+        MALACHITE = 7
+        TURQUOISE = 8
+        CYAN = 9
+        AZURE = 10
+        SAPPHIRE = 11
+        BLUE = 12
+        VIOLET = 13
+        MAGENTA = 14
+        FUCHSIA = 15
+        RASPBERRY = 16
+
+
+    def __init__(self, x, csY, hueStep, initSat):
 
         super().__init__()
 
-        self.hueStep     = hueStep
-        self.sliceWidth  = sliceWidth
-        self.sliceHeight = sliceHeight
+        self.hueStep      = hueStep
         self.X            = x
-        self.csY         = csY
+        self.csY          = csY
 
         # Init
         self.gradient     = True
         self.start        = 30
         self.end          = 70
         self.saturation   = initSat
+        self.__state      = self.State.ALL
 
         self.sliders      = {}
         self.layouts      = {}
         self.VLayout      = QVBoxLayout()
         self.__points     = {}
 
+        self.initHues(self.hueStep)
         self.initSliders()
         self.initLayout()
 
+    def initHues(self, hueStep):
+
+        hues = {}
+        for s in self.State:
+            if s == self.State.ALL:
+                hues[s] = [0, 360]
+            else:
+                hues[s] = [(int(s)-1)*self.hueStep, int(s)*self.hueStep]
+        setattr(self, 'hues', hues)
+
     def initSliders(self):
 
-        for hue in range(0, 360, self.hueStep):
-            cMed = hsl_to_hex((hue, self.saturation/100., .5))
+        for hue in range(0, 3600, int(10*self.hueStep)):
+            cMed = hsl_to_hex((hue/10, self.saturation/100., .5))
             name = self.genName(hue)
             self.addSlider(cMed, self.start, self.end)
 
@@ -67,6 +98,7 @@ class ColorDisplay(QWidget):
             self.sliders[name].setCanal(c)
 
     def genName(self, hue):
+
         name = "hue" + str(hue)
         if hue == 0:
             name = name[:3] + '0' + name[3:]
@@ -76,8 +108,26 @@ class ColorDisplay(QWidget):
 
     def setSaturation(self, s):
 
-        for slider in self.sliders.values():
-            slider.setSaturation(s)
+        self.saturation = s
+        for i, name in enumerate(sorted(self.sliders.keys())):
+            self.sliders[name].setSaturation(s)
+            if str(s) in self.__points.keys():
+                self.updateSlider(self.sliders[name], i)
+
+    # JSON file replace tuple by array
+    def updateSlider(self, slider, index):
+
+        colStart = self.__points[str(self.saturation)]['dark'][index]
+        colStart = rgb_to_hex(tuple(colStart))
+        colEnd = self.__points[str(self.saturation)]['bright'][index]
+        colEnd = rgb_to_hex(tuple(colEnd))
+        if slider.colorStart() == colStart and slider.colorEnd() == colEnd:
+            return
+        hue = hex_to_hsl(colStart)[0]
+        colMed = hsl_to_hex((hue, self.saturation/100., .5))
+        slider.setEndByColor(colEnd)
+        slider.setStartByColor(colStart)
+        slider.setColorMedian(colMed)
 
     def addSlider(self, colorMedian, start, end):
 
@@ -90,12 +140,11 @@ class ColorDisplay(QWidget):
                             saturation=self.saturation)
         self.sliders[name].setRange(start, end)
 
-    # Saturation fixed here
     # Output sorted by increasing hue
-    def getPoints(self):
+    def savePoints(self):
 
         for slider in self.sliders.values():
-            sat = slider.saturation()
+            sat = str(int(slider.saturation()*100))
             break
         self.__points[sat] = {}
         dark = self.__points[sat]['dark'] = []
@@ -103,23 +152,17 @@ class ColorDisplay(QWidget):
         for name in sorted(self.sliders.keys()):
             dark.append(hex_to_rgb(self.sliders[name].colorStart()))
             bright.append(hex_to_rgb(self.sliders[name].colorEnd()))
+        print(self.__points)
         return self.__points
 
     # Input sorted by increasing hue
-    # Only supports same number of sliders for now
-    def setPoints(self, points):
+    def loadPoints(self, points):
 
+        self.__points = points
         for key in points.keys():
             sat = key
             break
-        for i, key in enumerate(sorted(self.sliders.keys())):
-            dark = rgb_to_hsl(tuple(points[sat]['dark'][i]))
-            bright = rgb_to_hsl(tuple(points[sat]['bright'][i]))
-            colorMedian = hsl_to_hex((dark[0], float(sat), 0.5))
-            self.sliders[key].setColorMedian(colorMedian)
-            self.sliders[key].setStart(int(dark[2]*100))
-            self.sliders[key].setEnd(int(bright[2]*100))
-        self.setSaturation(int(float(sat)*100))
+        self.setSaturation(int(sat))
 
 
 class HyperplanEditor(QMainWindow):
@@ -207,14 +250,14 @@ class HyperplanEditor(QMainWindow):
             with open(self.fileName, 'r') as f:
                 points = json.load(f)
                 self.setWindowTitle(self.WINDOW_NAME + ": " + os.path.basename(self.fileName))
-                self.formWidget.colorSliders.setPoints(points)
+                self.formWidget.colorSliders.loadPoints(points)
                 self._saved = True
         except:
             return
 
     def saveFile(self):
 
-        points = self.formWidget.colorSliders.getPoints()
+        points = self.formWidget.colorSliders.savePoints()
         if self.fileName:
             outFile = QFileDialog.getSaveFileName(self, 'Save file', self.fileName)[0]
         else:
@@ -235,15 +278,11 @@ class FormWidget(QWidget):
         super(FormWidget, self).__init__(parent)
 
         # Color Slider
-        self.hueStep       = 20
+        self.hueStep       = 22.5  # Max 1 digit after comma
         self.initSat       = 100
-        self.sliceWidth    = 5
-        self.sliceHeight   = 20
         self.csY           = 30
-        self.MIN_SAT       = 0
+        self.MIN_SAT       = 1
         self.MAX_SAT       = 100
-        self.CS_WIDTH      = parent.WIDTH
-        self.CS_HEIGHT     = self.sliceHeight * 360 / self.hueStep
 
         # Classic sliders
         self.S_WIDTH        = 150
@@ -256,14 +295,16 @@ class FormWidget(QWidget):
         slider.setValue(self.initSat)
         slider.setGeometry(parent.X_WID, 40, self.S_WIDTH, self.S_HEIGHT)
 
+        #Save saturation button
+        saveSatButton = QPushButton("Save saturation\nconfiguration", self)
+        saveSatButton.resize(saveSatButton.sizeHint())
+
         # Color Sliders
         self.colorSliders = ColorDisplay(
                                 x=parent.X_WID,
                                 csY=self.csY,
                                 hueStep=self.hueStep,
                                 initSat=self.initSat,
-                                sliceWidth=self.sliceWidth,
-                                sliceHeight=self.sliceHeight
                                 )
 
         # Communication
@@ -272,16 +313,14 @@ class FormWidget(QWidget):
         self.c.modification.connect(parent.notSaved)
         slider.valueChanged[int].connect(self.changeSaturation)
         self.colorSliders.setCanal(self.c)
+        saveSatButton.clicked.connect(self.colorSliders.savePoints)
 
         # Layout
-        hboxSliderSat = QHBoxLayout()
-        hboxSliderSat.addWidget(slider)
-        hboxColorSliders = QHBoxLayout()
-        hboxColorSliders.addWidget(self.colorSliders)
-        vbox = QVBoxLayout()
-        vbox.addLayout(hboxColorSliders, 360 / self.hueStep)
-        vbox.addLayout(hboxSliderSat, 1)
-        self.setLayout(vbox)
+        grid = QGridLayout()
+        grid.addWidget(self.colorSliders, 0, 0)
+        grid.addWidget(slider, 1, 0)
+        grid.addWidget(saveSatButton, 1, 1)
+        self.setLayout(grid)
 
     def changeSaturation(self, value):
 

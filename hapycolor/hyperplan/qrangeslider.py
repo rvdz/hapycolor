@@ -289,6 +289,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     def setColorMedian(self, value):
 
         setattr(self, '__color_median', value)
+        setattr(self, '__hue', hex_to_hsl(getattr(self,  '__color_median', None))[0])
         if self.saturation() is None:
             setattr(self, '__saturation', self._INIT_SAT)
         start, end = self.getRange()
@@ -385,6 +386,12 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
         self._setStart(value)
 
+    def setStartByColor(self, color):
+
+        bright = round(hex_to_hsl(color)[2]*100)
+        self.setStart(bright)
+        self.setColorStart(color)
+
     def _setEnd(self, value):
 
         setattr(self, '__end', value)
@@ -397,6 +404,12 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self._splitter.moveSplitter(v, self._SPLIT_END)
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
         self._setEnd(value)
+
+    def setEndByColor(self, color):
+
+        bright = round(hex_to_hsl(color)[2]*100)
+        self.setEnd(bright)
+        self.setColorEnd(color)
 
     def getRange(self):
 
