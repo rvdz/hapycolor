@@ -41,11 +41,12 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 def parse_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", help="File path to the image")
-    # TODO directory handling
-    ap.add_argument("-d", "--dir", help="File directory to the image "
-            + "(this option will NOT export variables, use -f instead).")
+    ap.add_argument("-d", "--dir", help="Directory path to the images "
+            + "(this option will NOT export variables, use -f instead). "
+            + "This option enables -j option implicitely")
     ap.add_argument("-j", "--json", action="store_true", help="Saves output "
-              "as a Json format instead of exporting variables")
+              + "(RGB format) in a Json file palettes.json instead of "
+              + "exporting variables. Json file is updated if the file exists.")
     args = vars(ap.parse_args())
     if not (args["file"] or args["dir"]):
         ap.error('expected either argument -f or -d')
@@ -75,13 +76,24 @@ def main(args=None):
     args = parse_arguments()
 
     img_name = args["file"]
+    img_dir = args["dir"]
 
-    palette = raw_colors.get(img_name, num_colors=150)
-    palette = filters.apply(palette)
+    if args["json"] or args["dir"]:
+        img_list = []
+        if img_name is not None:
+            img_list.append(img_name)
+        elif img_dir is not None:
+            for f in os.listdir(img_dir):
+                if os.path.splitext(f)[1] in [".png", ".jpg", "jpeg"]:
+                    img_list.append(os.path.join(img_dir, f))
 
-    if args["json"]:
-        add_palette_json(os.path.abspath(img_name), palette)
+        for img in img_list:
+            palette = raw_colors.get(img, num_colors=150)
+            palette = filters.apply(palette)
+            add_palette_json(os.path.abspath(img), palette)
     else:
+        palette = raw_colors.get(img_name, num_colors=150)
+        palette = filters.apply(palette)
         targets.initialize()
         targets.export(palette, args["file"])
         display_palette(palette)
