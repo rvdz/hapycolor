@@ -84,10 +84,11 @@ def main(args=None):
             img_list.append(img_name)
         elif img_dir is not None:
             for f in os.listdir(img_dir):
-                if os.path.splitext(f)[1] in [".png", ".jpg", "jpeg"]:
+                if os.path.splitext(f)[1] in [".jpg", "jpeg"]:
                     img_list.append(os.path.join(img_dir, f))
 
         for img in img_list:
+            print("Processing file {}".format(img))
             palette = raw_colors.get(img, num_colors=150)
             palette = filters.apply(palette)
             add_palette_json(os.path.abspath(img), palette)
