@@ -180,15 +180,12 @@ class Handle(Element):
         e = self.main.end() + dx
         if s >= self.main.min() and e <= self.main.max():
             self.main.setRange(s, e)
+            self.main.setColorRangeByPos(s, e)
 
 
 class QRangeSlider(QtWidgets.QWidget, Ui_Form):
 
 
-    endValueChanged = QtCore.pyqtSignal(int)
-    maxValueChanged = QtCore.pyqtSignal(int)
-    minValueChanged = QtCore.pyqtSignal(int)
-    startValueChanged = QtCore.pyqtSignal(int)
     saturationChanged = QtCore.pyqtSignal(float)
     colorsChanged = QtCore.pyqtSignal(int)
 
@@ -240,9 +237,10 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         self.setColorMedian(colorMedian)
         self.setSaturation(saturation)
         self.setDrawValues(True)
+        self.setColorRangeByPos(start, end)
 
         self.show()
-        self.setRange(start, end)  # TODO not call it twice
+
 
     def setCanal(self, c):
 
@@ -346,6 +344,12 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         hsl_value = (self.hue(), self.saturation(), ratio)
         self.setColorEnd(hsl_to_hex(hsl_value))
 
+    def setColorRangeByPos(self, start, end):
+
+        self._setColorStart(start)
+        self._setColorEnd(end)
+        self.colorsChanged.emit(0)
+
 
     def min(self):
 
@@ -358,12 +362,10 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     def setMin(self, value):
 
         setattr(self, '__min', value)
-        self.minValueChanged.emit(value)
 
     def setMax(self, value):
 
         setattr(self, '__max', value)
-        self.maxValueChanged.emit(value)
 
     def start(self):
 
@@ -376,7 +378,6 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     def _setStart(self, value):
 
         setattr(self, '__start', value)
-        self.startValueChanged.emit(value)
 
     def setStart(self, value):
 
@@ -395,7 +396,6 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
     def _setEnd(self, value):
 
         setattr(self, '__end', value)
-        self.endValueChanged.emit(value)
 
     def setEnd(self, value):
 
