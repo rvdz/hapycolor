@@ -6,8 +6,8 @@ Subpackages
 
 .. toctree::
 
-    hapycolor.color
-    hapycolor.export
+    hapycolor.filters
+    hapycolor.targets
 
 Submodules
 ----------
@@ -44,10 +44,10 @@ hapycolor\.palette module
     :undoc-members:
     :show-inheritance:
 
-hapycolor\.target module
-------------------------
+hapycolor\.raw\_colors module
+-----------------------------
 
-.. automodule:: hapycolor.target
+.. automodule:: hapycolor.raw_colors
     :members:
     :undoc-members:
     :show-inheritance:
