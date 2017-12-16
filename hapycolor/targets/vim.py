@@ -2,6 +2,7 @@ from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
+from . import eight_bit_colors
 from . import base
 
 
@@ -102,31 +103,35 @@ let g:colors_name = "%s"''' % config.app_name()
 
     @staticmethod
     def __print_base(fg, bg, f):
-        hex_fg = helpers.rgb_to_hex(fg)
-        hex_bg = helpers.rgb_to_hex(bg)
-        normal_entry = ["hi Normal", "guifg=" + hex_fg + "\tguibg=" + hex_bg + "\n"]
-        f.write("{: <20}  {: <20}".format(*normal_entry))
+        Vim.__write_entry(f, "Normal", fg, bg)
+        Vim.__write_entry(f, "NonText", fg, bg)
 
-        nontext_entry = ["hi NonText", "guifg=" + hex_fg + "\tguibg=" + hex_bg + "\n"]
-        f.write("{: <20}  {: <20}".format(*nontext_entry))
+    @staticmethod
+    def __write_entry(f, category, fg, bg=None):
+        entry = ["hi " + category,
+                 "guifg=" + helpers.rgb_to_hex(fg),
+                 "ctermfg=" + str(eight_bit_colors.rgb2short(fg))]
+
+        if bg is not None:
+             entry.extend(["guibg=" + helpers.rgb_to_hex(bg),
+                           "ctermbg=" + str(eight_bit_colors.rgb2short(bg))])
+
+        elements = 3 if bg is None else 5
+        f.write(("{: <20} " * elements + "\n").format(*entry))
 
     @staticmethod
     def __print_visual(fg, bg, f):
         """ TODO: alter fg and bg, maybe use a color instead of fg """
-        # hex_fg = helpers.rgb_to_hex(fg)
-        # hex_bg = helpers.rgb_to_hex(bg)
-        hex_fg = "#AAAAAA"
-        hex_bg = "#222222"
-        line = ["hi Visual", "guifg=" + hex_fg + "\tguibg=" + hex_bg + "\n"]
-        f.write("{: <20}  {: <20}".format(*line))
+        fg = (170, 170, 170)
+        bg = (34, 34, 34)
+        Vim.__write_entry(f, "Visual", fg, bg)
 
     @staticmethod
     def __print_body(vim_colors, f):
         for i, G in enumerate(Vim.groups):
             color = vim_colors.get_color(i)
             for g in G:
-                line = ["hi " + g, "guifg=" + helpers.rgb_to_hex(color) + "\n"]
-                f.write("{: <20}  {: <20}".format(*line))
+                Vim.__write_entry(f, g, color)
 
 
 class VimColorManager:

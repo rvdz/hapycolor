@@ -1,6 +1,7 @@
 import enum
 import datetime
 from . import base
+from . import eight_bit_colors
 from hapycolor import config
 from hapycolor import exceptions
 from hapycolor import palette as pltte
@@ -149,9 +150,8 @@ class Lightline(base.Target):
         return colors
 
     def set_variable(label, color):
-        bit = 200
         return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', " \
-                                       + str(bit) + "]"
+                                       + str(eight_bit_colors.rgb2short(color)) + "]"
 
 
 class ColorEnum(enum.Enum):
