@@ -2,6 +2,7 @@ from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
+from . import eight_bit_colors
 from . import base
 
 
@@ -16,8 +17,8 @@ class Vim(base.Target):
     after enabling the option: 'set termguicolor'.
     """
 
-    foreground = "Normal"
-    groups = [["Comment"],
+    groups = [
+              ["Comment"],
               ["Boolean"],
               ["Character"],
               ["Keyword"],
@@ -44,16 +45,20 @@ class Vim(base.Target):
               ["Identifier"],
               ["Typedef"],
               ["Label"],
-              ["Operator"]]
+              ["Operator"],
+              ["LineNr"],
+              ["CursorLineNr"],
+              ["CursorColumn"],
+              ["Search"],
+             ]
 
     configuration_key = "colorscheme_vim"
 
     def is_config_initialized():
         try:
-            is_init = Vim.configuration_key in Vim.load_config()
+            return Vim.configuration_key in Vim.load_config()
         except exceptions.InvalidConfigKeyError:
             return False
-        return is_init
 
     def initialize_config():
         """
@@ -82,7 +87,8 @@ class Vim(base.Target):
 
         with open(Vim.load_config()[Vim.configuration_key], "w+") as f:
             Vim.__print_header(f)
-            Vim.__print_foreground(helpers.rgb_to_hex(palette.foreground), f)
+            Vim.__print_base(palette.foreground, palette.background, f)
+            Vim.__print_visual(palette.foreground, palette.background, f)
             Vim.__print_body(VimColorManager(palette.colors), f)
 
     @staticmethod
@@ -96,18 +102,36 @@ let g:colors_name = "%s"''' % config.app_name()
         f.write(header + "\n\n")
 
     @staticmethod
-    def __print_foreground(fg, f):
-            line = ["hi " + Vim.foreground,
-                    "guifg=" + fg + "\n"]
-            f.write("{: <20}  {: <20}".format(*line))
+    def __print_base(fg, bg, f):
+        Vim.__write_entry(f, "Normal", fg, bg)
+        Vim.__write_entry(f, "NonText", fg, bg)
+
+    @staticmethod
+    def __write_entry(f, category, fg, bg=None):
+        entry = ["hi " + category,
+                 "guifg=" + helpers.rgb_to_hex(fg),
+                 "ctermfg=" + str(eight_bit_colors.rgb2short(fg))]
+
+        if bg is not None:
+             entry.extend(["guibg=" + helpers.rgb_to_hex(bg),
+                           "ctermbg=" + str(eight_bit_colors.rgb2short(bg))])
+
+        elements = 3 if bg is None else 5
+        f.write(("{: <20} " * elements + "\n").format(*entry))
+
+    @staticmethod
+    def __print_visual(fg, bg, f):
+        """ TODO: alter fg and bg, maybe use a color instead of fg """
+        fg = (170, 170, 170)
+        bg = (34, 34, 34)
+        Vim.__write_entry(f, "Visual", fg, bg)
 
     @staticmethod
     def __print_body(vim_colors, f):
         for i, G in enumerate(Vim.groups):
             color = vim_colors.get_color(i)
             for g in G:
-                line = ["hi " + g, "guifg=" + helpers.rgb_to_hex(color) + "\n"]
-                f.write("{: <20}  {: <20}".format(*line))
+                Vim.__write_entry(f, g, color)
 
 
 class VimColorManager:
