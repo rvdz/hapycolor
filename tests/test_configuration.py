@@ -45,7 +45,7 @@ class TestConfiguration(unittest.TestCase):
 
         configuration = configparser.ConfigParser()
         configuration.read(config.get_config())
-        expected_sections = ["core", "hyperplan", "Iterm", "Wallpaper"]
+        expected_sections = ["core", "hyperplan", "Iterm", "Wallpaper", "Filters"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))
 
 
