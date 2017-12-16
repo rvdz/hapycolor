@@ -1,6 +1,6 @@
-let s:grey1  = [ '#5c6370', 200 ]
-let s:grey2  = [ '#2c323d', 200 ]
-let s:grey3  = [ '#3e4452', 200 ]
+let s:grey1  = [ '#5c6370', 59 ]
+let s:grey2  = [ '#2c323d', 23 ]
+let s:grey3  = [ '#3e4452', 59 ]
 
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 let s:p.normal.left     = [ [ s:background, s:blue, 'bold' ], [ s:foreground, s:grey3 ] ]
