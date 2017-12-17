@@ -25,7 +25,7 @@ of colors. Indeed, one of the challenges is to remove the colors that are to clo
 perspective, but still keeping the largest palette possible. Thus, supposing that such a color base exists, the problem
 can be also stated as: imagining that each color represent a node in a graph and that two colors sufficiently "far" from each other,
 have a common vertex. In this situation, the question becomes
-"`What is the maximum clique? <https://en.wikipedia.org/wiki/Clique_problem#Finding_a_single_maximal_clique>`_",
+"`what is the maximum clique? <https://en.wikipedia.org/wiki/Clique_problem#Finding_a_single_maximal_clique>`_",
 an inquiry already answered by `Coenraad Bron <https://en.wikipedia.org/wiki/Coenraad_Bron>`_ and Joep Kerbosch with the
 `Bron-Kerbosch algorithm <https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm>`_.
 
@@ -40,10 +40,11 @@ been used by Hapycolor to define the maximal clique problem.
 
 How to add a color filter?
 --------------------------
-In order to add a custom filter, a class inheriting from :class:base.Filter should be implemented in the filters module.
-Its main method, "apply" takes in a :class:Palette and should output another `hapycolor.Palette`.
+In order to add a custom filter, a class inheriting from :class:`hapycolor.filters.base.Filter` should be implemented in the filters module.
+Its main method, "apply" takes in a :class:`hapycolor.Palette` and should output another :class:`hapycolor.Palette`.
 In addition, in order to enable it, the module's name should be added in the "Filters" section of the configuration file,
 coupled with a value representing the complexity of the algorithm. At runtime, hapycolor searches for classes stored in
-the provided modules that inherits from :class:base.Filter and whose name is a PascalCase version of the respective module
-(which should be named in snake_case, but you already know that, I hope). Maybe, in a near future, this last constraint
-could be removed.
+the provided modules that inherits from :class:`hapycolor.filters.base.Filter` and whose name is a PascalCase version of the respective module
+(which should be named in snake_case, but you already know that, I hope).
+
+.. note:: Maybe, in a near future, this last constraint could be removed.
