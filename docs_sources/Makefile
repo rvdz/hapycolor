@@ -7,6 +7,8 @@ SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = Hapycolor
 SOURCEDIR     = source
 BUILDDIR      = build
+HTMLSOURCE    = $(BUILDDIR)/html
+HTMLTARGET    = ../docs
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -18,3 +20,6 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@rm -rf $(HTMLTARGET)/*
+	@mv $(HTMLSOURCE)/.buildinfo $(HTMLSOURCE)/* $(HTMLTARGET)
+	@rm -rf $(BUILDDIR)
