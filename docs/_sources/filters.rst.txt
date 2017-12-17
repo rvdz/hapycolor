@@ -1,13 +1,10 @@
 Color Filters
 =====================
 
-Current Color Filters
----------------------
-
 .. _filter_label:
 
 Filter
-^^^^^^
+------
 For instance, Hapycolor is able to determine if a color is too bright or too dark. A first step, would be to convert the
 colors in an `hsl <https://en.wikipedia.org/wiki/HSL_and_HSV>`_ base and then add conditions on the luminosity. But that
 would be an illusory solution, as a matter of fact, both hsl/hsv or rgb color bases do not match the human's eye perception
@@ -19,7 +16,7 @@ A similar approach has been implemented in order to filter out the colors that a
 .. _reduction_label:
 
 Reduction
-^^^^^^^^^
+---------
 A second innovative concept embedded into Hapycolor's color processing core, is the ability to properly reduce the number
 of colors. Indeed, one of the challenges is to remove the colors that are to close to one another from the human's eye
 perspective, but still keeping the largest palette possible. Thus, supposing that such a color base exists, the problem

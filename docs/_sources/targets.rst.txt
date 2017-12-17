@@ -3,20 +3,33 @@ Targets
 
 Currently Supported Targets
 ---------------------------
-- Gnome Terminal
-- Vim
-- iTerm
-- Wallpaper
-- Lightline
+- `Gnome Terminal`_
+- `Vim`_
+- `iTerm`_
+- `Wallpaper`_
+- `Lightline`_
+
+.. _Gnome Terminal:
+
+Gnome Terminal
+--------------
+
+.. _iTerm:
 
 iTerm
 -----
 
+.. _Vim:
+
 Vim
 ---
 
+.. _Wallpaper:
+
 Wallpaper
 ---------
+
+.. _Lightline:
 
 Lightline
 ---------
