@@ -165,7 +165,7 @@ class Iterm(base.Target):
         blue_key.text  = "Blue Component"
         blue_key.tail  = new_line
 
-        color_keys = [blue_key, green_key, red_key]
+        color_keys = [red_key, green_key, blue_key]
 
         bloc      = ET.Element(Iterm.Tag.DICT)
         bloc.text = new_line
@@ -320,17 +320,17 @@ class TermColorManager():
             raise exceptions.UninitializedError(msg)
 
         for tc in TermColorEnum:
+            # If the provided index corresponds to this TermColor enum
             if index in tc.value[1]:
-                # If the provided index corresponds to this TermColor enum
+                # If there are no colors for this label, returns a random one
                 if tc not in self.colors:
-                    # If there are no colors for this label, returns a random one
                     tmp_colors = {**self.colors}
                     del tmp_colors[TermColorEnum.BLACK]
                     del tmp_colors[TermColorEnum.WHITE]
                     label = random.choice(list(tmp_colors))
 
+                    # If the label is empty, pick another one
                     while not self.colors[label]:
-                        # If the label is empty, pick another one
                         label = random.choice(list(self.colors))
                     return helpers.hsl_to_rgb(random.choice(self.colors[label]))
 
@@ -356,9 +356,9 @@ class TermColorEnum(enum.Enum):
     """
     BLACK   = [[ ],         [ 0, 8]]
     WHITE   = [[ ],         [ 7, 15]]
-    RED     = [[ 345, 25],  [ 4, 12]]
-    YELLOW  = [[ 25, 60],   [ 6, 14]]
+    RED     = [[ 345, 25],  [ 1, 9]]
+    YELLOW  = [[ 25, 60],   [ 3, 11]]
     GREEN   = [[ 60, 160],  [ 2, 10]]
-    CYAN    = [[ 160, 200], [ 3, 11]]
-    BLUE    = [[ 200, 260], [ 1, 9]]
+    CYAN    = [[ 160, 200], [ 6, 14]]
+    BLUE    = [[ 200, 260], [ 4, 12]]
     MAGENTA = [[ 260, 345], [ 5, 13]]
