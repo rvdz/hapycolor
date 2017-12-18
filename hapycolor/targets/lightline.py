@@ -179,8 +179,9 @@ class ColorManager:
     """
     For each variable needed by the theme, defines a dictionary which binds
     a the enumerate to a value of the palette's colors.
-    TODO: Apply another reduction filter? Since we need only a few colors, it
-    makes sense.
+
+    .. todo:: Apply another reduction filter? Since we need only a few colors, it
+        makes sense.
     """
     def __init__(self, colors):
         if not all([helpers.can_be_rgb(c) for c in colors]):
@@ -204,7 +205,10 @@ class ColorManager:
                 label = ColorEnum.get_next(label)
             # Get color whose saturation is max
             colors = sorted_colors[label]
-            color = colors.pop(colors.index(max(colors, key=lambda c: c[1])))
+            # If there is only one color in this label and another label uses
+            # this list of colors, it will fail.
+            # color = colors.pop(colors.index(max(colors, key=lambda c: c[1])))
+            color = max(colors, key=lambda c: c[1])
             self.labels[original_label] = color
 
     def get(self, label):
