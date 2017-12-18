@@ -5,7 +5,9 @@ from hapycolor.targets.iterm import Iterm
 from hapycolor.targets.vim import Vim
 from hapycolor.targets.wallpaper import Wallpaper
 
-from tests.helpers import configurationtesting, vimtesting, itermtesting, retrytesting, disableprints
+from tests.helpers import configurationtesting, retrytesting, disableprints
+from tests.test_iterm import itermtesting
+from tests.test_vim import vimtesting
 
 from unittest.mock import patch
 import unittest

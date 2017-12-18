@@ -3,10 +3,24 @@ from hapycolor import visual
 from hapycolor import helpers
 from hapycolor import palette
 from hapycolor.targets.vim import Vim, VimColorManager
-from tests.helpers import generate_palette, vimtesting, configurationtesting
-from unittest.mock import patch
+from tests.helpers import generate_palette, configurationtesting
+from unittest import mock
 
+import contextlib
 import unittest
+
+@contextlib.contextmanager
+def vimtesting(fails=0):
+    import shutil
+    import pathlib
+    valid_entry = ["./tests"]
+    invalid_entry = ["./tests/run_suite.py"]
+    entries = invalid_entry * fails + valid_entry
+    with mock.patch('builtins.input', side_effect=entries):
+        yield
+    if pathlib.Path("./tests/hapycolor").exists():
+        shutil.rmtree("./tests/hapycolor")
+
 
 class TestVim(unittest.TestCase):
     @vimtesting()
