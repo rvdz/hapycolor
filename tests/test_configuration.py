@@ -21,24 +21,6 @@ class TestConfiguration(unittest.TestCase):
         with self.assertRaises(exceptions.WrongInputError):
             Vim.initialize_config()
 
-    @patch('hapycolor.config.input_path', return_value=pathlib.Path("~").expanduser())
-    def test_iterm_fail_with_directory(self, mock_input):
-        """ Assert that 'save_iterm' fails when a directory is provided """
-        with self.assertRaises(exceptions.WrongInputError):
-            Iterm.initialize_config()
-
-    @patch('hapycolor.config.input_path', return_value=pathlib.Path("./com.googlecode.iterm2.plist"))
-    def test_iterm_fail_with_incorrect_file_1(self, mock_input):
-        """ Assert that 'save_iterm' fails when an unexisting file is provided """
-        with self.assertRaises(exceptions.WrongInputError):
-            Iterm.initialize_config()
-
-    @patch('hapycolor.config.input_path', return_value=pathlib.Path("./README.md").expanduser())
-    def test_iterm_fail_with_incorrect_file_2(self, mock_input):
-        """ Assert that 'save_iterm' fails when an unexisting file is provided """
-        with self.assertRaises(exceptions.WrongInputError):
-            Iterm.initialize_config()
-
     def test_config_sections(self):
         """ Assert that the correct sections exist in the config file """
         import configparser

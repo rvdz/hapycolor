@@ -1,11 +1,32 @@
-from hapycolor import exceptions
-from hapycolor import helpers
-from hapycolor import palette
+from hapycolor import exceptions, config, helpers, palette
 from hapycolor.targets.iterm import Iterm, TermColorManager, TermColorEnum
-from tests.helpers import generate_palette, itermtesting, configurationtesting
-from unittest.mock import patch
 
+from tests.helpers import generate_palette, configurationtesting, disableprints
+
+import shutil
+from unittest.mock import patch
+import contextlib
 import unittest
+from unittest import mock
+import os
+
+@contextlib.contextmanager
+def itermtesting(fails=0, default=True):
+    valid_entry = ["./tests/com.googlecode.iterm2.plist"]
+    invalid_entry = ["."]
+    entries = invalid_entry * fails + valid_entry
+
+    test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.plist"
+    tmp_test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.tmp"
+    shutil.copyfile(test_config_path, tmp_test_config_path)
+    mock_config_dict = {Iterm.template_key    : Iterm.load_config()[Iterm.template_key]}
+
+    with mock.patch('builtins.input', side_effect=entries):
+        with mock.patch('hapycolor.targets.iterm.Iterm.set_default',
+                return_value=default):
+            yield
+    shutil.copyfile(tmp_test_config_path, test_config_path)
+    os.remove(tmp_test_config_path)
 
 
 class TestIterm(unittest.TestCase):
@@ -45,6 +66,7 @@ class TestIterm(unittest.TestCase):
         """ Checks that the basic configuration file is valid """
         import xml.etree.ElementTree as ET
         try:
+            Iterm.initialize_config()
             root = ET.parse(Iterm.load_config()[Iterm.preferences_key])
         except ET.ParseError as err:
             self.fail(str(err))
@@ -58,6 +80,7 @@ class TestIterm(unittest.TestCase):
     @configurationtesting()
     def test_export_iterm_1_color_palette(self):
         try:
+            Iterm.initialize_config()
             Iterm.export(generate_palette(1), "iterm_test")
         except Exception as err:
             self.fail(str(err))
@@ -66,6 +89,7 @@ class TestIterm(unittest.TestCase):
     @configurationtesting()
     def test_export_iterm_16_color_palette(self):
         try:
+            Iterm.initialize_config()
             Iterm.export(generate_palette(16), "iterm_test")
         except Exception as err:
             self.fail(str(err))
@@ -74,13 +98,35 @@ class TestIterm(unittest.TestCase):
     @configurationtesting()
     def test_export_iterm_200_color_palette(self):
         try:
+            Iterm.initialize_config()
             Iterm.export(generate_palette(200), "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
+    @itermtesting(default=True)
+    @configurationtesting()
+    def test_is_default_is_boolean_true(self):
+        Iterm.initialize_config()
+        self.assertEqual(Iterm.load_config()[Iterm.default_key], str(True))
+
+    @itermtesting(default=False)
+    @configurationtesting()
+    def test_is_default_is_boolean_false(self):
+        Iterm.initialize_config()
+        self.assertEqual(Iterm.load_config()[Iterm.default_key], str(False))
+
+    @disableprints()
+    @configurationtesting()
+    def test_default_profile_toggle(self):
+        with itermtesting(default=True):
+            Iterm.initialize_config()
+        self.assertEqual(Iterm.load_config()[Iterm.default_key], str(True))
+        with patch('builtins.input', return_value="2"):
+            Iterm.reconfigure()
+        self.assertEqual(Iterm.load_config()[Iterm.default_key], str(False))
+
 
 class TestTermColor(unittest.TestCase):
-
     def test_color_format(self):
         with self.assertRaises(exceptions.ColorFormatError):
             TermColorManager([(240, 240, 0.3), (0,0,1)])
