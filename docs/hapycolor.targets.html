@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hapycolor.targets package &mdash; Hapycolor  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Hapycolor  documentation" href="index.html"/>
+        <link rel="up" title="hapycolor package" href="hapycolor.html"/>
+        <link rel="prev" title="hapycolor.filters package" href="hapycolor.filters.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Hapycolor
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is Hapycolor?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">How to contribute?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filters.html">Color Filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">Targets</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">hapycolor</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="hapycolor.html">hapycolor package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="hapycolor.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="hapycolor.filters.html">hapycolor.filters package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">hapycolor.targets package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.config">hapycolor.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.exceptions">hapycolor.exceptions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.helpers">hapycolor.helpers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.palette">hapycolor.palette module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.raw_colors">hapycolor.raw_colors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.visual">hapycolor.visual module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Hapycolor</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">hapycolor</a> &raquo;</li>
+        
+          <li><a href="hapycolor.html">hapycolor package</a> &raquo;</li>
+        
+      <li>hapycolor.targets package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/hapycolor.targets.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hapycolor-targets-package">
+<h1>hapycolor.targets package<a class="headerlink" href="#hapycolor-targets-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-hapycolor.targets.base">
+<span id="hapycolor-targets-base-module"></span><h2>hapycolor.targets.base module<a class="headerlink" href="#module-hapycolor.targets.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hapycolor.targets.base.Target">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.base.</code><code class="descname">Target</code><a class="headerlink" href="#hapycolor.targets.base.Target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Abstract class introducting the basic methods needed to initialize the target
+and export the palette or the image to the environment. The subclasses need
+to implement:</p>
+<ul class="simple">
+<li>How to initialize the target</li>
+<li>Function that states if the target has already be correctly initialized</li>
+<li>A function that retrives a list of the compatible operating systems</li>
+<li>The export function which will be called by passing the palette and the path of the image</li>
+</ul>
+<p>Each target has a dedicated section in the configuration file from which
+it can load or save its own data. To do so, the class provides five class
+methods that aim at:</p>
+<ul class="simple">
+<li>Loading the section of the configuration file</li>
+<li>Adding or modifying information stored in the configuration file</li>
+<li>Enabling the target</li>
+<li>Disabling the target</li>
+<li>Check if the target is enabled</li>
+</ul>
+<dl class="staticmethod">
+<dt id="hapycolor.targets.base.Target.compatible_os">
+<em class="property">static </em><code class="descname">compatible_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.compatible_os" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of enum of class <a class="reference internal" href="hapycolor.html#hapycolor.config.OS" title="hapycolor.config.OS"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.config.OS</span></code></a></p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hapycolor.targets.base.Target.disable">
+<em class="property">classmethod </em><code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.disable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hapycolor.targets.base.Target.enable">
+<em class="property">classmethod </em><code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.enable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="hapycolor.targets.base.Target.export">
+<em class="property">static </em><code class="descname">export</code><span class="sig-paren">(</span><em>palette</em>, <em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.export" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="hapycolor.targets.base.Target.initialize_config">
+<em class="property">static </em><code class="descname">initialize_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="hapycolor.targets.base.Target.is_config_initialized">
+<em class="property">static </em><code class="descname">is_config_initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.is_config_initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hapycolor.targets.base.Target.is_enabled">
+<em class="property">classmethod </em><code class="descname">is_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.is_enabled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hapycolor.targets.base.Target.load_config">
+<em class="property">classmethod </em><code class="descname">load_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the configuration related to the subclass and returns a dictionary.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hapycolor.targets.base.Target.save_config">
+<em class="property">classmethod </em><code class="descname">save_config</code><span class="sig-paren">(</span><em>target_config</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.base.Target.save_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets.eight_bit_colors">
+<span id="hapycolor-targets-eight-bit-colors-module"></span><h2>hapycolor.targets.eight_bit_colors module<a class="headerlink" href="#module-hapycolor.targets.eight_bit_colors" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="hapycolor.targets.eight_bit_colors.rgb2short">
+<code class="descclassname">hapycolor.targets.eight_bit_colors.</code><code class="descname">rgb2short</code><span class="sig-paren">(</span><em>rgb</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.eight_bit_colors.rgb2short" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the closest xterm-256 approximation to the given RGB value.
+:arg rgb: A tuple representing an RGB value.
+:return: String between 0 and 255, compatible with xterm.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hapycolor.targets.eight_bit_colors.short2rgb">
+<code class="descclassname">hapycolor.targets.eight_bit_colors.</code><code class="descname">short2rgb</code><span class="sig-paren">(</span><em>short</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.eight_bit_colors.short2rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets.iterm">
+<span id="hapycolor-targets-iterm-module"></span><h2>hapycolor.targets.iterm module<a class="headerlink" href="#module-hapycolor.targets.iterm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hapycolor.targets.iterm.Iterm">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.iterm.</code><code class="descname">Iterm</code><a class="headerlink" href="#hapycolor.targets.iterm.Iterm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hapycolor.targets.base.Target" title="hapycolor.targets.base.Target"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.targets.base.Target</span></code></a></p>
+<dl class="class">
+<dt id="hapycolor.targets.iterm.Iterm.Enumeration">
+<em class="property">class </em><code class="descname">Enumeration</code><span class="sig-paren">(</span><em>Iterm</em>, <em>key_values</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.Enumeration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.Iterm.Key">
+<code class="descname">Key</code><em class="property"> = &lt;hapycolor.targets.iterm.Iterm.Enumeration object&gt;</em><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.Key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.Iterm.Tag">
+<code class="descname">Tag</code><em class="property"> = &lt;hapycolor.targets.iterm.Iterm.Enumeration object&gt;</em><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.Tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.iterm.Iterm.compatible_os">
+<code class="descname">compatible_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.compatible_os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.iterm.Iterm.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>palette</em>, <em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an iterm’s profile which is added to the terminal preferences’
+file. It requires a palette of 16 colors defined in the rgb format and
+a name for the new profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>palette</strong> – an instance of the class <a class="reference internal" href="hapycolor.html#hapycolor.palette.Palette" title="hapycolor.palette.Palette"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.palette.Palette</span></code></a></li>
+<li><strong>image_path</strong> – a string which will be used to name the newly created profile</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.iterm.Iterm.initialize_config">
+<code class="descname">initialize_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if iTerm’s preferences file is correct and save it’s path in the
+project configuration file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.iterm.Iterm.is_config_initialized">
+<code class="descname">is_config_initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.is_config_initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.Iterm.preferences_key">
+<code class="descname">preferences_key</code><em class="property"> = 'iterm_preferences'</em><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.preferences_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.Iterm.template_key">
+<code class="descname">template_key</code><em class="property"> = 'iterm_template'</em><a class="headerlink" href="#hapycolor.targets.iterm.Iterm.template_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hapycolor.targets.iterm.TermColorEnum">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.iterm.</code><code class="descname">TermColorEnum</code><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>Defines six enumerates which represent a label of the ‘hue’ dimension</p>
+<ul class="simple">
+<li>First list defines the hue’s range in degrees</li>
+<li>Second list defines to which terminal’s standard and high-intensity color’s number the label is related.</li>
+</ul>
+<p>For more details about standard and high-intensity terminal colors see:
+<a class="reference external" href="https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit">Standard and High-intensity colors</a></p>
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.BLACK">
+<code class="descname">BLACK</code><em class="property"> = [[], [0, 8]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.BLACK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.BLUE">
+<code class="descname">BLUE</code><em class="property"> = [[200, 260], [1, 9]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.BLUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.CYAN">
+<code class="descname">CYAN</code><em class="property"> = [[160, 200], [3, 11]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.CYAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.GREEN">
+<code class="descname">GREEN</code><em class="property"> = [[60, 160], [2, 10]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.GREEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.MAGENTA">
+<code class="descname">MAGENTA</code><em class="property"> = [[260, 345], [5, 13]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.MAGENTA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.RED">
+<code class="descname">RED</code><em class="property"> = [[345, 25], [4, 12]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.RED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.WHITE">
+<code class="descname">WHITE</code><em class="property"> = [[], [7, 15]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.WHITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.iterm.TermColorEnum.YELLOW">
+<code class="descname">YELLOW</code><em class="property"> = [[25, 60], [6, 14]]</em><a class="headerlink" href="#hapycolor.targets.iterm.TermColorEnum.YELLOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hapycolor.targets.iterm.TermColorManager">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.iterm.</code><code class="descname">TermColorManager</code><span class="sig-paren">(</span><em>colors</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.TermColorManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This class manages the terminal colors and defines a method that, for a
+standard of high-intensity terminal color’s number, returns the
+appropriate rgb color of the provided palette.
+For more details about standard and high-intensity terminal colors, see:
+<a class="reference external" href="https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit">Standard and Hight-intensity colors</a></p>
+<p>Initializes a <a class="reference internal" href="#hapycolor.targets.iterm.TermColorManager" title="hapycolor.targets.iterm.TermColorManager"><code class="xref py py-class docutils literal"><span class="pre">TermColorManager</span></code></a>’s instance with a list of colors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>colors</strong> – a <cite>list</cite> of rgb colors</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="hapycolor.targets.iterm.TermColorManager.analyze_colors">
+<em class="property">static </em><code class="descname">analyze_colors</code><span class="sig-paren">(</span><em>colors</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.TermColorManager.analyze_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dictionary which labelize each color with a respective enum
+from <a class="reference internal" href="#hapycolor.targets.iterm.TermColorEnum" title="hapycolor.targets.iterm.TermColorEnum"><code class="xref py py-class docutils literal"><span class="pre">TermColorEnum</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.iterm.TermColorManager.get_color">
+<code class="descname">get_color</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.TermColorManager.get_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes standard or high-intensity terminal color’s number and retrives the
+appropriate rgb color.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> – an integer between 0 and 15</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="hapycolor.targets.iterm.TermColorManager.get_label">
+<em class="property">static </em><code class="descname">get_label</code><span class="sig-paren">(</span><em>hsl_color</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.iterm.TermColorManager.get_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#hapycolor.targets.iterm.TermColorEnum" title="hapycolor.targets.iterm.TermColorEnum"><code class="xref py py-class docutils literal"><span class="pre">TermColorEnum</span></code></a> enum according to the color’s hue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hsl_color</strong> – a tuple representing a color defined in the hsl base</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets.lightline">
+<span id="hapycolor-targets-lightline-module"></span><h2>hapycolor.targets.lightline module<a class="headerlink" href="#module-hapycolor.targets.lightline" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hapycolor.targets.lightline.ColorEnum">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.lightline.</code><code class="descname">ColorEnum</code><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.BLUE">
+<code class="descname">BLUE</code><em class="property"> = [167, 255]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.BLUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.GREEN">
+<code class="descname">GREEN</code><em class="property"> = [75, 166]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.GREEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.MAGENTA">
+<code class="descname">MAGENTA</code><em class="property"> = [256, 344]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.MAGENTA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.ORANGE">
+<code class="descname">ORANGE</code><em class="property"> = [16, 32]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.ORANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.RED">
+<code class="descname">RED</code><em class="property"> = [345, 15]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.RED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.ColorEnum.YELLOW">
+<code class="descname">YELLOW</code><em class="property"> = [33, 74]</em><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.YELLOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.ColorEnum.get_label">
+<code class="descname">get_label</code><span class="sig-paren">(</span><em>hue</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.get_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.ColorEnum.get_next">
+<code class="descname">get_next</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.ColorEnum.get_next" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hapycolor.targets.lightline.ColorManager">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.lightline.</code><code class="descname">ColorManager</code><span class="sig-paren">(</span><em>colors</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.ColorManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>For each variable needed by the theme, defines a dictionary which binds
+a the enumerate to a value of the palette’s colors.
+TODO: Apply another reduction filter? Since we need only a few colors, it
+makes sense.</p>
+<dl class="method">
+<dt id="hapycolor.targets.lightline.ColorManager.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.ColorManager.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hapycolor.targets.lightline.Lightline">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.lightline.</code><code class="descname">Lightline</code><a class="headerlink" href="#hapycolor.targets.lightline.Lightline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hapycolor.targets.base.Target" title="hapycolor.targets.base.Target"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.targets.base.Target</span></code></a></p>
+<p>Overview:</p>
+<p>A lightline theme is defined by a template which uses the following
+undeclared variables:</p>
+<ul class="simple">
+<li>Yellow</li>
+<li>Green</li>
+<li>Blue</li>
+<li>Red</li>
+<li>Magenta</li>
+<li>Orange</li>
+<li>Foreground</li>
+<li>Background</li>
+</ul>
+<p>Then, once a palette is fed to the class, a lightline colorscheme is
+generated by pairing the variables to colors defined in the provided
+palette.</p>
+<p>Supported themes:</p>
+<ul class="simple">
+<li>Landscape</li>
+<li>One</li>
+<li>Wombat</li>
+</ul>
+<dl class="class">
+<dt id="hapycolor.targets.lightline.Lightline.ThemeEnum">
+<em class="property">class </em><code class="descname">ThemeEnum</code><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.ThemeEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.ThemeEnum.LANDSCAPE">
+<code class="descname">LANDSCAPE</code><em class="property"> = 'hapycolor/targets/lightline_themes/landscape.vim'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.ThemeEnum.LANDSCAPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.ThemeEnum.ONE">
+<code class="descname">ONE</code><em class="property"> = 'hapycolor/targets/lightline_themes/one.vim'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.ThemeEnum.ONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.ThemeEnum.SOLARIZED">
+<code class="descname">SOLARIZED</code><em class="property"> = 'hapycolor/targets/lightline_themes/solarized.vim'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.ThemeEnum.SOLARIZED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.ThemeEnum.WOMBAT">
+<code class="descname">WOMBAT</code><em class="property"> = 'hapycolor/targets/lightline_themes/wombat.vim'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.ThemeEnum.WOMBAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.colorscheme_key">
+<code class="descname">colorscheme_key</code><em class="property"> = 'colorscheme'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.colorscheme_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.compatible_os">
+<code class="descname">compatible_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.compatible_os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>palette</em>, <em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function extract the targeted colors of the palette and defines
+the color’s variables used in the theme’s template defined in the
+configuration file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.footer">
+<code class="descname">footer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.footer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.get_colors">
+<code class="descname">get_colors</code><span class="sig-paren">(</span><em>palette</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.get_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each label defined in the color enumeration, affects a color of
+the palette.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.header">
+<code class="descname">header</code><span class="sig-paren">(</span><em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.initialize_config">
+<code class="descname">initialize_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.is_config_initialized">
+<code class="descname">is_config_initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.is_config_initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.select_colorscheme_path">
+<code class="descname">select_colorscheme_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.select_colorscheme_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.select_theme">
+<code class="descname">select_theme</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.select_theme" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.lightline.Lightline.set_variable">
+<code class="descname">set_variable</code><span class="sig-paren">(</span><em>label</em>, <em>color</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.set_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.lightline.Lightline.theme_key">
+<code class="descname">theme_key</code><em class="property"> = 'theme'</em><a class="headerlink" href="#hapycolor.targets.lightline.Lightline.theme_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets.vim">
+<span id="hapycolor-targets-vim-module"></span><h2>hapycolor.targets.vim module<a class="headerlink" href="#module-hapycolor.targets.vim" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hapycolor.targets.vim.Vim">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.vim.</code><code class="descname">Vim</code><a class="headerlink" href="#hapycolor.targets.vim.Vim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hapycolor.targets.base.Target" title="hapycolor.targets.base.Target"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.targets.base.Target</span></code></a></p>
+<p>Generates a colorscheme with the provided palette. This colorscheme will
+be named ‘hapycolor’ and will be located in the directory provided when
+initializing the target.</p>
+<p>Currently it only generates a colorscheme by setting 24bit colors, so it
+only works with versions of newer than Vim &gt; 7.4 (TODO: To be confirmed)
+after enabling the option: ‘set termguicolor’.</p>
+<dl class="method">
+<dt id="hapycolor.targets.vim.Vim.compatible_os">
+<code class="descname">compatible_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.Vim.compatible_os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.vim.Vim.configuration_key">
+<code class="descname">configuration_key</code><em class="property"> = 'colorscheme_vim'</em><a class="headerlink" href="#hapycolor.targets.vim.Vim.configuration_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.vim.Vim.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>palette</em>, <em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.Vim.export" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.vim.Vim.groups">
+<code class="descname">groups</code><em class="property"> = [['Comment'], ['Boolean'], ['Character'], ['Keyword'], ['Number'], ['String'], ['Float'], ['Conditional', 'Repeat'], ['Include'], ['Macro'], ['Todo'], ['Constant'], ['Define'], ['Statement'], ['Cursor'], ['Delimiter'], ['Directory'], ['Structure'], ['Type'], ['Error', 'ErrorMsg', 'Exception'], ['PreCondit'], ['Function'], ['MatchParen'], ['Ignore'], ['Identifier'], ['Typedef'], ['Label'], ['Operator'], ['LineNr'], ['CursorLineNr'], ['CursorColumn'], ['Search']]</em><a class="headerlink" href="#hapycolor.targets.vim.Vim.groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.vim.Vim.initialize_config">
+<code class="descname">initialize_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.Vim.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the path where the colorscheme will be generated, and stores it in
+the project’s configuration file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.vim.Vim.is_config_initialized">
+<code class="descname">is_config_initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.Vim.is_config_initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hapycolor.targets.vim.VimColorManager">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.vim.</code><code class="descname">VimColorManager</code><span class="sig-paren">(</span><em>rgb_colors</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.VimColorManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Manages vim’s color’s distribution</p>
+<dl class="method">
+<dt id="hapycolor.targets.vim.VimColorManager.get_color">
+<code class="descname">get_color</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.vim.VimColorManager.get_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Considering a sequence of incrementing indexes, this function will
+return the first color of each label. Once all the labels’ first
+values have been returned, it retrives the seconds and so on.
+Once all the colors will been used, it repeates the pattern.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets.wallpaper">
+<span id="hapycolor-targets-wallpaper-module"></span><h2>hapycolor.targets.wallpaper module<a class="headerlink" href="#module-hapycolor.targets.wallpaper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hapycolor.targets.wallpaper.Wallpaper">
+<em class="property">class </em><code class="descclassname">hapycolor.targets.wallpaper.</code><code class="descname">Wallpaper</code><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hapycolor.targets.base.Target" title="hapycolor.targets.base.Target"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.targets.base.Target</span></code></a></p>
+<dl class="method">
+<dt id="hapycolor.targets.wallpaper.Wallpaper.compatible_os">
+<code class="descname">compatible_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper.compatible_os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hapycolor.targets.wallpaper.Wallpaper.configuration_key">
+<code class="descname">configuration_key</code><em class="property"> = 'wallpaper_macos'</em><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper.configuration_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.wallpaper.Wallpaper.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>palette</em>, <em>image_path</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a wallpaper on macOS.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>img</strong> – the image’s path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.wallpaper.Wallpaper.initialize_config">
+<code class="descname">initialize_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hapycolor.targets.wallpaper.Wallpaper.is_config_initialized">
+<code class="descname">is_config_initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.targets.wallpaper.Wallpaper.is_config_initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-hapycolor.targets">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hapycolor.targets" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="hapycolor.filters.html" class="btn btn-neutral" title="hapycolor.filters package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Robin Vincent-Deleuze, Romain Pierson, Yann Colina.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

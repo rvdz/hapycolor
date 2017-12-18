@@ -34,11 +34,13 @@ class Reducer(base.Filter):
         Returns a reduced list of rgb colors. The output result contains the
         maximal number of colors of the provided list, where each color is at
         at least a distance threshold from the others.
-
-        arg: colors: a list of colors defined in base RGB
-        arg: threshold: a positive integer defining the minimal `CIEL2000
+        This distance is currently a constant integer which defines the minimal `CIEL2000
         <https://en.wikipedia.org/wiki/Color_difference>`_ distance between
         colors.
+
+        :param palette: the input palette
+        :return: the output palette
+        :rtype: an instance of :class:`Palette`
         """
         edges = Reducer.get_edges(palette.colors, Reducer.threshold)
         maximum_clique = Reducer.get_maximum_clique(edges)
