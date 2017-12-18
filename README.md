@@ -1,42 +1,69 @@
-# hapycolor
-Generates beautiful color palettes from images.
+# Hapycolor
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
+[![forthebadge](http://forthebadge.com/images/badges/contains-cat-gifs.svg)](http://forthebadge.com)
+[![forthebadge](http://forthebadge.com/images/badges/kinda-sfw.svg)](http://forthebadge.com)
+[![shileds.io](https://img.shields.io/badge/built--with-vim-green.svg?style=for-the-badge)](http://shields.io)
 
+TODO: Check https://codecov.io/gh or https://coveralls.io
+
+Generates beautiful color palettes from images and exports them throughout your environment.
+
+## What is Hapycolor?
 hapycolor uses imagemagick and various filter algorithms to select the best colors from a picture.
 
-## Usage
-### Requirements
-- Debian Stretch or macOS Sierra
+## Requirements
+- Debian or macOS.
 
 ### Dependencies
-- python3 (> 3.6.2)
-- imagemagick (> 7.0.6)
+- linux or macOS (iTerm2)
+- python 3.5+
+- imagemagick
+- scipy
+- matplotlib (TODO: is it true?)
 
-__Python packages__:
-- colormath (> 2.1.1)
-- scipy (> 0.19.1)
-- matplotlib (> 2.0.2)
-- numpy (> 1.13.1)
-- Pillow (> 4.2.1)
-
-__Other__:
-- gcc
-- OpenCV (3.3.0) [macOS](https://www.pyimagesearch.com/2016/12/19/install-opencv-3-on-macos-with-homebrew-the-easy-way/), [Debian](http://milq.github.io/install-opencv-ubuntu-debian/)
-
-__Install python dependencies with pip__(> 9.0.1):
+__Debian__:
 ```sh
-pip3 install colormath scipy matplotlib numpy Pillow
+sudo apt-get update && sudo apt-get install python3 python3-pip python3-scipy python3-matplotlib imagemagick -y
 ```
 
-### Installation
-In order to install this project, run:
+__macOS__:
+With [homebrew](https://brew.sh/):
 ```sh
+brew install python3 python3-pip python3-scipy python3-matplotlib imagemagick
+```
+
+## Installation
+Hapycolor can be installed with `pip`, or by cloning this repository.
+
+### Pip install
+TODO: Still not enabled
+```sh
+pip3 install hapycolor
+```
+
+### Git install
+```sh
+git clone https://github.com/rvdz/hapycolor
+cd hapycolor
 python3 setup.py install
 ```
 
-### Run
+If you don't have sudoers permissions, then run: (TODO: does it work?)
+```sh
+python3 setup.py install --user
+```
+But then, you should add the generated binary in your $PATH. To do so execute
+the following command or add it in your <zsh/bash/...>rc. For more information, please check: [Installing Python Modules](https://docs.python.org/3.6/install/index.html#alternate-installation).
+```sh
+export PATH=<path/to/bin>:$PATH
+```
+
+## Usage
 To run the program execute:
 ```sh
-hapycolor -f [path/to/file]
+hapycolor -f <path/to/file>
 ```
 
 
