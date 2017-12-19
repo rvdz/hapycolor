@@ -9,6 +9,7 @@ class Target(metaclass=abc.ABCMeta):
     to implement:
 
     - How to initialize the target
+    - How to reconfigure the target (default: calls target initialization method)
     - Function that states if the target has already be correctly initialized
     - A function that retrives a list of the compatible operating systems
     - The export function which will be called by passing the palette and the path of the image
@@ -24,16 +25,7 @@ class Target(metaclass=abc.ABCMeta):
     - Check if the target is enabled
 
     """
-    # Static Methods
-    @staticmethod
-    def initialize_config():
-        pass
-
-    @staticmethod
-    def is_config_initialized():
-        return True
-
-    # Abstract Static Methods
+    # Main method
     @abc.abstractstaticmethod
     def export(palette, image_path):
         raise exceptions.CallingAbstractMethodError("Your are a wizard!")
@@ -43,7 +35,19 @@ class Target(metaclass=abc.ABCMeta):
         """ Returns a list of enum of class :class:`hapycolor.config.OS` """
         raise exceptions.CallingAbstractMethodError("Your are a wizard!")
 
-    # Class Methods
+    # --- Configuration Methods ---
+    @staticmethod
+    def initialize_config():
+        pass
+
+    @classmethod
+    def reconfigure(cls):
+        cls.initialize_config()
+
+    @staticmethod
+    def is_config_initialized():
+        return True
+
     @classmethod
     def load_config(cls):
         """

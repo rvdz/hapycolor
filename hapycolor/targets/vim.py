@@ -12,9 +12,12 @@ class Vim(base.Target):
     be named 'hapycolor' and will be located in the directory provided when
     initializing the target.
 
-    Currently it only generates a colorscheme by setting 24bit colors, so it
-    only works with versions of newer than Vim > 7.4 (TODO: To be confirmed)
-    after enabling the option: 'set termguicolor'.
+    Currently, it supports 8bit and 24bit terminals, but by default, vim only
+    supports 8bit colors. To enable 24bit support, the option 'set termguicolor',
+    available since Vim 7.4, should be set in your vimrc.
+
+    .. todo:: Check if the option was introduced with Vim 7.4
+
     """
 
     groups = [

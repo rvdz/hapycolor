@@ -13,7 +13,6 @@ ROOT_DIR = pth.dirname(pth.abspath(__file__))
 def get_config():
     return ROOT_DIR + "/config.ini"
 
-
 class OS(enum.Enum):
     LINUX  = 0
     DARWIN = 1

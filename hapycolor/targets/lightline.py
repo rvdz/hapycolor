@@ -54,10 +54,30 @@ class Lightline(base.Target):
                                Lightline.theme_key       : str(theme.value)
                               })
 
+    def reconfigure():
+        try:
+            entry = int(input("\nTheme: 1\nLightline's path: 2\nEntry: "))
+            if entry != 1 and entry != 2:
+                raise ValueError
+        except ValueError:
+            print("Wrong input")
+            Lightline.reconfigure()
+
+        if entry == 1:
+            theme = Lightline.select_theme()
+            Lightline.save_config({Lightline.theme_key : str(theme.value)})
+        elif entry == 2:
+            colorscheme_path = Lightline.select_colorscheme_path()
+            Lightline.save_config({Lightline.colorscheme_key : colorscheme_path})
+
+
     def select_colorscheme_path():
         p = config.input_path("Path to lightline's plugin folder: ")
-        if not p.is_absolute():
-            p = p.resolve()
+        try:
+            if not p.is_absolute():
+                p = p.resolve()
+        except FileNotFoundError as e:
+            raise exceptions.WrongInputError("Cannot resolve path: " + str(e))
 
         if not p.is_dir():
             raise exceptions.WrongInputError("Must be a directory")
@@ -71,7 +91,7 @@ class Lightline(base.Target):
 
     def select_theme():
         try:
-            print("Select a theme:")
+            print("\nSelect a theme:")
             for i, t in enumerate(Lightline.ThemeEnum):
                 print(t.name + ": (" + str(i) + ")")
             theme_i = int(input("Theme: "))

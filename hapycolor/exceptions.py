@@ -116,3 +116,9 @@ class PaletteFormatError(HapycolorError):
     def __init__(self, msg):
         super(PaletteFormatError, self).__init__(msg)
         self.msg = msg
+
+
+class InvalidTarget(HapycolorError):
+    def __init__(self, msg):
+        super(InvalidTarget, self).__init__(msg)
+        self.msg = msg

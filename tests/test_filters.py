@@ -51,6 +51,7 @@ class TestFilters(unittest.TestCase):
         """
         import inspect
 
+        filters.__all__ = ['luminosity_filter', 'reducer']
         filter_modules = inspect.getmembers(filters)[0][1]
         for m in filter_modules:
             try:
