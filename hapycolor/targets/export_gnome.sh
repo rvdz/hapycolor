@@ -55,25 +55,29 @@ dlist_append() {
     "$DCONF" write "$key" "[$entries]"
 }
 
-if [[ "$1" -eq "-h" ]]; then
-	echo "usage: bash export_gnome.sh <Profile Name> <path/to/tmp/file> [<path/to/terminal/profiles> | ]"
+if [[ "$1" == "-h" ]]; then
+	echo -e "usage:\n    bash export_gnome.sh <profile_name> <path/to/tmp/file> <path/to/terminal/profiles>"
 	exit 0
 fi
 
 # first argument is profile name
 PROFILE_NAME=$1; shift
 # second argument is tmp file with colors
-i=1
+TMP_FILE=$1; shift
+# third argument is theme location
+BASE_KEY_NEW=$1
+
+i=0
 while IFS='' read -r line || [[ -n "$line" ]]; do
 	declare "COLOR_$i=$(gnome_color \"$line\")"
 	((i++))
-done < "$1"
-# first before last one is background
-BACKGROUND_COLOR=$COLOR_17
-# last is foreground
-FOREGROUND_COLOR=$COLOR_18
+done < "$TMP_FILE"
+rm -f $TMP_FILE
+# first is background
+BACKGROUND_COLOR=$COLOR_0
+# second is foreground
+FOREGROUND_COLOR=$COLOR_1
 
-shift; BASE_KEY_NEW=$1
 [[ -z "$BASE_KEY_NEW" ]] && BASE_KEY_NEW=/org/gnome/terminal/legacy/profiles:
 
 [[ -z "$PROFILE_NAME" ]] && PROFILE_NAME="Default"
@@ -112,7 +116,7 @@ if which "$DCONF" > /dev/null 2>&1; then
 
 		# update profile values with theme options
 		set_theme
-		dset palette "['${COLOR_01}', '${COLOR_02}', '${COLOR_03}', '${COLOR_04}', '${COLOR_05}', '${COLOR_06}', '${COLOR_07}', '${COLOR_08}', '${COLOR_09}', '${COLOR_10}', '${COLOR_11}', '${COLOR_12}', '${COLOR_13}', '${COLOR_14}', '${COLOR_15}', '${COLOR_16}']"
+		dset palette "['${COLOR_2}', '${COLOR_3}', '${COLOR_4}', '${COLOR_5}', '${COLOR_6}', '${COLOR_7}', '${COLOR_8}', '${COLOR_9}', '${COLOR_10}', '${COLOR_11}', '${COLOR_12}', '${COLOR_13}', '${COLOR_14}', '${COLOR_15}', '${COLOR_16}', '${COLOR_17}']"
 
         unset PROFILE_NAME
 		unset PROFILE_SLUG
@@ -124,3 +128,6 @@ if which "$DCONF" > /dev/null 2>&1; then
 		exit 0
 	fi
 fi
+
+echo "$DCONF command not found"
+exit 0

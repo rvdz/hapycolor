@@ -27,11 +27,6 @@ __Install python dependencies with pip__(> 9.0.1):
 pip3 install colormath scipy matplotlib numpy Pillow
 ```
 
-#### Comments
-- Check if you have force_color_prompt=no in your .bashrc
-- Remove any wal calls in your .bashrc or .zshrc
-- zshrc themes does not interfer with hapycolor
-- Uncheck the "use system colors" box in gnome terminal color options
 ### Installation
 In order to install this project, run:
 ```sh
@@ -43,8 +38,9 @@ To run the program execute:
 ```sh
 hapycolor -f [path/to/file]
 ```
-#### Comments
-- Check if you have force_color_prompt=no in your .bashrc
-- Remove any wal calls in your .bashrc or .zshrc
-- zshrc themes does not interfer with hapycolor
-- Uncheck the "use system colors" box in gnome terminal color options
+
+
+gnome-terminal:
+    - create a new profile called 'Default', and switch to it
+    - OR execute dconf reset -f /org/gnome/terminal/legacy/profiles:/
+    (or replace the path with yours, but this is the default one)
