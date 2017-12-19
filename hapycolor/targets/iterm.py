@@ -7,6 +7,7 @@ from . import base
 
 import random
 import enum
+import pathlib
 import uuid
 import re
 import xml.etree.ElementTree as ET
@@ -74,6 +75,13 @@ class Iterm(base.Target):
 
     def set_configuration_path():
         p = config.input_path("Path to iTerm configuration file: ")
+
+        # Does not work without decoding the configuration file
+        # If default is selected:
+        # default = pathlib.Path("~/Library/Preferences/com.googlecode.iterm2.plist").expanduser()
+        # if p.as_posix() == ".":
+        #     return default.as_posix()
+
         if not p.is_absolute() and p.is_file():
             p = p.resolve()
         try:
