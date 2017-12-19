@@ -75,6 +75,7 @@ Hapycolor is an infrastructure that helps ricers to efficiently configure their 
 addition of benefiting from other's people work. In particular through the choice of color filters and how to
 use the palette on the targets, and on which target.
 
-.. Options to add (TODO list)
-.. Customization (eg moving hyperplans)
-.. People sharing dotfiles
+.. todo::
+    Options to add (a TODO list)
+    Customization (eg moving hyperplans)
+    People sharing dotfiles?
