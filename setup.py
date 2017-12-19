@@ -11,7 +11,7 @@ from setuptools import find_packages, setup, Command
 NAME = 'hapycolor'
 DESCRIPTION = 'Generates beautiful color palettes from images.'
 URL = 'https://github.com/rvdz/hapycolor'
-EMAIL = 'robin.vdeleuze@gmail.com, romain.pierson@yahoo.fr, yanncolina@gmail.com'
+EMAIL = 'robin.vincent@grenoble-inp.org, romain.pierson@grenoble-inp.org, yanncolina@gmail.com'
 AUTHOR = 'Robin Vincent-Deleuze, Romain Pierson, Yann Colina'
 
 # What packages are required for this module to be executed?
