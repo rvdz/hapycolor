@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Targets &mdash; Hapycolor  documentation</title>
+  <title>Targets &mdash; Hapycolor 1.0.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Hapycolor  documentation" href="index.html"/>
+    <link rel="top" title="Hapycolor 1.0.0 documentation" href="index.html"/>
         <link rel="next" title="hapycolor" href="modules.html"/>
         <link rel="prev" title="Color Filters" href="filters.html"/> 
 
@@ -64,6 +64,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -94,9 +98,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Targets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#currently-supported-targets">Currently Supported Targets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gnome-terminal">Gnome Terminal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#iterm">iTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#iterm2">iTerm2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#vim">Vim</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#wallpaper">Wallpaper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wallpaper">Wallpaper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#macos">macOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linux">Linux</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#lightline">Lightline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-add-a-target">How to add a target?</a></li>
 </ul>
@@ -172,30 +180,89 @@
 <ul class="simple">
 <li><a class="reference internal" href="#gnome-terminal">Gnome Terminal</a></li>
 <li><a class="reference internal" href="#vim">Vim</a></li>
-<li><a class="reference internal" href="#iterm">iTerm</a></li>
+<li><a class="reference internal" href="#iterm2">iTerm2</a></li>
 <li><a class="reference internal" href="#wallpaper">Wallpaper</a></li>
 <li><a class="reference internal" href="#lightline">Lightline</a></li>
 </ul>
 </div>
 <div class="section" id="gnome-terminal">
 <span id="id1"></span><h2>Gnome Terminal<a class="headerlink" href="#gnome-terminal" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write something here</p>
 </div>
-<div class="section" id="iterm">
-<span id="id2"></span><h2>iTerm<a class="headerlink" href="#iterm" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="iterm2">
+<span id="id2"></span><h2>iTerm2<a class="headerlink" href="#iterm2" title="Permalink to this headline">¶</a></h2>
+<p>This program is a replacement for Terminal and works on Macs with macOS 10.10 or newer.
+iTerm2 brings the terminal into the modern age with features you never knew you always wanted.
+For more information, please check their <a class="reference external" href="https://iterm2.com/">website</a>. It can be downloaded and installed from its
+<a class="reference external" href="https://iterm2.com/">website</a>, or with <a class="reference external" href="https://brew.sh/">homebrew</a>’s <a class="reference external" href="https://caskroom.github.io/">cask</a> extension: <code class="code bash docutils literal"><span class="pre">brew</span> <span class="pre">cask</span> <span class="pre">install</span> <span class="pre">iterm2</span></code>.</p>
+<p>Hapycolor creates an iTerm’s profile which is added to the terminal preferences’
+file named after the provided image’s name. A custom configuration file
+must be used instead of the default one. To do so, enable the option
+<code class="code docutils literal"><span class="pre">Load</span> <span class="pre">preferences</span> <span class="pre">from</span> <span class="pre">a</span> <span class="pre">custom</span> <span class="pre">folder</span> <span class="pre">or</span> <span class="pre">URL:</span></code> in iTerm’s <cite>Preferences -&gt; General</cite> menu and
+select a target folder, then, when configuring hapycolor’s target, enter the newly created configuration file.</p>
+<p>In addition, this feature allows the user to choose whether or not the generated
+profile should be set as the default profile.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">By default, iTerm2 uses the configuration file located in: <code class="code docutils literal"><span class="pre">~/Library/Preferences/com.googlecode.iterm2.plist</span></code>,
+which is automatically encoded and therefore, would require additional operations in order to
+be altered. Maybe a future version of hapycolor will support the default file,
+but by now, it only manages a custom one, which is not encoded.</p>
+</div>
 </div>
 <div class="section" id="vim">
 <span id="id3"></span><h2>Vim<a class="headerlink" href="#vim" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.vim.org/">Vim (Vi IMproved)</a> is a highly configurable text editor built to make creating and changing
+any kind of text very efficient, compatible with most UNIX distributions. It can be installed
+through your favorite package manager, which can be confirmed by running the command <code class="code bash docutils literal"><span class="pre">vim</span> <span class="pre">--version</span></code>.</p>
+<p>Hapycolor is able to generate a colorscheme from a palette, with the condition
+of providing, when initializing the target, a path where it will be installed
+as a plugin. So, you should make sure that the plugin ‘hapycolor’ is enabled
+in your environment.</p>
+<p>To activate the generated colorscheme, use the command <code class="code vim docutils literal"><span class="keyword"><span class="pre">colorscheme</span></span> <span class="pre">hapycolor</span></code> from the
+<cite>Ex</cite> command line or in your <cite>vimrc</cite>.</p>
+<p>Currently, it supports 8bit and 24bit color terminals, but by default, vim only
+supports 8bit colors. If your terminal supports 24bit colors, it is highly advised
+to set the option <code class="code vim docutils literal"><span class="keyword"><span class="pre">set</span></span> <span class="pre">termguicolor</span></code>, available since Vim 7.4, in your vimrc.</p>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check if the option was introduced with Vim 7.4</p>
+</div>
 </div>
 <div class="section" id="wallpaper">
 <span id="id4"></span><h2>Wallpaper<a class="headerlink" href="#wallpaper" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="macos">
+<h3>macOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h3>
+<p>Hapycolor allows you to automatically set the provided image as the wallpaper of the
+current workspace. This target works only if <cite>desktoppicture.db</cite> exists in the
+folder <cite>~/Library/Application Support/Dock/</cite>, which should be allways true.</p>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Does anybody know if the previous assertion have exceptions?</p>
+</div>
+</div>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write something here</p>
+</div>
+</div>
 </div>
 <div class="section" id="lightline">
 <span id="id5"></span><h2>Lightline<a class="headerlink" href="#lightline" title="Permalink to this headline">¶</a></h2>
-<p>A light and configurable statusline/tabline plugin for Vim (see github <a class="reference external" href="https://github.com/itchyny/lightline.vim">repository</a>).
-For a simple configuration, add the following instruction in your vimrc:</p>
+<p>A light and configurable statusline/tabline plugin for Vim. To install this plugin,
+please check <a class="reference external" href="https://github.com/itchyny">itchyny</a>’s <a class="reference external" href="https://github.com/itchyny/lightline.vim">repository</a>.</p>
+<p>To enable this target, for a simple configuration, the following instruction should be
+added to the vimrc:</p>
 <div class="highlight-vim"><div class="highlight"><pre><span></span><span class="k">let</span> <span class="k">g</span>:lightline <span class="p">=</span> {<span class="s1">&#39;colorscheme&#39;</span>: <span class="s1">&#39;hapycolor&#39;</span> }
 </pre></div>
 </div>
+<p>For more information on how to configure this target, please check its <a class="reference external" href="https://github.com/itchyny/lightline.vim">repository</a>.</p>
+<p>Then, hapycolor’s initialization will require the user to enter the path of this plugin.</p>
 <p>It currently supports various themes inspired from lightline’s repository:</p>
 <ul class="simple">
 <li>Solarized</li>
@@ -203,15 +270,15 @@ For a simple configuration, add the following instruction in your vimrc:</p>
 <li>One</li>
 <li>Landscape</li>
 </ul>
-<p>In order to add new themes, a template should be added in <cite>hapycolor/targets/lightline_themes/</cite>, written in
-a flattened <a class="footnote-reference" href="#id7" id="id6">[1]</a> format and can use the following undefined variables:</p>
+<p>In order to add new themes, a template should be added in <code class="code docutils literal"><span class="pre">hapycolor/targets/lightline_themes/</span></code>, written in
+a flattened <a class="footnote-reference" href="#id7" id="id6">[1]</a> format, as the other themes, and can use the following undefined variables:</p>
 <ul class="simple">
-<li>s:blue</li>
-<li>s:magenta</li>
-<li>s:yellow</li>
-<li>s:red</li>
-<li>s:orange</li>
-<li>s:green</li>
+<li><code class="code vim docutils literal"><span class="pre">s:blue</span></code></li>
+<li><code class="code vim docutils literal"><span class="pre">s:magenta</span></code></li>
+<li><code class="code vim docutils literal"><span class="pre">s:yellow</span></code></li>
+<li><code class="code vim docutils literal"><span class="pre">s:</span><span class="keyword"><span class="pre">red</span></span></code></li>
+<li><code class="code vim docutils literal"><span class="pre">s:orange</span></code></li>
+<li><code class="code vim docutils literal"><span class="pre">s:green</span></code></li>
 </ul>
 <table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -235,9 +302,9 @@ persistent data needed to export a palette.</li>
 target’s module to reconfigure. To do so, it currently searches for a class that matches the module’s name implemented in
 it, except, named in PascalCase, rather than snake_case in the case of the module.</li>
 </ul>
-<p>Finally, the module’s name needs to be added to <code class="xref py py-class docutils literal"><span class="pre">targets</span></code>’s environment. In other words, the <cite>__all__</cite> list
-defined in <code class="xref py py-class docutils literal"><span class="pre">targets.__init__</span></code> shoud be altered to include the new target.</p>
-<div class="admonition-todo admonition" id="index-0">
+<p>Finally, the module’s name needs to be imported into <code class="xref py py-mod docutils literal"><span class="pre">targets</span></code>’s environment. In other words,
+<code class="code docutils literal"><span class="pre">from</span> <span class="pre">.</span> <span class="pre">import</span> <span class="pre">&lt;new_target_module&gt;</span></code> must be added in <code class="xref py py-mod docutils literal"><span class="pre">targets</span></code>.</p>
+<div class="admonition-todo admonition" id="index-4">
 <p class="first admonition-title">Todo</p>
 <p class="last">Change -reconfigure- by its real command</p>
 </div>
@@ -294,7 +361,7 @@ perhaps, remove the need for a second step.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

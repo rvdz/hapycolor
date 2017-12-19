@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hapycolor package &mdash; Hapycolor  documentation</title>
+  <title>hapycolor package &mdash; Hapycolor 1.0.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Hapycolor  documentation" href="index.html"/>
+    <link rel="top" title="Hapycolor 1.0.0 documentation" href="index.html"/>
         <link rel="up" title="hapycolor" href="modules.html"/>
         <link rel="next" title="hapycolor.filters package" href="hapycolor.filters.html"/>
         <link rel="prev" title="hapycolor" href="modules.html"/> 
@@ -65,6 +65,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -107,7 +111,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-hapycolor.palette">hapycolor.palette module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-hapycolor.raw_colors">hapycolor.raw_colors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-hapycolor.visual">hapycolor.visual module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-hapycolor">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hapycolor">hapycolor.targets module</a></li>
 </ul>
 </li>
 </ul>
@@ -184,22 +188,20 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="hapycolor.filters.html">hapycolor.filters package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#module-hapycolor.filters">hapycolor.filters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#module-hapycolor.filters.base">hapycolor.filters.base module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#module-hapycolor.filters.luminosity_filter">hapycolor.filters.luminosity_filter module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#module-hapycolor.filters.reducer">hapycolor.filters.reducer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hapycolor.filters.html#module-hapycolor.filters">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="hapycolor.targets.html">hapycolor.targets package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets">hapycolor.targets module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.base">hapycolor.targets.base module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.eight_bit_colors">hapycolor.targets.eight_bit_colors module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.iterm">hapycolor.targets.iterm module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.lightline">hapycolor.targets.lightline module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.vim">hapycolor.targets.vim module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets.wallpaper">hapycolor.targets.wallpaper module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hapycolor.targets.html#module-hapycolor.targets">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -255,8 +257,19 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="hapycolor.config.create_config">
+<code class="descclassname">hapycolor.config.</code><code class="descname">create_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.config.create_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a local configuration from the default one, in the user’s base directory</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="hapycolor.config.get_config">
 <code class="descclassname">hapycolor.config.</code><code class="descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.config.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="hapycolor.config.get_default_config">
+<code class="descclassname">hapycolor.config.</code><code class="descname">get_default_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.config.get_default_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -384,6 +397,12 @@ input:</p>
 <dl class="exception">
 <dt id="hapycolor.exceptions.InvalidImageError">
 <em class="property">exception </em><code class="descclassname">hapycolor.exceptions.</code><code class="descname">InvalidImageError</code><span class="sig-paren">(</span><em>msg</em>, <em>wrapped_exc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.exceptions.InvalidImageError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hapycolor.exceptions.HapycolorError" title="hapycolor.exceptions.HapycolorError"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.exceptions.HapycolorError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="hapycolor.exceptions.InvalidTarget">
+<em class="property">exception </em><code class="descclassname">hapycolor.exceptions.</code><code class="descname">InvalidTarget</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.exceptions.InvalidTarget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#hapycolor.exceptions.HapycolorError" title="hapycolor.exceptions.HapycolorError"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.exceptions.HapycolorError</span></code></a></p>
 </dd></dl>
 
@@ -567,7 +586,7 @@ color of them.</p>
 
 </div>
 <div class="section" id="module-hapycolor">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hapycolor" title="Permalink to this headline">¶</a></h2>
+<span id="hapycolor-targets-module"></span><h2>hapycolor.targets module<a class="headerlink" href="#module-hapycolor" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -615,7 +634,7 @@ color of them.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

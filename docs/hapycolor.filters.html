@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>hapycolor.filters package &mdash; Hapycolor  documentation</title>
+  <title>hapycolor.filters package &mdash; Hapycolor 1.0.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Hapycolor  documentation" href="index.html"/>
+    <link rel="top" title="Hapycolor 1.0.0 documentation" href="index.html"/>
         <link rel="up" title="hapycolor package" href="hapycolor.html"/>
         <link rel="next" title="hapycolor.targets package" href="hapycolor.targets.html"/>
         <link rel="prev" title="hapycolor package" href="hapycolor.html"/> 
@@ -65,6 +65,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -107,7 +111,7 @@
 <li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.palette">hapycolor.palette module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.raw_colors">hapycolor.raw_colors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor.visual">hapycolor.visual module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hapycolor.html#module-hapycolor">hapycolor.targets module</a></li>
 </ul>
 </li>
 </ul>
@@ -181,8 +185,38 @@
             
   <div class="section" id="hapycolor-filters-package">
 <h1>hapycolor.filters package<a class="headerlink" href="#hapycolor-filters-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-hapycolor.filters">
+<span id="hapycolor-filters-module"></span><h2>hapycolor.filters module<a class="headerlink" href="#module-hapycolor.filters" title="Permalink to this headline">¶</a></h2>
+<p>This module defines all the methods needed to interact with all the filters
+implemented in the <a class="reference internal" href="#module-hapycolor.filters" title="hapycolor.filters"><code class="xref py py-mod docutils literal"><span class="pre">hapycolor.filters</span></code></a> package.</p>
+<p>To add a new filter, a class inheriting from <a class="reference internal" href="#hapycolor.filters.base.Filter" title="hapycolor.filters.base.Filter"><code class="xref py py-class docutils literal"><span class="pre">base.Filter</span></code></a> needs to be
+implemented and its module should be imported in this very module, else,
+hapycolor will fail to find the new filter. Currently, the <a class="reference internal" href="#hapycolor.filters.get" title="hapycolor.filters.get"><code class="xref py py-func docutils literal"><span class="pre">get()</span></code></a> function
+needs the class to be named after a PascalCase version of its module’s name.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A list <cite>__all__</cite> could be used to define all the modules to be imported and
+then <code class="code python docutils literal"><span class="keyword namespace"><span class="pre">from</span></span> <span class="name namespace"><span class="pre">.</span></span> <span class="keyword namespace"><span class="pre">import</span></span> <span class="operator"><span class="pre">*</span></span></code> would import them all, but strangely,
+in this case, <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">sphinx</a> fails to generate the documentation of this file.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Maybe, a future version of this project would be able to get rid of
+the class name/module name constraint by analyzing the classes contained
+in the module and retrieving the one that implements <a class="reference internal" href="#hapycolor.filters.base.Filter" title="hapycolor.filters.base.Filter"><code class="xref py py-class docutils literal"><span class="pre">base.Filter</span></code></a>.</p>
+</div>
+<dl class="function">
+<dt id="hapycolor.filters.apply">
+<code class="descclassname">hapycolor.filters.</code><code class="descname">apply</code><span class="sig-paren">(</span><em>palette</em><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.filters.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply all the enabled filters to a given palette</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hapycolor.filters.get">
+<code class="descclassname">hapycolor.filters.</code><code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hapycolor.filters.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the filters enabled sorted by their complexity.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-hapycolor.filters.base">
 <span id="hapycolor-filters-base-module"></span><h2>hapycolor.filters.base module<a class="headerlink" href="#module-hapycolor.filters.base" title="Permalink to this headline">¶</a></h2>
@@ -316,9 +350,6 @@ colors.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-hapycolor.filters">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hapycolor.filters" title="Permalink to this headline">¶</a></h2>
-</div>
 </div>
 
 
@@ -365,7 +396,7 @@ colors.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'',
+            VERSION:'1.0.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
