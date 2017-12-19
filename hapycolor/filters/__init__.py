@@ -7,7 +7,7 @@ implemented in the :mod:`hapycolor.filters` package.
 
 To add a new filter, a class inheriting from :class:`base.Filter` needs to be
 implemented and its module should be imported in this very module, else,
-hapycolor will fail to find the new filter. Currently, the :func:`get_filter` function
+hapycolor will fail to find the new filter. Currently, the :func:`get` function
 needs the class to be named after a PascalCase version of its module's name.
 
 .. note::
@@ -27,7 +27,7 @@ from . import base
 from hapycolor import visual
 from hapycolor import config
 
-def get_filters():
+def get():
     """
     Returns all the filters enabled sorted by their complexity.
     """
@@ -48,8 +48,8 @@ def apply(palette):
     """
     Apply all the enabled filters to a given palette
     """
-    print("Filters found: " + str([f.__name__ for f in get_filters()]))
-    for filtr in get_filters():
+    print("Filters found: " + ", ".join([f.__name__ for f in get()]))
+    for filtr in get():
         palette = filtr.apply(palette)
         print("\nFiltered colors with " + filtr.__name__ + " (" + str(len(palette.colors)) + "):")
         visual.print_palette(palette.colors, size=1)

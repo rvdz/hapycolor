@@ -59,10 +59,10 @@ def display_palette(palette):
     print("\nFinal palette (" + str(len(palette.colors)) + "):")
     visual.print_palette(palette.colors, size=2)
 
-    print("\Foreground color:")
+    print("\nForeground color:")
     visual.print_palette([palette.foreground], size=4)
 
-    print("\Background color:")
+    print("\nBackground color:")
     visual.print_palette([palette.background], size=4)
 
     colors_to_file([c for c in palette.colors], "palette.png")
@@ -74,6 +74,7 @@ def add_palette_json(img_name, palette, filename):
 
 def main(args=None):
 
+    config.create_config()
     args = parse_arguments()
 
     img_name = args["file"]

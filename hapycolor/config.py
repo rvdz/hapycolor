@@ -5,13 +5,28 @@ import enum
 import readline
 import pathlib
 import platform
-from os import path as pth
+import shutil
 
-ROOT_DIR = pth.dirname(pth.abspath(__file__))
+ROOT_DIR = pathlib.Path(__file__).parent
+CONFIG = "hapycolor.config"
 
+# To be overwritten if the user wants to use a custom configuration file
+LOCAL_DIR = pathlib.Path("~")
+LOCAL_CONFIG = CONFIG
+
+def create_config():
+    """
+    Creates a local configuration from the default one, in the user's base directory
+    """
+    dst = get_config()
+    if not pathlib.Path(dst).is_file():
+        shutil.copyfile(get_default_config(), dst)
 
 def get_config():
-    return ROOT_DIR + "/config.ini"
+    return pathlib.Path(LOCAL_DIR / ("." + LOCAL_CONFIG)).expanduser().as_posix()
+
+def get_default_config():
+    return (ROOT_DIR / CONFIG).as_posix()
 
 class OS(enum.Enum):
     LINUX  = 0
@@ -93,13 +108,13 @@ def yabar_config():
 
 def hyperplan_file(filter_type):
     config = load_config("hyperplan")
-    path = ROOT_DIR + "/"
+    path = ROOT_DIR
     if filter_type == LuminosityFilter.DARK:
-        path += config["dark"]
+        path /= config["dark"]
     elif filter_type == LuminosityFilter.BRIGHT:
-        path += config["bright"]
+        path /= config["bright"]
     elif filter_type == LuminosityFilter.SATURATION:
-        path += config["saturation"]
+        path /= config["saturation"]
     else:
         raise exceptions.UnknownLuminosityFilterTypeError("Unknown filter type")
     return path
