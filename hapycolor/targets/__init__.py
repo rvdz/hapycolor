@@ -10,9 +10,10 @@ from . import *
 from hapycolor import config
 from hapycolor import exceptions
 
+
 def initialize():
     """ Initialize config and/or choose to enable targets """
-    print("Targets found: ", [t.__name__ for t in get()])
+    print("Targets found: " + ", ".join([t.__name__ for t in get()]))
     targets = get_compatible()
     uninit_targets = []
     for t in targets:
@@ -54,6 +55,37 @@ def initialize_target(target):
             break
 
 
+def is_target_subclass(target_str):
+    try:
+        clazz_str = "".join([t.title() for t in target_str.split("_")])
+        clazz = eval(target_str + "." + clazz_str)
+        if not issubclass(clazz, base.Target):
+            return False
+    except NameError:
+        return False
+    return True
+
+
+def reconfigure(target_str):
+    """
+    Calls the :func:reconfigure method of the appropriate class
+    contained in the target module provided in the arguments.
+    This method allows to interact with the user and change the
+    target settings.
+
+    :param target_str: a string representing a target module.
+    :raise: raises an :exc:`exceptions.InvalidTarget` if a module cannot be
+        resolve from the provided string, or if there are no matching classes
+        defined in the module that implement a :class:`Target`.
+    """
+    if not is_target_subclass(target_str):
+        raise exceptions.InvalidTarget("Input does not match a module"
+                                       + " containing a Target class")
+    clazz_str = "".join([t.title() for t in target_str.split("_")])
+    clazz = eval(target_str + "." + clazz_str)
+    clazz.reconfigure()
+
+
 def retry():
     """
     When initializing targets, asks for a retry if the user failed
@@ -71,10 +103,13 @@ def get_compatible():
     """
     all_targets = base.Target.__subclasses__()
     # Filters out the incompatible or disabled targets
-    return list(filter(lambda t: config.os() in t.compatible_os(), all_targets))
+    return list(filter(lambda t: config.os() in t.compatible_os(),
+                       all_targets))
+
 
 def get():
     return base.Target.__subclasses__()
+
 
 def export(palette, image_path):
     """
