@@ -28,5 +28,6 @@ class Wallpaper(base.Target):
             msg = "\nUnable to set the wallpaper, sorry\n"
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
-        subprocess.call(["sqlite3", db_file, "update data set value = '%s'" % image_path])
+        full_path = pathlib.Path(image_path).resolve().as_posix()
+        subprocess.call(["sqlite3", db_file, "update data set value = '%s'" % full_path])
         subprocess.call(["killall", "Dock"])

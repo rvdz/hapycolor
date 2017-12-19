@@ -15,6 +15,7 @@ class TestTarget(unittest.TestCase):
             except Exception as e:
                 self.fail(str(e))
 
+    @helpers.configurationtesting()
     def test_target_is_initialized_implemented(self):
         for t in targets.get():
             try:

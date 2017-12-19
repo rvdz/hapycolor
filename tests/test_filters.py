@@ -2,10 +2,12 @@ from hapycolor import config
 from hapycolor import filters
 from hapycolor.filters import *
 from hapycolor.filters import base
+from tests.helpers import configurationtesting
 
 import unittest
 
 class TestFilters(unittest.TestCase):
+    @configurationtesting()
     def test_filters_are_modules(self):
         """
         Asserts that all the filters in the configuration file represent a
@@ -18,6 +20,7 @@ class TestFilters(unittest.TestCase):
             except Exception as e:
                 self.fail(str(f) + " is not a module - " + str(e))
 
+    @configurationtesting()
     def test_filter_modules_contain_filter_class(self):
         """
         Asserts that the filters modules defined in the configuration file
@@ -35,14 +38,16 @@ class TestFilters(unittest.TestCase):
         [self.assertIsInstance(c(), base.Filter) for c in classes]
 
 
+    @configurationtesting()
     def test_correct_order(self):
         """
         Asserts that the luminosity filter will be applied before the reduction.
         """
-        fltrs_classes = filters.get_filters()
+        fltrs_classes = filters.get()
         self.assertLess(fltrs_classes.index(luminosity_filter.LuminosityFilter),
                         fltrs_classes.index(reducer.Reducer))
 
+    @configurationtesting()
     def test_filters_class_names(self):
         """
         Assert that each filter class is named after its module name. It should be

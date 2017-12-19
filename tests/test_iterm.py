@@ -16,10 +16,9 @@ def itermtesting(fails=0, default=True):
     invalid_entry = ["."]
     entries = invalid_entry * fails + valid_entry
 
-    test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.plist"
-    tmp_test_config_path= config.ROOT_DIR + "/../tests/com.googlecode.iterm2.tmp"
+    test_config_path= (config.ROOT_DIR / "../tests/com.googlecode.iterm2.plist").as_posix()
+    tmp_test_config_path= (config.ROOT_DIR / "../tests/com.googlecode.iterm2.tmp").as_posix()
     shutil.copyfile(test_config_path, tmp_test_config_path)
-    mock_config_dict = {Iterm.template_key    : Iterm.load_config()[Iterm.template_key]}
 
     with mock.patch('builtins.input', side_effect=entries):
         with mock.patch('hapycolor.targets.iterm.Iterm.set_default',
@@ -30,6 +29,8 @@ def itermtesting(fails=0, default=True):
 
 
 class TestIterm(unittest.TestCase):
+    @itermtesting()
+    @configurationtesting()
     def test_valid_template(self):
         """ Checks that the template file is valid """
         import xml.etree.ElementTree as ET
@@ -72,6 +73,7 @@ class TestIterm(unittest.TestCase):
             self.fail(str(err))
 
     @itermtesting()
+    @configurationtesting()
     def test_export_iterm_0_color_palette(self):
         with self.assertRaises(exceptions.ColorFormatError):
             Iterm.export(generate_palette(0), "iterm_test")

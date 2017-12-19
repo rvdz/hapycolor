@@ -2,4 +2,4 @@ include README.md LICENCE setup.py
 include hapycolor/hyperplan/*
 include hapycolor/export/*
 include hapycolor/color/*
-include hapycolor/config.ini
+include hapycolor/hapycolor.config
