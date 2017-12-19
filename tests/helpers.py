@@ -14,7 +14,7 @@ def disableprints():
 
 
 def mock_get_config():
-    return config.ROOT_DIR + "/../tests/config.ini"
+    return (config.ROOT_DIR / ("../tests/" + config.CONFIG)).as_posix()
 
 
 @contextlib.contextmanager
@@ -28,7 +28,7 @@ def configurationtesting():
     file, the original file will be left unaltered, and instead, a new configuration
     file located in the 'tests' folder will become the target.
     """
-    shutil.copyfile(config.get_config(), mock_get_config())
+    shutil.copyfile(config.get_default_config(), mock_get_config())
     with mock.patch('hapycolor.config.get_config', mock_get_config):
         yield
     os.remove(mock_get_config())
