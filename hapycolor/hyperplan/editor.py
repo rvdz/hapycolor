@@ -7,7 +7,8 @@ from hapycolor.hyperplan.qrangeslider import QRangeSlider as RangeSlider
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
                             QDesktopWidget, QSlider, QHBoxLayout, \
                             QVBoxLayout, QMainWindow, QAction, \
-                            QMessageBox, QFileDialog, QGridLayout
+                            QMessageBox, QFileDialog, QGridLayout, \
+                            QLabel
 from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject
 
@@ -21,6 +22,8 @@ class Communicate(QObject):
 
 class ColorDisplay(QWidget):
 
+
+    saveSaturation = pyqtSignal(int)
 
     # Inspired by http://www.procato.com/rgb+index/#
     class State(IntEnum):
@@ -165,6 +168,8 @@ class ColorDisplay(QWidget):
         for slider in self.sliders.values():
             sat = str(int(slider.saturation()*100))
             break
+        if sat not in self.__points.keys():
+            self.saveSaturation.emit(int(sat))
         self.__points[sat] = {}
         dark = self.__points[sat]['dark'] = []
         bright = self.__points[sat]['bright'] = []
@@ -310,6 +315,10 @@ class FormWidget(QWidget):
         self.S_WIDTH        = 150
         self.S_HEIGHT       = 30
 
+        # Buttons
+        self.MAX_COL        = 3
+        self.MAX_ROW        = 18
+
         # Saturation slider
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setFocusPolicy(Qt.NoFocus)
@@ -317,7 +326,7 @@ class FormWidget(QWidget):
         self.slider.setValue(self.initSat)
         self.slider.setGeometry(parent.X_WID, 40, self.S_WIDTH, self.S_HEIGHT)
 
-        #Save saturation button
+        # Save saturation button
         self.saveSatButton = QPushButton("Save saturation\nconfiguration", self)
         self.saveSatButton.resize(self.saveSatButton.sizeHint())
 
@@ -335,14 +344,35 @@ class FormWidget(QWidget):
         self.c.modification.connect(self.colorSliderUpdate)
         self.slider.valueChanged[int].connect(self.changeSaturation)
         self.colorSliders.setCanal(self.c)
+        self.colorSliders.saveSaturation[int].connect(self.addSavedSat)
         self.saveSatButton.clicked.connect(self.colorSliders.savePoints)
+
+        # Saved saturation buttons
+        self.dynGrid = QGridLayout()
+        self.dynGrid.addWidget(QLabel('Saved saturations', self), 0, 0)
 
         # Layout
         grid = QGridLayout()
         grid.addWidget(self.colorSliders, 0, 0)
+        grid.addLayout(self.dynGrid, 0, 1)
         grid.addWidget(self.slider, 1, 0)
         grid.addWidget(self.saveSatButton, 1, 1)
         self.setLayout(grid)
+
+    def addSavedSat(self, sat):
+
+        row = self.dynGrid.rowCount() - 1
+        if self.dynGrid.itemAtPosition(row, self.MAX_COL-1) is not None or row == 0:
+            row += 1
+        for i in range(self.MAX_COL):
+            col = i
+            if self.dynGrid.itemAtPosition(row, col) == None:
+                break;
+        self.dynGrid.addWidget(QPushButton(str(sat), self), row, col)
+
+    def loadSavedSat(self, sat):
+
+        self.changeSaturation(sat)
 
     def updateSatSlider(self, value):
 
