@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
                             QDesktopWidget, QSlider, QHBoxLayout, \
                             QVBoxLayout, QMainWindow, QAction, \
                             QMessageBox, QFileDialog, QGridLayout, \
-                            QLabel
+                            QLabel, QLineEdit
 from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtCore import QCoreApplication, Qt, pyqtSignal, QObject
 
@@ -18,6 +18,7 @@ class Communicate(QObject):
 
     updateSaturation = pyqtSignal(int)
     modification     = pyqtSignal(int)
+    removeSavedSat   = pyqtSignal(int)
 
 
 class ColorDisplay(QWidget):
@@ -189,6 +190,10 @@ class ColorDisplay(QWidget):
         self.updateSliders(sat, self.State.ALL)
         return int(sat)
 
+    def removeSatPoints(self, sat):
+
+        del self.__points[str(sat)]
+
 
 class HyperplanEditor(QMainWindow):
 
@@ -338,18 +343,28 @@ class FormWidget(QWidget):
                                 initSat=self.initSat,
                                 )
 
+        # Saved saturation buttons
+        self.dynGrid = QGridLayout()
+        self.dynGrid.addWidget(QLabel('Saved\nsaturations', self), 1, 0)
+        self.dynGrid.setRowStretch(0, 1)
+        self.dynSatButtons = {}
+        self.removeSatButton = QPushButton("Remove sat", self)
+        self.removeSatButton.resize(self.removeSatButton.sizeHint())
+        self.dynGrid.addWidget(self.removeSatButton, 1, 1)
+        self.removeSatTextBox = QLineEdit(self)
+        self.removeSatTextBox.resize(self.removeSatButton.size())
+        self.dynGrid.addWidget(self.removeSatTextBox, 1, 2)
+
         # Communication
         self.c = Communicate()
         self.c.updateSaturation[int].connect(self.colorSliders.setSaturation)
         self.c.modification.connect(self.colorSliderUpdate)
+        self.c.removeSavedSat[int].connect(self.colorSliders.removeSatPoints)
         self.slider.valueChanged[int].connect(self.changeSaturation)
         self.colorSliders.setCanal(self.c)
         self.colorSliders.saveSaturation[int].connect(self.addSavedSat)
         self.saveSatButton.clicked.connect(self.colorSliders.savePoints)
-
-        # Saved saturation buttons
-        self.dynGrid = QGridLayout()
-        self.dynGrid.addWidget(QLabel('Saved saturations', self), 0, 0)
+        self.removeSatButton.clicked.connect(self.removeSavedSat)
 
         # Layout
         grid = QGridLayout()
@@ -359,20 +374,41 @@ class FormWidget(QWidget):
         grid.addWidget(self.saveSatButton, 1, 1)
         self.setLayout(grid)
 
+    def removeSavedSat(self):
+
+        if self.dynGrid.rowCount() < 3:
+            print("Warning: no sat to be removed")
+            return
+        textBox = self.removeSatTextBox.text()
+        if textBox not in self.dynSatButtons.keys():
+            print("Warning: trying to remove invalid sat")
+            return
+        toRemove = self.dynSatButtons[textBox]
+        self.dynGrid.removeWidget(toRemove)
+        toRemove.deleteLater()
+        toRemove = None
+        del self.dynSatButtons[textBox]
+        self.c.removeSavedSat.emit(int(textBox))
+
     def addSavedSat(self, sat):
 
         row = self.dynGrid.rowCount() - 1
-        if self.dynGrid.itemAtPosition(row, self.MAX_COL-1) is not None or row == 0:
+        if self.dynGrid.itemAtPosition(row, self.MAX_COL-1) is not None or row == 1:
             row += 1
         for i in range(self.MAX_COL):
             col = i
             if self.dynGrid.itemAtPosition(row, col) == None:
                 break;
-        self.dynGrid.addWidget(QPushButton(str(sat), self), row, col)
+        name = str(sat)
+        self.dynSatButtons[name] = QPushButton(name, self)
+        self.dynSatButtons[name].resize(self.dynSatButtons[name].sizeHint())
+        self.dynSatButtons[name].clicked.connect(lambda: self.loadSavedSat(sat))
+        self.dynGrid.addWidget(self.dynSatButtons[name], row, col)
 
     def loadSavedSat(self, sat):
 
         self.changeSaturation(sat)
+        self.updateSatSlider(sat)
 
     def updateSatSlider(self, value):
 
