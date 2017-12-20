@@ -7,4 +7,8 @@ class Filter(metaclass=abc.ABCMeta):
     """
     @abc.abstractstaticmethod
     def apply(palette):
+        """
+        :arg palette: the input palette
+        :return: returns an output palette
+        """
         pass

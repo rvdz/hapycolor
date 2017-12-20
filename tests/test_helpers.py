@@ -166,11 +166,13 @@ Nude pagoda careens.""",
 
         try:
             helpers.save_json(TestHelpers.tmp_file, TestHelpers.hello_world)
+            os.remove(TestHelpers.tmp_file)
         except Exception as err:
             self.fail(str(err))
 
     def test_load_json(self):
         try:
+            helpers.save_json(TestHelpers.tmp_file, TestHelpers.hello_world)
             self.assertEqual(helpers.load_json(TestHelpers.tmp_file), TestHelpers.hello_world)
             os.remove(TestHelpers.tmp_file)
         except Exception as err:

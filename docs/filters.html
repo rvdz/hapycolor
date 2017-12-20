@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Color Filters &mdash; Hapycolor 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Hapycolor 1.0.0 documentation" href="index.html"/>
+        <link rel="next" title="Targets" href="targets.html"/>
+        <link rel="prev" title="How to contribute?" href="contribution.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Hapycolor
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">What is Hapycolor?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">How to contribute?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Color Filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#filter">Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reduction">Reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-add-a-color-filter">How to add a color filter?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">Targets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">hapycolor</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Hapycolor</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Color Filters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/filters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="color-filters">
+<h1>Color Filters<a class="headerlink" href="#color-filters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="filter">
+<span id="filter-label"></span><h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
+<p>For instance, Hapycolor is able to determine if a color is too bright or too dark. A first step, would be to convert the
+colors in an <a class="reference external" href="https://en.wikipedia.org/wiki/HSL_and_HSV">hsl</a> base and then add conditions on the luminosity. But that
+would be an illusory solution, as a matter of fact, both hsl/hsv or rgb color bases do not match the human’s eye perception
+of colors. That is why, we handpicked more than a hundred colors that we consider being at the interface between the space
+where the colors are too bright (respectively, too dark) and the space where they are not. From this discretisation, Hapycolor
+is able to generate a more fine discretisation of this hyperplan which is used to filter the colors.
+A similar approach has been implemented in order to filter out the colors that are deemed not enough saturated.</p>
+</div>
+<div class="section" id="reduction">
+<span id="reduction-label"></span><h2>Reduction<a class="headerlink" href="#reduction" title="Permalink to this headline">¶</a></h2>
+<p>A second innovative concept embedded into Hapycolor’s color processing core, is the ability to properly reduce the number
+of colors. Indeed, one of the challenges is to remove the colors that are to close to one another from the human’s eye
+perspective, but still keeping the largest palette possible. Thus, supposing that such a color base exists, the problem
+can be also stated as: imagining that each color represent a node in a graph and that two colors sufficiently “far” from each other,
+have a common vertex. In this situation, the question becomes
+“<a class="reference external" href="https://en.wikipedia.org/wiki/Clique_problem#Finding_a_single_maximal_clique">what is the maximum clique?</a>”,
+an inquiry already answered by <a class="reference external" href="https://en.wikipedia.org/wiki/Coenraad_Bron">Coenraad Bron</a> and Joep Kerbosch with the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm">Bron-Kerbosch algorithm</a>.</p>
+<p>Back to the concreteness of our world, the hypothesis of the existence of a color base that is perceptually uniform still
+needs to be proven, and worse, found, if one hopes to disclose the impenetrable mysteries of Ricing’s Art. I am pleased
+to announce another saviour: <a class="reference external" href="https://en.wikipedia.org/wiki/Richard_S._Hunter">Richard S. Hunter</a>, a man and a color
+scientist who invented the <a class="reference external" href="https://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> from which has been devised
+by the <a class="reference external" href="https://en.wikipedia.org/wiki/International_Commission_on_Illumination">International Commission on Illumination</a>
+the <a class="reference external" href="https://en.wikipedia.org/wiki/CIELUV">CIEL*a*b color space</a>. The commission crafted various distances that could
+operate in this space, among others the: <a class="reference external" href="https://en.wikipedia.org/wiki/Color_difference#CIEDE2000">CIEDE2000</a>, that have
+been used by Hapycolor to define the maximal clique problem.</p>
+</div>
+<div class="section" id="how-to-add-a-color-filter">
+<h2>How to add a color filter?<a class="headerlink" href="#how-to-add-a-color-filter" title="Permalink to this headline">¶</a></h2>
+<p>In order to add a custom filter, a class inheriting from <a class="reference internal" href="hapycolor.filters.html#hapycolor.filters.base.Filter" title="hapycolor.filters.base.Filter"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.filters.base.Filter</span></code></a> should be implemented in the filters module.
+Its main method, “apply” takes in a <code class="xref py py-class docutils literal"><span class="pre">hapycolor.Palette</span></code> and should output another <code class="xref py py-class docutils literal"><span class="pre">hapycolor.Palette</span></code>.
+In addition, in order to enable it, the module’s name should be added in the “Filters” section of the configuration file,
+coupled with a value representing the complexity of the algorithm. At runtime, hapycolor searches for classes stored in
+the provided modules that inherits from <a class="reference internal" href="hapycolor.filters.html#hapycolor.filters.base.Filter" title="hapycolor.filters.base.Filter"><code class="xref py py-class docutils literal"><span class="pre">hapycolor.filters.base.Filter</span></code></a> and whose name is a PascalCase version of the respective module
+(which should be named in snake_case, but you already know that, I hope).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Maybe, in a near future, this last constraint could be removed.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="targets.html" class="btn btn-neutral float-right" title="Targets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contribution.html" class="btn btn-neutral" title="How to contribute?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Robin Vincent-Deleuze, Romain Pierson, Yann Colina.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

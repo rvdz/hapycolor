@@ -4,6 +4,7 @@ __all__ = [
            "wallpaper",
            "base",
            "gnome",
+           "lightline",
           ]
 
 from . import *
@@ -60,7 +61,9 @@ def retry():
     to enter correct inputs. This class is usefull in order to
     test the targets' initializations
     """
-    return input("\nAbort? (y/n): ").capitalize() == "Y"
+    res = input("\nAbort? (y/n): ").capitalize() == "Y"
+    print("Abort: " + str(res))
+    return res
 
 
 def get_compatible():
