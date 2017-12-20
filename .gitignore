@@ -112,3 +112,7 @@ src/keys.json
 # shared objects
 src/*.so
 src/*.dylib
+
+# others
+palette.json
+palette.png

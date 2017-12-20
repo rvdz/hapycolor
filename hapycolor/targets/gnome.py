@@ -1,4 +1,5 @@
 from hapycolor import config
+from hapycolor import exceptions
 from hapycolor.helpers import rgb_to_hex
 from hapycolor import palette as pltte
 from . import base
@@ -22,16 +23,18 @@ class Gnome(base.Target):
         """
             Set the path for themes
         """
-        p = config.input_path("Path to gnome-terminal's dconf profiles: ")
-        if not p.is_absolute():
-            p = p.resolve()
+        default_path = '/org/gnome/terminal/legacy/profiles:'
+        p = config.input_path("Path to gnome-terminal's dconf profiles\n(Keep empty to use default path '{}'): ".format(default_path))
+        if str(p) == '.':
+            Gnome.save_config({Gnome.configuration_key : default_path})
+            return
 
-        if p[-2:] != ':/':
-            raise exceptions.WrongInputError("Must end with ':/'")
+        if str(p)[-1] != ':':
+            raise exceptions.WrongInputError("Must end with ':'")
 
-        Gnome.save_config({Gnome.configuration_key : p.as_posix()})
+        Gnome.save_config({Gnome.configuration_key : str(p)})
 
-    def is_config_initialiazed():
+    def is_config_initialized():
         try:
             is_init = Gnome.configuration_key in Gnome.load_config()
         except exceptions.InvalidConfigKeyError:
@@ -53,6 +56,7 @@ class Gnome(base.Target):
 
         name = os.path.splitext(os.path.basename(image_path))[0]
         saved_profiles_path = Gnome.load_config()[Gnome.configuration_key]
+        print(saved_profiles_path)
         colors = list(map(lambda x: rgb_to_hex(x)[1:], palette._colors))
         fg = rgb_to_hex(palette._foreground)[1:]
         bg = rgb_to_hex(palette._background)[1:]
