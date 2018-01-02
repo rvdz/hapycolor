@@ -15,6 +15,7 @@ Welcome to Hapycolor's documentation!
    filters
    targets
    modules
+   directory_structure
 
 
 

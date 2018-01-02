@@ -17,6 +17,11 @@ hapycolor\.config module
 
 .. automodule:: hapycolor.config
 
+hapycolor\.imgur module
+------------------------
+
+.. automodule:: hapycolor.imgur
+
 hapycolor\.exceptions module
 ----------------------------
 

@@ -1,5 +1,6 @@
 import unittest
 from hapycolor.filters.reducer import Reducer
+import subprocess as sp
 
 
 class TestReducer(unittest.TestCase):
@@ -21,3 +22,9 @@ class TestReducer(unittest.TestCase):
         maximum_clique.sort()
 
         self.assertIn(maximum_clique, possible_expected_outputs)
+
+    @unittest.skip("Still developing, might never be finished")
+    def test_cpp(self):
+        proc = sp.run("cd ./hapycolor/filters/reducer/ && make test", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        if proc.returncode != 0:
+            self.fail("C++ reducer tests failed, for more details, run: cd ./hapycolor/filters/reducer/ && make test")

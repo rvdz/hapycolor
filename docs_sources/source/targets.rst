@@ -1,28 +1,21 @@
 Targets
 ========
 
+.. contents::
+
 .. role:: vim(code)
     :language: vim
 
 .. role:: bash(code)
     :language: bash
 
-Currently Supported Targets
----------------------------
-- `Gnome Terminal`_
-- `Vim`_
-- `iTerm2`_
-- `Wallpaper`_
-- `Lightline`_
-
-.. _Gnome Terminal:
+.. role:: python(code)
+    :language: python
 
 Gnome Terminal
 --------------
 
 .. todo:: Write something here
-
-.. _iTerm2:
 
 iTerm2
 ------
@@ -40,36 +33,34 @@ website_, or with homebrew_'s cask_ extension: :bash:`brew cask install iterm2`.
 Hapycolor creates an iTerm's profile which is added to the terminal preferences'
 file named after the provided image's name. A custom configuration file
 must be used instead of the default one. To do so, enable the option
-:code:`Load preferences from a custom folder or URL:` in iTerm's `Preferences -> General` menu and
+``Load preferences from a custom folder or URL:`` in iTerm's ``Preferences -> General`` menu and
 select a target folder, then, when configuring hapycolor's target, enter the newly created configuration file.
 
 In addition, this feature allows the user to choose whether or not the generated
 profile should be set as the default profile.
 
+.. note::
+    For some themes, you might want to switch to the dark mode, to do so, go to Preferences > Appearance and in
+    the `Theme:`'s menu, select `Dark`.
 
 .. note::
-    By default, iTerm2 uses the configuration file located in: :code:`~/Library/Preferences/com.googlecode.iterm2.plist`,
-    which is automatically encoded and therefore, would require additional operations in order to
-    be altered. Maybe a future version of hapycolor will support the default file,
-    but by now, it only manages a custom one, which is not encoded.
+    By default, iTerm2 uses the configuration file located in: :code:``~/Library/Preferences/com.googlecode.iterm2.plist``,
+    which is automatically encoded as an `Apple binary property list`_. It is possible to use a custom file by enabling
+    ``Load preferences from a custom folder or URL:`` in ``Preferences > General > Preferences``, and selecting a target folder.
+    Then, when configuring hapycolor, you will have to provide the path to the generated custom preferences file.
 
-.. _Vim:
+.. _`Apple binary property list`: https://en.wikipedia.org/wiki/Property_list
 
 Vim
 ---
 `Vim (Vi IMproved)`_ is a highly configurable text editor built to make creating and changing
 any kind of text very efficient, compatible with most UNIX distributions. It can be installed
-through your favorite package manager, which can be confirmed by running the command :bash:`vim --version`.
+with your favorite package manager, which can be confirmed by running the command :bash:`vim --version`.
 
 .. _Vim (Vi IMproved): http://www.vim.org/
 
-Hapycolor is able to generate a colorscheme from a palette, with the condition
-of providing, when initializing the target, a path where it will be installed
-as a plugin. So, you should make sure that the plugin 'hapycolor' is enabled
-in your environment.
-
-When configuring vim, if you are using common paths to manage your plugins, such as 
-`~/.vim/bundle`, `~/.vim_runtime/sources_non_forked` or `~/.vim_runtime/sources_forked`,
+When configuring this target, if you are using common paths to manage your plugins, such as
+``~/.vim/bundle``, ``~/.vim_runtime/sources_non_forked`` or ``~/.vim_runtime/sources_forked``,
 hapycolor should automatically install the colorscheme. Else, you will be prompted to input
 the path of the location where the plugin should be installed. If you are not using any plugin manager,
 enter the following commands in your vimrc:
@@ -80,15 +71,13 @@ enter the following commands in your vimrc:
     Plug 'hapycolor'
 
 To activate the generated colorscheme, use the command :vim:`colorscheme hapycolor` from the
-`Ex` command line or add it to your `vimrc`.
+``Ex`` command line or add it to your ``vimrc``.
 
-Currently, it supports 8bit and 24bit color terminals, but by default, vim only
-supports 8bit colors. If your terminal supports 24bit colors, it is highly advised
+Currently, it supports 8bit and 24bit color terminals. By default, vim only
+supports 8bit colors, but if your terminal supports 24bit colors, it is highly advised
 to set the option :vim:`set termguicolor`, available since Vim 7.4, in your vimrc.
 
 .. todo:: Check if the option was introduced with Vim 7.4
-
-.. _Wallpaper:
 
 Wallpaper
 ---------
@@ -96,8 +85,8 @@ Wallpaper
 macOS
 `````
 Hapycolor allows you to automatically set the provided image as the wallpaper of the
-current workspace. This target works only if `desktoppicture.db` exists in the
-folder `~/Library/Application Support/Dock/`, which should be allways true.
+current workspace. This target works only if ``desktoppicture.db`` exists in the
+folder ``~/Library/Application Support/Dock/``, which should be allways true.
 
 .. todo:: Does anybody know if the previous assertion have exceptions?
 
@@ -105,8 +94,6 @@ Linux
 `````
 
 .. todo:: Write something here
-
-.. _Lightline:
 
 Lightline
 ---------
@@ -122,6 +109,8 @@ added to the vimrc:
 
     let g:lightline = {'colorscheme': 'hapycolor' }
 
+By default, Vim displays the current mode (except for 'normal') in the bottom left section of the editor,
+to disable it, use: :vim:`set showmode!`.
 For more information on how to configure this target, please check its repository_.
 
 Then, hapycolor's initialization will require the user to enter the path of this plugin.
@@ -133,7 +122,7 @@ It currently supports various themes inspired from lightline's repository:
 - One
 - Landscape
 
-In order to add new themes, a template should be added in :code:`hapycolor/targets/lightline_themes/`, written in
+In order to add new themes, a template should be added in ``hapycolor/targets/lightline_themes/``, written in
 a flattened [1]_ format, as the other themes, and can use the following undefined variables:
 
 - :vim:`s:blue`
@@ -154,18 +143,18 @@ How to add a target?
 In order to add a target, two steps are required:
 
 First, a class extending :class:`hapycolor.targets.base.Target` needs
-to be implemented in the module :class:`hapycolor.targets`. The main method, the static function :func:`export`, takes
+to be implemented in the module :class:`hapycolor.targets`. The main method, the static function :func:`hapycolor.targets.base.Target.export`, takes
 in a palette of colors and exports it to the target. Other methods that should be implemented are:
 
-- :func:`compatible_os`, which defines a list of compatible OS.
-- :func:`initialize_config`, which interacts with the user and stores in its respective section of the configuration file
+- :func:`hapycolor.targets.base.Target.compatible_os`, which defines a list of compatible OS.
+- :func:`hapycolor.targets.base.Target.initialize_config`, which interacts with the user and stores in its respective section of the configuration file
   persistent data needed to export a palette.
-- :func:`reconfigure`. This method can be triggered by hapycolor's -reconfigure- option, which asks for the name of the
+- :func:`hapycolor.targets.base.Target.reconfigure`. This method can be triggered by hapycolor's -reconfigure- option, which asks for the name of the
   target's module to reconfigure. To do so, it currently searches for a class that matches the module's name implemented in
   it, except, named in PascalCase, rather than snake_case in the case of the module.
 
-Finally, the module's name needs to be imported into :mod:`targets`'s environment. In other words,
-:code:`from . import <new_target_module>` must be added in :mod:`targets`.
+Finally, the module's name needs to be imported into :mod:`hapycolor.targets`'s environment. In other words,
+:python:`from . import <new_target_module>` must be added in :mod:`hapycolor.targets`.
 
 .. todo:: Change -reconfigure- by its real command
 

@@ -1,6 +1,8 @@
 Color Filters
 =====================
 
+.. contents::
+
 .. _filter_label:
 
 Filter

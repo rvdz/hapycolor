@@ -4,6 +4,8 @@ from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
 from . import base
+import subprocess
+import contextlib
 
 import random
 import enum
@@ -13,6 +15,14 @@ import re
 import xml.etree.ElementTree as ET
 
 class Iterm(base.Target):
+
+    @contextlib.contextmanager
+    def open_preferences(mode="r"):
+        preferences = Iterm.load_config()[Iterm.preferences_key]
+        subprocess.run(["plutil", "-convert", "xml1", preferences])
+        with open(preferences, mode) as f:
+            yield f
+        # subprocess.run(["plutil", "-convert", "binary1", preferences])
 
     class Enumeration(object):
         def __init__(Iterm, key_values):
@@ -74,13 +84,12 @@ class Iterm(base.Target):
             Iterm.reconfigure()
 
     def set_configuration_path():
-        p = config.input_path("Path to iTerm configuration file: ")
+        default = pathlib.Path("~/Library/Preferences/com.googlecode.iterm2.plist").expanduser()
+        p = config.input_path("Path to iTerm configuration file (" + default.as_posix() + "): ")
 
-        # Does not work without decoding the configuration file
         # If default is selected:
-        # default = pathlib.Path("~/Library/Preferences/com.googlecode.iterm2.plist").expanduser()
-        # if p.as_posix() == ".":
-        #     return default.as_posix()
+        if p.as_posix() == ".":
+            return default.as_posix()
 
         if not p.is_absolute() and p.is_file():
             p = p.resolve()
@@ -137,10 +146,12 @@ class Iterm(base.Target):
         Iterm.__set_cursor_color(palette.foreground, template_root)
         Iterm.__set_transparency(0.2, template_root)
 
-        config_tree = ET.parse(Iterm.load_config()[Iterm.preferences_key])
+        with Iterm.open_preferences("r") as f:
+            config_tree = ET.parse(Iterm.load_config()[Iterm.preferences_key])
         root = config_tree.getroot().find(Iterm.Tag.DICT)
 
         guid = Iterm.__set_guid(template_root, root)
+
         if Iterm.load_config()[Iterm.default_key] == str(True):
             Iterm.__set_default(guid, root)
 
@@ -151,8 +162,9 @@ class Iterm(base.Target):
                 root[i+1].append(template_root)
 
         # Save changes
-        with open(Iterm.load_config()[Iterm.preferences_key], "wb") as f:
+        with Iterm.open_preferences("wb") as f:
             f.write(ET.tostring(config_tree.getroot()))
+
 
     def __create_color_bloc(color):
         """ Creates a Color bloc. Requires a color in the rgb format """
