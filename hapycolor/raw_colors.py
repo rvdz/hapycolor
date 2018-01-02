@@ -1,9 +1,11 @@
 from hapycolor import palette as pltte
 from hapycolor import helpers
+from hapycolor import exceptions
 
 import re
 import subprocess as sp
 from ast import literal_eval as make_tuple
+
 
 def get(image_path, num_colors):
     """
@@ -21,14 +23,35 @@ def get(image_path, num_colors):
     del raw_colors[0]
 
     # Select only the rgb colors from output
-    magic_colors = [re.search("rgb\(.*\)", str(col)).group(0)[3:] for col in raw_colors]
-    rgb_colors = [make_tuple(rgb_col) for rgb_col in magic_colors]
+    rgb_colors = [extract_rgb(str(col)) for col in raw_colors]
 
     palette = pltte.Palette()
     palette.colors = rgb_colors
     palette.foreground, palette.background = get_fg_and_bg(rgb_colors)
 
     return palette
+
+
+def extract_rgb(raw_color):
+    """
+    Checks if the color are encoded over 8 bit (greyscale), 24bit (rgb) or
+    32bit (rgb + alpha) and returns a tuple of rgb values
+
+    :param raw_color: en entry line of the result of the imagemagick extraction
+    :raises exceptions.BlackAndWhitePictureException: if the colors are encoded
+    in a greyscale format.
+    :return: A tuple of rgb values
+    """
+    if re.search("gray", raw_color):
+        msg = "Some minimalist hipster thinks he deserves using hapycolor"
+        raise exceptions.BlackAndWhitePictureException(msg)
+    elif re.search("srgba", raw_color):
+        match = re.search("srgba\(.*\)", raw_color).group(0)
+        return make_tuple(match[5:])[:-1]
+    elif re.search("srgb", raw_color):
+        match = re.search("srgb\(.*\)", raw_color).group(0)
+        return make_tuple(match[4:])
+
 
 def get_fg_and_bg(rgb_colors):
     """ Extract the background and foreground """
