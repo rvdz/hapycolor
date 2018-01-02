@@ -1,4 +1,8 @@
-import hapycolor.config
+"""
+Hapycolor's exceptions
+"""
+
+from hapycolor import config
 
 
 class HapycolorError(Exception):
@@ -136,6 +140,7 @@ class NoCommonPathFound(HapycolorError):
         super(NoCommonPathFound, self).__init__(msg)
         self.msg = msg
 
+
 class UnsupportedFeatureError(HapycolorError):
     def __init__(self, msg):
         super(UnsupportedFeatureError, self).__init__(msg)
@@ -145,4 +150,10 @@ class UnsupportedFeatureError(HapycolorError):
 class ImageNotFoundException(HapycolorError):
     def __init__(self, msg):
         super(ImageNotFoundException, self).__init__(msg)
+        self.msg = msg
+
+
+class BlackAndWhitePictureException(HapycolorError):
+    def __init__(self, msg):
+        super(BlackAndWhitePictureException, self).__init__(msg)
         self.msg = msg
