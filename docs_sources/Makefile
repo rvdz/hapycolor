@@ -18,8 +18,8 @@ help:
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
+html: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	@rm -rf $(HTMLTARGET)/*
-	@mv $(HTMLSOURCE)/.buildinfo $(HTMLSOURCE)/* $(HTMLTARGET)
+	mv $(HTMLSOURCE)/.buildinfo $(HTMLSOURCE)/* $(HTMLTARGET)
 	@rm -rf $(BUILDDIR)

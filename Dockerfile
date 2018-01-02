@@ -2,6 +2,7 @@ FROM debian
 
 RUN apt-get update && apt-get install git python3 python3-pip python3-scipy python3-matplotlib imagemagick -y
 
+RUN apt-get install vim -y
 RUN useradd -m bonisseur-de-la-batte
 RUN su - bonisseur-de-la-batte
 

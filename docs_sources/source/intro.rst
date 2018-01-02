@@ -53,6 +53,9 @@ Did we kill the Art of Ricing?
 
 Synthesis
 ---------
+
+.. todo:: Find a better title
+
 These relevant arguments forget one essential trait of the accomplished Ricer. Indeed, a True Ricer would
 spot a subtle mistake in the last sentence, since this artistry has no end, and thus, one can not claim to have reached
 the ultimate state of enlightenment.

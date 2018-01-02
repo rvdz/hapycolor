@@ -11,7 +11,6 @@ Some examples of badges:
 
 TODO: we could add a badge according to our code coverage: https://codecov.io/gh or https://coveralls.io
 
-
 ## What is Hapycolor?
 Hapyolor generates beautiful color palettes from images and exports them throughout your environment.
 By using imagemagick and various clever filter algorithms it selects the best colors from a picture.
