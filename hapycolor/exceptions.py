@@ -22,6 +22,7 @@ class CallingAbstractMethodError(HapycolorError):
         super(CallingAbstractMethodError, self).__init__(msg)
         self.msg = msg
 
+
 class ExportTargetFailure(HapycolorError):
     def __init__(self, msg, target):
         super(ExportTargetFailure, self).__init__(msg)
@@ -123,12 +124,25 @@ class InvalidTarget(HapycolorError):
         super(InvalidTarget, self).__init__(msg)
         self.msg = msg
 
+
 class PluginError(HapycolorError):
     def __init__(self, msg):
         super(PluginError, self).__init__(msg)
         self.msg = msg
 
+
 class NoCommonPathFound(HapycolorError):
     def __init__(self, msg):
         super(NoCommonPathFound, self).__init__(msg)
+        self.msg = msg
+
+class UnsupportedFeatureError(HapycolorError):
+    def __init__(self, msg):
+        super(UnsupportedFeatureError, self).__init__(msg)
+        self.msg = msg
+
+
+class ImageNotFoundException(HapycolorError):
+    def __init__(self, msg):
+        super(ImageNotFoundException, self).__init__(msg)
         self.msg = msg

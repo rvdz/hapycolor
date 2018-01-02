@@ -16,7 +16,13 @@ AUTHOR = 'Robin Vincent-Deleuze, Romain Pierson, Yann Colina'
 
 # Packages required for this module to be executed
 REQUIRED = [
-    'Pillow', 'networkx==1.11', 'scipy', 'colormath', 'numpy', 'matplotlib'
+    'Pillow',
+    'networkx==1.11',
+    'scipy',
+    'colormath',
+    'numpy',
+    'matplotlib',
+    'imgur_downloader-0.1.6'
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -73,7 +79,7 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    packages=find_packages(exclude=('tests',)),
+    packages=find_packages(exclude=('tests', 'docs', 'docs_sources')),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
