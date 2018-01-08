@@ -56,7 +56,6 @@ class Gnome(base.Target):
 
         name = os.path.splitext(os.path.basename(image_path))[0]
         saved_profiles_path = Gnome.load_config()[Gnome.configuration_key]
-        print(saved_profiles_path)
         colors = list(map(lambda x: rgb_to_hex(x)[1:], palette._colors))
         fg = rgb_to_hex(palette._foreground)[1:]
         bg = rgb_to_hex(palette._background)[1:]
