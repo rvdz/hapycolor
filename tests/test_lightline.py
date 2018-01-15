@@ -1,11 +1,12 @@
-import unittest
-from unittest.mock import patch
-from hapycolor.targets.lightline import Lightline
 from hapycolor import exceptions
+from hapycolor.targets.lightline import Lightline
 from tests.helpers import disableprints
+from unittest.mock import patch
 import os
 import pathlib
 import shutil
+import unittest
+
 
 class TestLightline(unittest.TestCase):
     @disableprints()

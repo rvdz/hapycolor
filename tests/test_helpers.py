@@ -1,19 +1,14 @@
 from hapycolor import helpers
-import numpy as np
 import os
-
 import unittest
 
-class TestHelpers(unittest.TestCase):
-    def setUp(self):
-        pass
 
-    def test_hsl_to_rgb(self):
+class TestHelpers(unittest.TestCase):
+    def test_hsl_to_rgb_1(self):
         colors = []
         colors.append((0, 0, 0))
         colors.append((360, 1, 1))
         colors.append((22, 0.111111111111, 0.99999))
-
         for c in colors:
             self.__test_rgb_color(helpers.hsl_to_rgb(c))
 
@@ -24,21 +19,20 @@ class TestHelpers(unittest.TestCase):
 
     def __test_hsl_color(self, color):
         self.assertEqual(len(color), 3)
-
         self.assertTrue(0 <= color[0] and color[0] <= 360)
         self.assertTrue(0 <= color[1] and color[1] <= 1)
         self.assertTrue(0 <= color[2] and color[2] <= 1)
 
     hsl_rgb_dict = {
-                    (34, 0.33, 0.8)   : (221, 206, 187),
-                    (0, 0, 0)         : (0, 0, 0),
-                    (58, 0.12, 0.55)  : (154, 153, 126),
-                    (120, 0.68, 0.17) : (14, 73, 14),
-                    (0, 0, 1)         : (255, 255, 255),
-                    (84, 0.1, 0.1)    : (26, 28, 23)
-                   }
+            (34, 0.33, 0.8): (221, 206, 187),
+            (0, 0, 0): (0, 0, 0),
+            (58, 0.12, 0.55): (154, 153, 126),
+            (120, 0.68, 0.17): (14, 73, 14),
+            (0, 0, 1): (255, 255, 255),
+            (84, 0.1, 0.1): (26, 28, 23),
+       }
 
-    def test_hsl_to_rgb(self):
+    def test_hsl_to_rgb_2(self):
         for hsl1, rgb2 in TestHelpers.hsl_rgb_dict.items():
             with self.subTest(line=hsl1):
                 rgb1 = helpers.hsl_to_rgb(hsl1)
@@ -54,24 +48,27 @@ class TestHelpers(unittest.TestCase):
                 self.assertAlmostEqual(hsl1[1], hsl2[1], 2)
                 self.assertAlmostEqual(hsl1[2], hsl2[2], 2)
 
-
     def test_hex_to_rgb(self):
-        colors = { "#000000" : (0,0,0),
-                   "#FFFFFF" : (255, 255, 255),
-                   "#89ABCD" : (137, 171, 205)}
+        colors = {
+               "#000000": (0, 0, 0),
+               "#FFFFFF": (255, 255, 255),
+               "#89ABCD": (137, 171, 205),
+            }
         for c in colors:
             self.assertEqual(helpers.hex_to_rgb(c), colors[c])
 
     tmp_file = "/tmp/test_save_json.json"
-    hello_world = {"asdf" : """asaasaasssasaasssasaaaasssasaasssasaaaaaaaasssasaaaasssasaaaasssasaasssasaasss
-asaasssasaasssasaaaasssasaasssasaaaasssasaaaaaasssasaaaasssasaasssasaaaasssasa
-aaaaasssasaaaasssasaasssasaaaaaaaasssasaaaasssasaasssasaasssasaaaasssasaaaaaaa
-asssasaasssasaaaaaaaaaaaasssasaaaaaasssasaasssasaaaaaasssasaasssasaaaasssasaas
-ssasaaaaaaaasssasaasssasaaaaaasssasaaaasssasaasssasaaaasssasaaaasssasaasssasaa
-aasssasaaaaaasssasaaaasssasaaaasssasaasssasaaaaaaaasssasaasssasaaaaaaaasssasaa""",
-                   "Aubergine" : """=aA-a1=oA=bi+b1-Ab-bb:bA+B1=iBGolf by Quintopia
+    hello_world = {
+            "asdf": """asaasaasssasaasssasaaaasssasaasssasaaaaaaaasssasaaaasss
+asaaaasssasaasssasaasssasaasssasaasssasaaaasssasaasssasaaaasssasaaaaaasssasaaaa
+sssasaasssasaaaasssasaaaaaasssasaaaasssasaasssasaaaaaaaasssasaaaasssasaasssasaa
+sssasaaaasssasaaaaaaaasssasaasssasaaaaaaaaaaaasssasaaaaaasssasaasssasaaaaaasssa
+saasssasaaaasssasaasssasaaaaaaaasssasaasssasaaaaaasssasaaaasssasaasssasaaaasssa
+saaaasssasaasssasaaaasssasaaaaaasssasaaaasssasaaaasssasaasssasaaaaaaaasssasaass
+sasaaaaaaaasssasaa""",
+            "Aubergine": """=aA-a1=oA=bi+b1-Ab-bb:bA+B1=iBGolf by Quintopia
 !dlroW ,olleH""",
-                   "Beatnik" : """Soars, larkspurs, rains.
+           "Beatnik": """Soars, larkspurs, rains.
 Indistinctness.
 Mario snarl (nurses, natures, rules...) sensuously retries goal.
 Agribusinesses' costs par lain ropes (mopes) autos' cores.
@@ -160,7 +157,9 @@ Saint Towellings.
 Larger aeons telephone stolid char, pal!
 Boats Dean forsook, rosters, tunas, terrariums -- united, traced.
 Nude pagoda careens.""",
-            "Brainfuck" : "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."}
+            "Brainfuck": """++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+
+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."""
+    }
 
     def test_save_json(self):
 
@@ -173,7 +172,8 @@ Nude pagoda careens.""",
     def test_load_json(self):
         try:
             helpers.save_json(TestHelpers.tmp_file, TestHelpers.hello_world)
-            self.assertEqual(helpers.load_json(TestHelpers.tmp_file), TestHelpers.hello_world)
+            self.assertEqual(helpers.load_json(TestHelpers.tmp_file),
+                             TestHelpers.hello_world)
             os.remove(TestHelpers.tmp_file)
         except Exception as err:
             self.fail(str(err))
