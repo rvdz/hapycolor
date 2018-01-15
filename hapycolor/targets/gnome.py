@@ -60,15 +60,24 @@ class Gnome(base.Target):
         fg = rgb_to_hex(palette._foreground)[1:]
         bg = rgb_to_hex(palette._background)[1:]
 
-        open('./tmp', 'a').close()
-        with open('./tmp', 'w') as f:
+        if len(colors) == 0:
+            msg = 'The palette does not contain any color'
+            raise exceptions.PaletteFormatError(msg)
+        while len(colors) < 16:
+            for i in range(len(colors)):
+                colors.append(colors[i])
+                if len(colors) == 16:
+                    break
+
+        tmp_file = '/tmp/hapycolor.txt'
+        with open(tmp_file, 'w') as f:
             f.write('%s\n' % bg)
             f.write('%s\n' % fg)
             for c in colors:
                 f.write('%s\n' % c)
             f.close()
 
-        process = subprocess.Popen(['bash',  './hapycolor/targets/export_gnome.sh', name, './tmp', saved_profiles_path], stdout=subprocess.PIPE, bufsize=1)
+        process = subprocess.Popen(['bash',  './hapycolor/targets/export_gnome.sh', name, tmp_file, saved_profiles_path], stdout=subprocess.PIPE, bufsize=1)
         with process.stdout:
             for line in iter(process.stdout.readline, b''):
                 print(line, )
