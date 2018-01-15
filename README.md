@@ -81,6 +81,7 @@ gnome-terminal:
    Gnome shell 3.22 for instance), try doing both by reseting first
 
 ## Tests
+
 To check if all the test pass on a Debian Stretch, you can build and run the provided dockerfile:
 ```sh
 docker build -t hapycolor .

@@ -57,7 +57,7 @@ class Lightline(base.Target):
     def reconfigure():
         try:
             entry = int(input("\nTheme: 1\nLightline's path: 2\nEntry: "))
-            if entry != 1 and entry != 2:
+            if entry not in [1, 2]:
                 raise ValueError
         except ValueError:
             print("Wrong input")
