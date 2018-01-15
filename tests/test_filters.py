@@ -1,10 +1,10 @@
 from hapycolor import config
 from hapycolor import filters
-from hapycolor.filters import *
+from hapycolor.filters import luminosity_filter, reducer
 from hapycolor.filters import base
 from tests.helpers import configurationtesting
-
 import unittest
+
 
 class TestFilters(unittest.TestCase):
     @configurationtesting()
@@ -37,22 +37,22 @@ class TestFilters(unittest.TestCase):
 
         [self.assertIsInstance(c(), base.Filter) for c in classes]
 
-
     @configurationtesting()
     def test_correct_order(self):
         """
-        Asserts that the luminosity filter will be applied before the reduction.
+        Asserts that the luminosity filter will be applied before the
+        reduction.
         """
-        fltrs_classes = filters.get()
-        self.assertLess(fltrs_classes.index(luminosity_filter.LuminosityFilter),
-                        fltrs_classes.index(reducer.Reducer))
+        fltr_classes = filters.get()
+        self.assertLess(fltr_classes.index(luminosity_filter.LuminosityFilter),
+                        fltr_classes.index(reducer.Reducer))
 
     @configurationtesting()
     def test_filters_class_names(self):
         """
-        Assert that each filter class is named after its module name. It should be
-        a PascalCase version of it. In addition, it checks also if the respective
-        class inherits from :class:base.Filter.
+        Assert that each filter class is named after its module name. It should
+        be a PascalCase version of it. In addition, it checks also if the
+        respective class inherits from :class:base.Filter.
         """
         import inspect
 

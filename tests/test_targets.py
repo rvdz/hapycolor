@@ -1,13 +1,12 @@
-import unittest
 from hapycolor import config
-from unittest.mock import patch
 from hapycolor import targets
+from hapycolor.targets import base, vim, lightline, iterm, wallpaper
 from tests import helpers
-from hapycolor.targets import *
-from hapycolor.targets import base
+from unittest.mock import patch
+import unittest
+
 
 class TestTarget(unittest.TestCase):
-
     def test_target_compatible_os_implemented(self):
         for t in targets.get():
             try:
@@ -23,7 +22,6 @@ class TestTarget(unittest.TestCase):
             except Exception as e:
                 self.fail(str(e))
 
-
     @patch('hapycolor.config.os', return_value=config.OS.LINUX)
     def test_get_compatible_linux(self, mock_os):
         for t in targets.get_compatible():
@@ -35,7 +33,6 @@ class TestTarget(unittest.TestCase):
             self.assertIn(config.OS.DARWIN, t.compatible_os())
 
     def test_reconfigure_valid_target(self):
-        from hapycolor.targets import vim, base
         try:
             target_str = "vim"
             clazz_str = "".join([t.title() for t in target_str.split("_")])
@@ -45,16 +42,15 @@ class TestTarget(unittest.TestCase):
             self.fails(str(e))
 
     def test_reconfigure_valid_target_module(self):
-        from hapycolor.targets import vim, base
         with self.assertRaises(NameError):
             target_str = "Vim"
-            clazz = eval(target_str)
+            eval(target_str)
 
     def test_target_class_names(self):
         """
-        Assert that each target class is named after its module name. It should be
-        a PascalCase version of it. In addition, it checks also if the respective
-        class inherits from :class:base.Target.
+        Assert that each target class is named after its module name. It should
+        be a PascalCase version of it. In addition, it checks also if the
+        respective class inherits from :class:base.Target.
 
         .. note:: When adding a new test, it should be added in the list:
             `targets.__all__`, defined in this test.

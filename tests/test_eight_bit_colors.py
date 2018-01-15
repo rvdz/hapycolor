@@ -1,5 +1,6 @@
+from hapycolor.targets.eight_bit_colors import short2rgb
 import unittest
-from hapycolor.targets.eight_bit_colors import short2rgb, rgb2short
+
 
 class TestEightBitColors(unittest.TestCase):
     def test_short_to_rgb(self):

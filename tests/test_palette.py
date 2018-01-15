@@ -1,13 +1,12 @@
 from hapycolor import palette
 from hapycolor import exceptions
-
 import unittest
 
-class TestPalette(unittest.TestCase):
 
+class TestPalette(unittest.TestCase):
     def test_invalid_background_and_foreground(self):
         pltte = palette.Palette()
-        formats = [[], {}, (1,2,3,4), (350, 0, 0), (0,0,0.4)]
+        formats = [[], {}, (1, 2, 3, 4), (350, 0, 0), (0, 0, 0.4)]
         for f in formats:
             with self.subTest(line=f):
                 with self.assertRaises(exceptions.ColorFormatError):
@@ -17,14 +16,13 @@ class TestPalette(unittest.TestCase):
 
     def test_valid_background_and_foreground(self):
         pltte = palette.Palette()
-        formats = [(0,0,0), (245, 0, 1)]
+        formats = [(0, 0, 0), (245, 0, 1)]
         try:
             for f in formats:
                 pltte.foreground = f
                 pltte.background = f
         except Exception as e:
             self.fail(str(e))
-
 
     def test_invalid_colors(self):
         pltte = palette.Palette()
