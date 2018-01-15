@@ -38,3 +38,12 @@ To run the program execute:
 ```sh
 hapycolor -f [path/to/file]
 ```
+
+
+gnome-terminal:
+    - create a new profile called 'Default', and switch to it
+    - OR execute dconf reset -f /org/gnome/terminal/legacy/profiles:/
+    (or replace the path with yours, but this is the default one)
+
+!! If one of the above solutions does not work for you (Debian 9, 
+   Gnome shell 3.22 for instance), try doing both by reseting first

@@ -3,6 +3,7 @@ __all__ = [
            "iterm",
            "wallpaper",
            "base",
+           "gnome",
            "lightline",
           ]
 
