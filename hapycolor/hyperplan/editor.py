@@ -374,6 +374,7 @@ class FormWidget(QWidget):
         grid.addWidget(self.saveSatButton, 1, 1)
         self.setLayout(grid)
 
+
     def removeSavedSat(self):
 
         if self.dynGrid.rowCount() < 3:
@@ -384,14 +385,31 @@ class FormWidget(QWidget):
             print("Warning: trying to remove invalid sat")
             return
         toRemove = self.dynSatButtons[textBox]
+        index = self.dynGrid.indexOf(toRemove)
+        lastButton = self.dynGrid.itemAt(index + 1)
+        # Find index of last item
+        while lastButton != None:
+            index += 1
+            lastButton = self.dynGrid.itemAt(index + 1)
+        lastButton = self.dynGrid.itemAt(index).widget()
+        previousButton = self.dynGrid.itemAt(index - 1).widget()
+        # Move every button from last to index
+        while toRemove != lastButton:
+            self.dynGrid.replaceWidget(previousButton, lastButton)
+            index -= 1
+            lastButton = previousButton
+            previousButton = self.dynGrid.itemAt(index - 1)
+            if previousButton != None:
+                previousButton = previousButton.widget()
+        # Safely remove widget
         self.dynGrid.removeWidget(toRemove)
         toRemove.deleteLater()
-        toRemove = None
         del self.dynSatButtons[textBox]
         self.c.removeSavedSat.emit(int(textBox))
 
     def addSavedSat(self, sat):
 
+        # Calculating position
         row = self.dynGrid.rowCount() - 1
         if self.dynGrid.itemAtPosition(row, self.MAX_COL-1) is not None or row == 1:
             row += 1
@@ -399,6 +417,7 @@ class FormWidget(QWidget):
             col = i
             if self.dynGrid.itemAtPosition(row, col) == None:
                 break;
+        # Create and add button to grid
         name = str(sat)
         self.dynSatButtons[name] = QPushButton(name, self)
         self.dynSatButtons[name].resize(self.dynSatButtons[name].sizeHint())
@@ -409,6 +428,7 @@ class FormWidget(QWidget):
 
         self.changeSaturation(sat)
         self.updateSatSlider(sat)
+
 
     def updateSatSlider(self, value):
 
