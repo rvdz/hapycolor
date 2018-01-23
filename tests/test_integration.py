@@ -1,14 +1,10 @@
-from hapycolor import config
-from hapycolor import exceptions
 from hapycolor import targets
-from hapycolor.targets.iterm import Iterm
 from hapycolor.targets.vim import Vim
-from hapycolor.targets.wallpaper import Wallpaper
 
-from tests.helpers import configurationtesting, vimtesting, itermtesting, retrytesting, disableprints
-
-from unittest.mock import patch
+from tests.helpers import configurationtesting, retrytesting, disableprints
+from tests.test_vim import vimtesting
 import unittest
+
 
 class TestIntegrationConfiguration(unittest.TestCase):
     @vimtesting(fails=1)

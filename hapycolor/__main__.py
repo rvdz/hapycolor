@@ -19,6 +19,7 @@ from . import filters
 
 from PIL import Image, ImageDraw
 import argparse
+import os
 
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
@@ -39,37 +40,67 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 def parse_arguments():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="File path to the image", required=True)
-    return vars(ap.parse_args())
+    ap.add_argument("-f", "--file", help="File path to the image")
+    ap.add_argument("-d", "--dir", help="Directory path to the images "
+            + "(this option will NOT export variables, use -f instead). "
+            + "This option implicitly enables -j option")
+    ap.add_argument("-j", "--json", action="store_true", help="Saves output "
+              + "(RGB format) in a Json file palettes.json instead of "
+              + "exporting variables. Json file is updated if the file exists.")
+    args = vars(ap.parse_args())
+    if not (args["file"] or args["dir"]):
+        ap.error('expected either argument -f or -d')
+    if args["file"] and args["dir"]:
+        ap.error('cannot use simultaneaously option -f and -d')
+    return args
 
 def display_palette(palette):
     print("\nFinal palette (" + str(len(palette.colors)) + "):")
     visual.print_palette(palette.colors, size=2)
 
-    print("\Foreground color:")
+    print("\nForeground color:")
     visual.print_palette([palette.foreground], size=4)
 
-    print("\Background color:")
+    print("\nBackground color:")
     visual.print_palette([palette.background], size=4)
 
     colors_to_file([c for c in palette.colors], "palette.png")
     helpers.save_json("palette.json", palette.colors)
 
+def add_palette_json(img_name, palette, filename):
+    data_dict = {img_name: palette.hexcolors}
+    helpers.update_json(filename, data_dict)
 
 def main(args=None):
 
+    config.create_config()
     args = parse_arguments()
 
-    targets.initialize()
+    img_name = args["file"]
+    img_dir = args["dir"]
 
-    palette = raw_colors.get(args["file"], num_colors=150)
+    if args["json"] or args["dir"]:
+        img_list = []
+        if img_name is not None:
+            img_list.append(img_name)
+        elif img_dir is not None:
+            for f in os.listdir(img_dir):
+                if os.path.splitext(f)[1] in [".jpg", "jpeg"]:
+                    img_list.append(os.path.join(img_dir, f))
 
-    palette = filters.apply(palette)
-
-    targets.export(palette, args["file"])
-
-    display_palette(palette)
-
+        for img in img_list:
+            print("Processing file {}".format(img))
+            palette = raw_colors.get(img, num_colors=150)
+            palette = filters.apply(palette)
+            add_palette_json(os.path.abspath(img), palette, "palettes.json")
+        print()
+        print("Palette saved to palettes.json")
+    else:
+        palette = raw_colors.get(img_name, num_colors=150)
+        palette = filters.apply(palette)
+        targets.initialize()
+        targets.export(palette, args["file"])
+        display_palette(palette)
 
 if __name__ == '__main__':
     main()

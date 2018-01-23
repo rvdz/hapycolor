@@ -41,6 +41,10 @@ class Palette:
     def colors(self):
         return self._colors
 
+    @property
+    def hexcolors(self):
+        return [helpers.rgb_to_hex(c) for c in self._colors]
+
     @colors.setter
     def colors(self, rgb_colors):
         if rgb_colors.__class__ != list or len(rgb_colors) == 0 \

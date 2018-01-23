@@ -1,6 +1,6 @@
-import json, sys, os
+import json
 from hapycolor import exceptions
-import pathlib
+import os
 
 """ Utilitary methods to convert color types  """
 
@@ -46,11 +46,6 @@ def hex_to_rgb(hexcol):
 def hsl_to_hex(colhsl):
     colrgb = hsl_to_rgb(colhsl)
     return rgb_to_hex(colrgb)
-
-
-def hex_to_hsl(colhex):
-    colrgb = hex_to_rgb(colhex)
-    return rgb_to_hsl(colrgb)
 
 
 def rgb_to_hsl(colrgb):
@@ -120,3 +115,16 @@ def load_json(file_path):
 def save_json(data_file, data_object):
     with open(data_file, 'w') as f:
         json.dump(data_object, f, indent=4)
+
+def update_json(data_file, data_object):
+    if not os.path.exists(data_file):
+        with open(data_file, 'wt') as inFile:
+            inFile.write("{}")
+        data = data_object
+    else:
+        with open(data_file) as f:
+            data = json.load(f)
+        data.update(data_object)
+
+    with open(data_file, 'w') as f:
+        json.dump(data, f, indent=2)

@@ -11,12 +11,12 @@ from setuptools import find_packages, setup, Command
 NAME = 'hapycolor'
 DESCRIPTION = 'Generates beautiful color palettes from images.'
 URL = 'https://github.com/rvdz/hapycolor'
-EMAIL = 'robin.vdeleuze@gmail.com, romain.pierson@yahoo.fr, yanncolina@gmail.com'
+EMAIL = 'robin.vincent@grenoble-inp.org, romain.pierson@grenoble-inp.org, yanncolina@gmail.com'
 AUTHOR = 'Robin Vincent-Deleuze, Romain Pierson, Yann Colina'
 
-# What packages are required for this module to be executed?
+# Packages required for this module to be executed
 REQUIRED = [
-    # 'requests', 'maya', 'records',
+    'Pillow', 'networkx==1.11', 'scipy', 'colormath', 'numpy', 'matplotlib'
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -83,7 +83,7 @@ setup(
     python_requires=">=3.5",
     install_requires=REQUIRED,
     include_package_data=True,
-    license='GPL-3.0',
+    license='MIT License',
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers

@@ -7,6 +7,7 @@ from . import base
 
 import random
 import enum
+import pathlib
 import uuid
 import re
 import xml.etree.ElementTree as ET
@@ -26,6 +27,7 @@ class Iterm(base.Target):
                       })
 
     Key = Enumeration({
+                       "DEFAULT"           : "Default Bookmark Guid",
                        "NEW_BOOKMARKS"     : "New Bookmarks",
                        "GUID"              : "Guid",
                        "NAME"              : "Name",
@@ -37,6 +39,7 @@ class Iterm(base.Target):
                       })
 
     preferences_key = "iterm_preferences"
+    default_key = "default"
     template_key = "iterm_template"
     def is_config_initialized():
         return Iterm.preferences_key in Iterm.load_config()
@@ -44,17 +47,64 @@ class Iterm(base.Target):
     def initialize_config():
         """
         Checks if iTerm's preferences file is correct and save it's path in the
-        project configuration file.
+        project configuration file. Then asks for the user if the generated
+        profiles should be set as default.
         """
+        config_path = Iterm.set_configuration_path()
+        Iterm.save_config({Iterm.preferences_key: config_path})
+        is_default = Iterm.set_default()
+        Iterm.save_config({Iterm.default_key: str(is_default)})
+
+    def reconfigure():
+        try:
+            is_default = eval(Iterm.load_config()[Iterm.default_key])
+            is_set = "set" if not is_default else "unset"
+            print("\nChange configuration path: 1")
+            print(is_set.title() + " generated profile as default: 2")
+            option = int(input("Option: "))
+            if option != 1 and option != 2:
+                raise ValueError
+            elif option == 1:
+                path = Iterm.set_configuration_path()
+                Iterm.save_config({Iterm.preferences_key: path})
+            elif option == 2:
+                Iterm.save_config({Iterm.default_key: str(not is_default)})
+        except ValueError:
+            print("Wrong input")
+            Iterm.reconfigure()
+
+    def set_configuration_path():
         p = config.input_path("Path to iTerm configuration file: ")
+
+        # Does not work without decoding the configuration file
+        # If default is selected:
+        # default = pathlib.Path("~/Library/Preferences/com.googlecode.iterm2.plist").expanduser()
+        # if p.as_posix() == ".":
+        #     return default.as_posix()
+
         if not p.is_absolute() and p.is_file():
             p = p.resolve()
-        if not p.is_file():
-            raise exceptions.WrongInputError("Path does not lead to a file")
-        if p.name != "com.googlecode.iterm2.plist":
-            raise exceptions.WrongInputError("The file does not match an iTerm"
-                                             + " configuration file")
-        Iterm.save_config({Iterm.preferences_key: p.as_posix()})
+        try:
+            if not p.is_file():
+                raise exceptions.WrongInputError("Path does not lead to a file")
+            if p.name != "com.googlecode.iterm2.plist":
+                raise exceptions.WrongInputError("The file does not match an iTerm"
+                                                 + " configuration file")
+        except exceptions.WrongInputError as e:
+            print(str(e))
+            return Iterm.set_configuration_path()
+        else:
+            return p.as_posix()
+
+    def set_default():
+        answ = input("Set generated profile as default? (y/n): ").upper()
+        if answ == "Y":
+            return True
+        elif answ == "N":
+            return False
+        else:
+            print("Wrong input")
+            return Iterm.set_default()
 
     def compatible_os():
         return [config.OS.DARWIN]
@@ -90,7 +140,9 @@ class Iterm(base.Target):
         config_tree = ET.parse(Iterm.load_config()[Iterm.preferences_key])
         root = config_tree.getroot().find(Iterm.Tag.DICT)
 
-        Iterm.__set_guid(template_root, root)
+        guid = Iterm.__set_guid(template_root, root)
+        if Iterm.load_config()[Iterm.default_key] == str(True):
+            Iterm.__set_default(guid, root)
 
         # Append profile to profile list
         for i, n in enumerate(root):
@@ -121,7 +173,7 @@ class Iterm(base.Target):
         blue_key.text  = "Blue Component"
         blue_key.tail  = new_line
 
-        color_keys = [blue_key, green_key, red_key]
+        color_keys = [red_key, green_key, blue_key]
 
         bloc      = ET.Element(Iterm.Tag.DICT)
         bloc.text = new_line
@@ -150,11 +202,19 @@ class Iterm(base.Target):
         """ Insert new guid into the template """
         guid_element = ET.Element(Iterm.Tag.STRING)
 
-        guid_element.text = str(uuid.uuid1()).upper()
+        guid = uuid.uuid1()
+        guid_element.text = str(guid).upper()
         guid_element.tail = "\n\t"
         for i, n in enumerate(template):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.GUID:
                 template.insert(i+1, guid_element)
+        return guid
+
+    def __set_default(guid, root):
+        """ Sets generated profile as default """
+        for i, n in enumerate(root):
+            if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.DEFAULT:
+                root[i+1].text = str(guid).upper()
 
     def __set_background_color(color, root):
         color_element = Iterm.__create_color_bloc(color)
@@ -268,14 +328,17 @@ class TermColorManager():
             raise exceptions.UninitializedError(msg)
 
         for tc in TermColorEnum:
+            # If the provided index corresponds to this TermColor enum
             if index in tc.value[1]:
-                # If the provided index corresponds to this TermColor enum
+                # If there are no colors for this label, returns a random one
                 if tc not in self.colors:
-                    # If there are no colors for this label, returns a random one
-                    label = random.choice(list(self.colors))
+                    tmp_colors = {**self.colors}
+                    del tmp_colors[TermColorEnum.BLACK]
+                    del tmp_colors[TermColorEnum.WHITE]
+                    label = random.choice(list(tmp_colors))
 
+                    # If the label is empty, pick another one
                     while not self.colors[label]:
-                        # If the label is empty, pick another one
                         label = random.choice(list(self.colors))
                     return helpers.hsl_to_rgb(random.choice(self.colors[label]))
 
@@ -301,9 +364,9 @@ class TermColorEnum(enum.Enum):
     """
     BLACK   = [[ ],         [ 0, 8]]
     WHITE   = [[ ],         [ 7, 15]]
-    RED     = [[ 345, 25],  [ 4, 12]]
-    YELLOW  = [[ 25, 60],   [ 6, 14]]
+    RED     = [[ 345, 25],  [ 1, 9]]
+    YELLOW  = [[ 25, 60],   [ 3, 11]]
     GREEN   = [[ 60, 160],  [ 2, 10]]
-    CYAN    = [[ 160, 200], [ 3, 11]]
-    BLUE    = [[ 200, 260], [ 1, 9]]
+    CYAN    = [[ 160, 200], [ 6, 14]]
+    BLUE    = [[ 200, 260], [ 4, 12]]
     MAGENTA = [[ 260, 345], [ 5, 13]]
