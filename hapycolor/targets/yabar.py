@@ -21,12 +21,12 @@ class Yabar(base.Target):
 
         Methods for defined color:
             - 'closest': finds the closest color in hue
-                         => full token must look like '$DC30T60'
-                         for hue from 30 to 60
+                         => full token must be '$DCT45' for a target
+                         hue of 45
             - 'range': finds a color in the hue range, if none,
                        uses the default hue
-                       => full token must be '$DCT45' for a target
-                       hue of 45
+                       => full token must look like '$DC30T60'
+                       for hue from 30 to 60
         !!! THE TOKEN DEFINES THE METHOD !!!
     """
 
@@ -65,7 +65,7 @@ class Yabar(base.Target):
 
         try:
             if not 0 <= int(p) <= 360:
-                raise exceptions.WrongInputError("Must be an int")
+                raise exceptions.WrongInputError("Must be between 0 and 360")
         except:
             raise exceptions.WrongInputError("Must be an int")
 
