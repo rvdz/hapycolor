@@ -48,6 +48,11 @@ def hsl_to_hex(colhsl):
     return rgb_to_hex(colrgb)
 
 
+def hex_to_hsl(hexcol):
+    colrgb = hex_to_rgb(hexcol)
+    return rgb_to_hsl(colrgb)
+
+
 def rgb_to_hsl(colrgb):
     if not can_be_rgb(colrgb):
         raise exceptions.ColorFormatError("The input color must be defined in"
