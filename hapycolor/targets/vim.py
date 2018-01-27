@@ -77,7 +77,7 @@ class Vim(base.Target):
 
         p = None
         try:
-            p = VimHelpers.pathogen_plugins_path()
+            p = VimHelpers.bundle_plugins_path()
         except exceptions.NoCommonPathFound:
             p = Vim.custom_path()
 

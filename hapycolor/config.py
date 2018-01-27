@@ -14,22 +14,27 @@ CONFIG = "hapycolor.config"
 LOCAL_DIR = pathlib.Path("~")
 LOCAL_CONFIG = CONFIG
 
+
 def create_config():
     """
-    Creates a local configuration from the default one, in the user's base directory
+    Creates a local configuration from the default one, in the user's base
+    directory
     """
     dst = get_config()
     if not pathlib.Path(dst).is_file():
         shutil.copyfile(get_default_config(), dst)
 
+
 def get_config():
     return pathlib.Path(LOCAL_DIR / ("." + LOCAL_CONFIG)).expanduser().as_posix()
+
 
 def get_default_config():
     return (ROOT_DIR / CONFIG).as_posix()
 
+
 class OS(enum.Enum):
-    LINUX  = 0
+    LINUX = 0
     DARWIN = 1
 
 
@@ -109,18 +114,19 @@ def yabar_config():
 def hyperplan_file(filter_type):
     config = load_config("hyperplan")
     path = ROOT_DIR
-    if filter_type == LuminosityFilter.DARK:
+    if filter_type == Filter.DARK:
         path /= config["dark"]
-    elif filter_type == LuminosityFilter.BRIGHT:
+    elif filter_type == Filter.BRIGHT:
         path /= config["bright"]
-    elif filter_type == LuminosityFilter.SATURATION:
+    elif filter_type == Filter.SATURATION:
         path /= config["saturation"]
     else:
         raise exceptions.UnknownLuminosityFilterTypeError("Unknown filter type")
     return path.as_posix()
 
+
 # ----------------------------Color Filter ---------------------------------- #
-class LuminosityFilter(enum.Enum):
-    BRIGHT     = 1
-    DARK       = 2
+class Filter(enum.Enum):
+    BRIGHT = 1
+    DARK = 2
     SATURATION = 3

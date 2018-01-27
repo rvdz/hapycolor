@@ -157,3 +157,9 @@ class BlackAndWhitePictureException(HapycolorError):
     def __init__(self, msg):
         super(BlackAndWhitePictureException, self).__init__(msg)
         self.msg = msg
+
+
+class NotPolarException(HapycolorError):
+    def __init__(self, msg):
+        super(NotPolarException, self).__init__(msg)
+        self.msg = msg
