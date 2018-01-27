@@ -1,6 +1,7 @@
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import palette
+from hapycolor.targets import vim_helpers
 from hapycolor.targets.vim import Vim, VimColorManager
 from tests.helpers import generate_palette, configurationtesting
 from unittest import mock
@@ -17,15 +18,15 @@ def vimtesting(fails=0):
     invalid_entry = "./tests/run_suite.py"
     entries = []
     try:
-        VimHelpers.pathogen_plugins_path()
-    except:
+        vim_helpers.VimHelpers.bundle_plugins_path()
+    except exceptions.NoCommonPathFound:
         entries = [invalid_entry] * fails + [valid_entry]
 
-    pathogen_mock = pathlib.Path(valid_entry)
-    pathogen_finder = 'hapycolor.targets.vim_helpers.VimHelpers.pathogen_plugins_path'
+    bundle_mock = pathlib.Path(valid_entry)
+    bundle_finder = 'hapycolor.targets.vim_helpers.VimHelpers.bundle_plugins_path'
 
     with mock.patch('builtins.input', side_effect=entries):
-        with mock.patch(pathogen_finder, return_value=pathogen_mock):
+        with mock.patch(bundle_finder, return_value=bundle_mock):
             yield
     if pathlib.Path("./tests/hapycolor").exists():
         shutil.rmtree("./tests/hapycolor")
@@ -49,18 +50,6 @@ class TestVim(unittest.TestCase):
         """
         with self.assertRaises(exceptions.ColorFormatError):
             Vim.export(generate_palette(0), "vim_test")
-
-    @vimtesting()
-    @configurationtesting()
-    def test_vim_export_1_color_palette(self):
-        """ Asserting that vim's export functions works with a palette containing
-            only one color """
-        try:
-            Vim.initialize_config()
-            self.assertTrue(Vim.is_config_initialized())
-            Vim.export(generate_palette(1), "vim_test")
-        except Exception as err:
-            self.fail(str(err))
 
     @vimtesting()
     @configurationtesting()
@@ -98,7 +87,7 @@ class TestVim(unittest.TestCase):
         pltte = palette.Palette()
         pltte.foreground = (0, 0, 0)
         pltte.background = (0, 0, 0)
-        hsl_colors = ([(16  , 0.54 , 0.45) , (28  , 0.77 , 0.64) , (45  , 0.94 , 0.66) , (52  , 0.38 , 0.53) , (59  , 0.97 , 0.67) , (98  , 0.82 , 0.69) , (147 , 0.70 , 0.48) , (162 , 0.60 , 0.42) , (172 , 0.85 , 0.54) , (177 , 0.64 , 0.39) , (182 , 0.78 , 0.50) , (202 , 0.57 , 0.57) , (227 , 0.05 , 0.65) , (239 , 0.44 , 0.50) , (305 , 0.70 , 0.50) , (319 , 0.32 , 0.50) , (333 , 0.57 , 0.42) , (338 , 0.57 , 0.60) , (342 , 0.57 , 0.44) , (344 , 0.60 , 0.5)  , (348 , 0.92 , 0.62)])
+        hsl_colors = ([(16, 0.5, 0.45), (2, 0.7, 0.64), (4, 0.9, 0.66), (5, 0.3, 0.53), (5, 0.9, 0.67), (9, 0.8, 0.69), (14, 0.7, 0.48), (16, 0.6, 0.42), (17, 0.8, 0.54), (17, 0.64, 0.39), (182, 0.78, 0.50), (202, 0.57, 0.57), (227, 0.05, 0.65), (239, 0.44, 0.50), (305, 0.70, 0.50), (319, 0.32, 0.50), (333, 0.57, 0.42), (338, 0.57, 0.60), (342, 0.57, 0.44), (344, 0.60, 0.5), (348, 0.92, 0.62)])
         pltte.colors = [helpers.hsl_to_rgb(c) for c in hsl_colors]
 
         try:

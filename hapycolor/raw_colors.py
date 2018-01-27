@@ -43,7 +43,8 @@ def extract_rgb(raw_color):
     :return: A tuple of rgb values
     """
     if re.search("gray", raw_color):
-        msg = "Some minimalist hipster thinks he deserves using hapycolor"
+        msg = "Some minimalist hipster thinks he deserves using Hapycolor. " \
+                "Fortunately, Hapycolor does not accept b&w images."
         raise exceptions.BlackAndWhitePictureException(msg)
     elif re.search("srgba", raw_color):
         match = re.search("srgba\(.*\)", raw_color).group(0)

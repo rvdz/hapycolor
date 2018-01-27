@@ -9,23 +9,25 @@ from hapycolor import exceptions
 class VimHelpers:
     def is_vim_installed():
         try:
-            p = subprocess.run(["vim", "--version"], stdout=subprocess.DEVNULL)
+            subprocess.run(["vim", "--version"], stdout=subprocess.DEVNULL)
             return True
         except FileNotFoundError:
             return False
 
-    def pathogen_plugins_path():
+    def bundle_plugins_path():
         common_paths = [pathlib.Path(p) for p in ["~/.vim/bundle",
+                                                  "~/.vim/pack/bundle/start",
                                                   "~/.vim_runtime/sources_non_forked"]]
         for p in common_paths:
             if p.expanduser().exists():
                 return p.expanduser()
-        raise exceptions.NoCommonPathFound("Common pathogen's path do not exist")
+        raise exceptions.NoCommonPathFound("Common bundle's path do not exist")
 
     @contextlib.contextmanager
     def export_plugin_paths():
         """
-        Generates a file containing all the plugins' paths, and removes afterward.
+        Generates a file containing all the plugins' paths, and removes
+        afterward.
         """
 
         plugin_paths = pathlib.Path("./hapycolor/targets/plugin_paths.txt") \
