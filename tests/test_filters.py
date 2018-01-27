@@ -1,12 +1,11 @@
-from hapycolor import config
-from hapycolor import filters
-from hapycolor.filters import luminosity_filter, reducer
-from hapycolor.filters import base
+from hapycolor import config, filters
+from hapycolor.filters import base, reducer
+from hapycolor.filters import lum_filter
 from tests.helpers import configurationtesting
 import unittest
 
 
-class TestFilters(unittest.TestCase):
+class TestFilterBase(unittest.TestCase):
     @configurationtesting()
     def test_filters_are_modules(self):
         """
@@ -44,7 +43,7 @@ class TestFilters(unittest.TestCase):
         reduction.
         """
         fltr_classes = filters.get()
-        self.assertLess(fltr_classes.index(luminosity_filter.LuminosityFilter),
+        self.assertLess(fltr_classes.index(lum_filter.LumFilter),
                         fltr_classes.index(reducer.Reducer))
 
     @configurationtesting()
@@ -56,7 +55,7 @@ class TestFilters(unittest.TestCase):
         """
         import inspect
 
-        filters.__all__ = ['luminosity_filter', 'reducer']
+        filters.__all__ = ['lum_filter', 'reducer']
         filter_modules = inspect.getmembers(filters)[0][1]
         for m in filter_modules:
             try:
@@ -66,4 +65,4 @@ class TestFilters(unittest.TestCase):
                 self.assertTrue(inspect.isclass(clazz))
                 self.assertIsInstance(clazz(), base.Filter)
             except NameError as e:
-                self.fails(str(e))
+                self.fail(str(e))

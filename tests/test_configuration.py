@@ -13,13 +13,15 @@ class TestConfiguration(unittest.TestCase):
     @helpers.configurationtesting()
     def test_hypeplans_files_exist(self):
         """ Checks if manual hyperplan point's file exists """
-        for filter_type in config.LuminosityFilter:
+        for filter_type in config.Filter:
             hyperplan_file = pathlib.Path(config.hyperplan_file(filter_type))
             self.assertTrue(hyperplan_file.is_file())
 
     @patch('hapycolor.config.input_path',
            return_value=pathlib.Path("./README.md").expanduser())
-    def test_vim_file(self, mock_input):
+    @patch('hapycolor.targets.vim_helpers.VimHelpers.bundle_plugins_path',
+           side_effect=exceptions.NoCommonPathFound(""))
+    def test_vim_file(self, mock_input, mock_bundle_path):
         """ Assert that 'save_vim' fails when a file is provided """
         with self.assertRaises(exceptions.WrongInputError):
             Vim.initialize_config()
@@ -42,7 +44,7 @@ class TestConfiguration(unittest.TestCase):
             config.os()
 
     @patch('platform.system', side_effect=["Linux", "Darwin"])
-    def test_not_supported_operating_system(self, get_os):
+    def test_supported_operating_system(self, get_os):
         """ Checks that the 'os' getter works properly when running the program
             on a supported platform """
         try:
@@ -81,5 +83,5 @@ class TestConfiguration(unittest.TestCase):
     def test_hyperplan_files(self):
         with self.assertRaises(exceptions.UnknownLuminosityFilterTypeError):
             config.hyperplan_file("hue")
-        for f in config.LuminosityFilter:
+        for f in config.Filter:
             self.assertTrue(pathlib.Path(config.hyperplan_file(f)).exists())

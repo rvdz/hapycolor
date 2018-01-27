@@ -87,8 +87,23 @@ class Reducer(base.Filter):
         return graphs
 
     def get_maximum_clique(graph, threshold):
+        """
+        Computes the maximal clique of a provided graph. The generated graphs'
+        nodes correspond to the colors and for each couple of colors which are
+        sufficiently far apart, there is an edge. The distance used is the
+        CIEDE2000 distance and when this value is larger than the provided
+        threshold, the colors are considered sufficently appart.
+
+        To improve the performances of the algorithm, if the graph contains
+        more than 60 colors, it will be reduced to this value.
+
+        .. see:: :func:Reducer.distance()
+        """
         if len(graph) <= 1:
             return [n.color for n in graph]
+
+        if len(graph) > 60:
+            graph = graph[:60]
 
         edges = []
         for i1, c1 in enumerate(graph):
