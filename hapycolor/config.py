@@ -117,7 +117,7 @@ def hyperplan_file(filter_type):
         path /= config["saturation"]
     else:
         raise exceptions.UnknownLuminosityFilterTypeError("Unknown filter type")
-    return path
+    return path.as_posix()
 
 # ----------------------------Color Filter ---------------------------------- #
 class LuminosityFilter(enum.Enum):
