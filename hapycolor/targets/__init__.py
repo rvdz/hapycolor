@@ -23,7 +23,7 @@ name.
     in the module and retrieving the one that implements :class:`base.Target`.
 """
 
-from . import vim, iterm, wallpaper, lightline, gnome
+from . import vim, iterm, wallpaper, lightline, gnome, yabar
 from . import base
 from hapycolor import config
 from hapycolor import exceptions
