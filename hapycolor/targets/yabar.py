@@ -83,7 +83,7 @@ class Yabar(base.Target):
 
         ya_conf    = Yabar.load_config()[Yabar.configuration_key]
         def_hue    = int(Yabar.load_config()[Yabar.configuration_hue_key])
-        tmp_conf   = '/tmp/tmp.conf'
+        hapyconf   = ya_conf[:-len(os.path.basename(ya_conf))] + "hapy.conf"
         col_bg     = helpers.rgb_to_hex(palette._background)[1:]
         col_fg     = helpers.rgb_to_hex(palette._foreground)[1:]
         hex_colors = list(map(lambda x: helpers.rgb_to_hex(x)[1:],
@@ -91,7 +91,7 @@ class Yabar(base.Target):
         hsl_colors = list(map(lambda x: helpers.rgb_to_hsl(x),
                               palette._colors))
 
-        with open(ya_conf, 'r') as f, open(tmp_conf, 'a') as tmp:
+        with open(ya_conf, 'r') as f, open(hapyconf, 'a') as hapy:
             body = f.read()
 
             # TOKEN BACKGROUND
@@ -139,6 +139,4 @@ class Yabar(base.Target):
                 index = dists.index(min(dists))
                 body = body.replace(match, hex_colors[index])
 
-            tmp.write(body)
-        os.remove(ya_conf)
-        os.rename(tmp_conf, ya_conf)
+            hapy.write(body)
