@@ -1,5 +1,13 @@
 # Export to targets
 
+## Wallpaper
+
+### Linux
+
+Requires either ```feh``` or ```gsettings```. ```feh``` option is ```--bg-scale```.
+
+TODO: test with ```gsettings``` (does not work on my Deb).
+
 ## Yabar
 
 You must specify the path to your yabar config file during the initialization,
