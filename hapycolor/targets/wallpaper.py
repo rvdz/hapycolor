@@ -1,5 +1,6 @@
 import subprocess
 import pathlib
+import platform
 from hapycolor import config
 from hapycolor import exceptions
 from . import base
@@ -14,7 +15,7 @@ class Wallpaper(base.Target):
         return True
 
     def compatible_os():
-        return [config.OS.DARWIN]
+        return [config.OS.DARWIN, config.OS.LINUX]
 
     configuration_key = "wallpaper_macos"
 
@@ -23,6 +24,30 @@ class Wallpaper(base.Target):
 
         :arg img: the image's path
         """
+        os = platform.system()
+        if os == 'Darwin':
+            Wallpaper.__export_darwin(image_path)
+        elif os == 'Linux':
+            Wallpaper.__export_linux(image_path)
+        else:
+            msg = 'Current OS not supported'
+            raise exceptions.ExportTargetFailure(msg, Wallpaper)
+
+    def __export_linux(image_path):
+        try:
+            subprocess.call(['feh', '--bg-scale', image_path])
+            return
+        except:
+            pass
+
+        try:
+            subprocess.call(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', "file:///" + image_path])
+        except:
+            msg = '\nUnable to set the wallpaper\n'
+            raise exceptions.ExportTargetFailure(msg, Wallpaper)
+
+
+    def __export_darwin(image_path):
         db_file = pathlib.Path(Wallpaper.load_config()[Wallpaper.configuration_key]).expanduser()
         if not db_file.is_file():
             msg = "\nUnable to set the wallpaper, sorry\n"
