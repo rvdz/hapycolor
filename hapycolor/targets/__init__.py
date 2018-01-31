@@ -125,6 +125,14 @@ def get_compatible():
                        all_targets))
 
 
+def get_enabled():
+    """
+    Get all enabled targets
+    """
+    all_targets = base.Target.__subclasses__()
+    return list(filter(lambda t: t.is_enabled() == True, all_targets))
+
+
 def get():
     return base.Target.__subclasses__()
 

@@ -46,12 +46,14 @@ def parse_arguments():
                     + "(this option will NOT export variables, use -f instead)"
                     + ". This option implicitly enables -j option")
     ap.add_argument("-j", "--json", action="store_true", help="Saves output "
-                    + "(RGB format) in a Json file palettes.json instead of "
-                    + "exporting variables. Json file is updated if the file "
-                    + "exists.")
+              + "(RGB format) in a Json file palettes.json instead of "
+              + "exporting variables. Json file is updated if the file exists.")
+    ap.add_argument("-lct", "--list-compatible-targets", action="store_true", help="List all compatible targets.")
+    ap.add_argument("-let", "--list-enabled-targets", action="store_true", help="List all enabled targets.")
+    ap.add_argument("-r", "--reconfigure", metavar="target", nargs="*", type=str, help="Reconfigure all targets passed in arguments.")
     args = vars(ap.parse_args())
-    if not (args["file"] or args["dir"]):
-        ap.error('expected either argument -f or -d')
+    #if not (args["file"] or args["dir"]):
+    #    ap.error('expected either argument -f or -d')
     if args["file"] and args["dir"]:
         ap.error('cannot use simultaneaously option -f and -d')
     return args
@@ -84,6 +86,21 @@ def main(args=None):
     img_name = args["file"]
     img_dir = args["dir"]
 
+    if args["list_compatible_targets"] \
+            or args["list_enabled_targets"]:
+        if args["list_compatible_targets"]:
+            tlist = targets.get_compatible()
+            print("Compatible targets are:")
+            for t in tlist:
+                print("\t- {}".format(t.__name__))
+
+        if args["list_enabled_targets"]:
+            tlist = targets.get_enabled()
+            print("Enabled targets are:")
+            for t in tlist:
+                print("\t- {}".format(t.__name__))
+        return
+
     if args["json"] or args["dir"]:
         img_list = []
         if img_name is not None:
@@ -104,6 +121,16 @@ def main(args=None):
             add_palette_json(os.path.abspath(img), palette, "palettes.json")
         print()
         print("Palette saved to palettes.json")
+
+    elif args["reconfigure"] is not None:
+        tlist = args["reconfigure"]
+        if tlist == []:
+            tlist = [t.__name__ for t in targets.get_compatible()]
+        for t in tlist:
+            helpers.bold("Reconfiguring target {}".format(t.lower()))
+            targets.reconfigure(t.lower())
+            print()
+
     else:
         try:
             palette = raw_colors.get(img_name, num_colors=200)

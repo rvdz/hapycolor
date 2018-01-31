@@ -5,6 +5,10 @@ import os
 """ Utilitary methods to convert color types  """
 
 
+def bold(string):
+    print("\033[1m{}\033[0m".format(string))
+
+
 def can_be_hsl(color):
     if color.__class__ != tuple or len(color) != 3:
         return False
