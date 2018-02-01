@@ -17,21 +17,18 @@ class Wallpaper(base.Target):
     def compatible_os():
         return [config.OS.DARWIN, config.OS.LINUX]
 
-    configuration_key = "wallpaper_macos"
+    configuration_key = "wallpaper"
 
     def export(palette, image_path):
-        """Sets a wallpaper on macOS.
+        """Sets a wallpaper.
 
         :arg img: the image's path
         """
-        os = platform.system()
-        if os == 'Darwin':
+        os = config.os()
+        if os == config.OS.DARWIN:
             Wallpaper.__export_darwin(image_path)
-        elif os == 'Linux':
+        elif os == config.OS.LINUX:
             Wallpaper.__export_linux(image_path)
-        else:
-            msg = 'Current OS not supported'
-            raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
     def __export_linux(image_path):
         try:
@@ -39,7 +36,6 @@ class Wallpaper(base.Target):
             return
         except:
             pass
-
         try:
             subprocess.call(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', "file:///" + image_path])
         except:
