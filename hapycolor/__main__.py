@@ -51,6 +51,8 @@ def parse_arguments():
     ap.add_argument("-lct", "--list-compatible-targets", action="store_true", help="List all compatible targets.")
     ap.add_argument("-let", "--list-enabled-targets", action="store_true", help="List all enabled targets.")
     ap.add_argument("-r", "--reconfigure", metavar="target", nargs="*", type=str, help="Reconfigure all targets passed in arguments.")
+    ap.add_argument("-en", "--enable", metavar="target", nargs="+", type=str, help="Enable targets passed in arguments. To enable every targets compatible, argument can be 'all'.")
+    ap.add_argument("-dis", "--disable", metavar="target", nargs="+", type=str, help="Disable targets passed in arguments. To disable every targets, argument can be 'all'.")
     args = vars(ap.parse_args())
     #if not (args["file"] or args["dir"]):
     #    ap.error('expected either argument -f or -d')
@@ -89,10 +91,10 @@ def main(args=None):
     if args["list_compatible_targets"] \
             or args["list_enabled_targets"]:
         if args["list_compatible_targets"]:
-            tlist = targets.get_compatible()
+            tlist = targets.get_compatible_names()
             print("Compatible targets are:")
             for t in tlist:
-                print("\t- {}".format(t.__name__))
+                print("\t- {}".format(t))
 
         if args["list_enabled_targets"]:
             tlist = targets.get_enabled()
@@ -125,11 +127,30 @@ def main(args=None):
     elif args["reconfigure"] is not None:
         tlist = args["reconfigure"]
         if tlist == []:
-            tlist = [t.__name__ for t in targets.get_compatible()]
+            tlist = targets.get_compatible_names()
         for t in tlist:
-            helpers.bold("Reconfiguring target {}".format(t.lower()))
-            targets.reconfigure(t.lower())
+            helpers.bold("Reconfiguring target {}".format(t))
+            targets.reconfigure(t)
             print()
+
+    elif args["enable"] is not None:
+        tlist = args["enable"]
+        if tlist == ["all"]:
+            tlist = targets.get_compatible_names()
+        for t in tlist:
+            if targets.enable(t):
+                print("Target {} was already enabled.".format(t))
+            else:
+                print("Enabled target {}.".format(t))
+    elif args["disable"] is not None:
+        tlist = args["disable"]
+        if tlist == ["all"]:
+            tlist = targets.get_compatible_names()
+        for t in tlist:
+            if targets.disable(t):
+                print("Target {} was already disabled.".format(t))
+            else:
+                print("Disabled target {}.".format(t))
 
     else:
         try:

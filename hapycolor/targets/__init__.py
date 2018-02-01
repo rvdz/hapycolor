@@ -84,12 +84,9 @@ def is_target_subclass(target_str):
     return True
 
 
-def reconfigure(target_str):
+def get_class(target_str):
     """
-    Calls the :func:reconfigure method of the appropriate class
-    contained in the target module provided in the arguments.
-    This method allows to interact with the user and change the
-    target settings.
+    Returns the class which name correspond to the string
 
     :param target_str: a string representing a target module.
     :raise: raises an :exc:`exceptions.InvalidTarget` if a module cannot be
@@ -101,7 +98,44 @@ def reconfigure(target_str):
                                        + " containing a Target class")
     clazz_str = "".join([t.title() for t in target_str.split("_")])
     clazz = eval(target_str + "." + clazz_str)
+    return clazz
+
+
+def reconfigure(target_str):
+    """
+    Calls the :func:reconfigure method of the appropriate class
+    contained in the target module provided in the arguments.
+    This method allows to interact with the user and change the
+    target settings.
+
+    :param target_str: a string representing a target module.
+    """
+    clazz = get_class(target_str)
     clazz.reconfigure()
+
+
+def enable(target_str):
+    """
+    Calls the :func:enable method of the appropriate class
+    contained in the target module provided in the arguments.
+    """
+    clazz = get_class(target_str)
+    if clazz.is_enabled():
+        return 1
+    clazz.enable()
+    return 0
+
+
+def disable(target_str):
+    """
+    Calls the :func:disable method of the appropriate class
+    contained in the target module provided in the arguments.
+    """
+    clazz = get_class(target_str)
+    if not clazz.is_enabled():
+        return 1
+    clazz.disable()
+    return 0
 
 
 def retry():
@@ -123,6 +157,13 @@ def get_compatible():
     # Filters out the incompatible or disabled targets
     return list(filter(lambda t: config.os() in t.compatible_os(),
                        all_targets))
+
+
+def get_compatible_names():
+    """
+    Get str names of all compatible targets
+    """
+    return [t.__name__.lower() for t in get_compatible()]
 
 
 def get_enabled():
