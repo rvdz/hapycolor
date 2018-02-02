@@ -41,23 +41,38 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 def parse_arguments():
     ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="File path to the image")
-    ap.add_argument("-d", "--dir", help="Directory path to the images "
-                    + "(this option will NOT export variables, use -f instead)"
-                    + ". This option implicitly enables -j option")
-    ap.add_argument("-j", "--json", action="store_true", help="Saves output "
-              + "(RGB format) in a Json file palettes.json instead of "
-              + "exporting variables. Json file is updated if the file exists.")
-    ap.add_argument("-lct", "--list-compatible-targets", action="store_true", help="List all compatible targets.")
-    ap.add_argument("-let", "--list-enabled-targets", action="store_true", help="List all enabled targets.")
-    ap.add_argument("-r", "--reconfigure", metavar="target", nargs="*", type=str, help="Reconfigure all targets passed in arguments.")
-    ap.add_argument("-en", "--enable", metavar="target", nargs="+", type=str, help="Enable targets passed in arguments. To enable every targets compatible, argument can be 'all'.")
-    ap.add_argument("-dis", "--disable", metavar="target", nargs="+", type=str, help="Disable targets passed in arguments. To disable every targets, argument can be 'all'.")
+
+    plt_args = ap.add_mutually_exclusive_group()
+    plt_args.add_argument("-f", "--file", help="File path to the image")
+    plt_args.add_argument("-x", "--export",
+                          help="Export json palette to targets")
+    plt_args.add_argument("-d", "--dir",
+                          help="Directory path to the images (this option will"
+                          + " NOT export variables, use -f instead). This "
+                          + "option implicitly enables -j option")
+
+    ap.add_argument("-j", "--json", action="store_true",
+                    help="Saves output (RGB format) in a Json file "
+                    + "palettes.json instead of exporting variables. "
+                    + "Json file is updated if the file exists.")
+    ap.add_argument("-r", "--reconfigure", metavar="target", nargs="*",
+                    type=str,
+                    help="Reconfigure all targets passed in arguments.")
+    ap.add_argument("-en", "--enable", metavar="target", nargs="+", type=str,
+                    help="Enable targets passed in arguments. "
+                    + "Argument 'all' enables every compatible targets.")
+    ap.add_argument("-dis", "--disable", metavar="target", nargs="+", type=str,
+                    help="Disable targets passed in arguments. "
+                    + "Argument 'all' disables every targets")
+    ap.add_argument("-lct", "--list-compatible-targets", action="store_true",
+                    help="List all compatible targets.")
+    ap.add_argument("-let", "--list-enabled-targets", action="store_true",
+                    help="List all enabled targets.")
+
     args = vars(ap.parse_args())
-    #if not (args["file"] or args["dir"]):
-    #    ap.error('expected either argument -f or -d')
-    if args["file"] and args["dir"]:
-        ap.error('cannot use simultaneaously option -f and -d')
+    # Arguments compatibility
+    if args["json"] and not args["file"]:
+        ap.error("-j option needs -f")
     return args
 
 
@@ -88,20 +103,46 @@ def main(args=None):
     img_name = args["file"]
     img_dir = args["dir"]
 
-    if args["list_compatible_targets"] \
-            or args["list_enabled_targets"]:
-        if args["list_compatible_targets"]:
-            tlist = targets.get_compatible_names()
-            print("Compatible targets are:")
-            for t in tlist:
-                print("\t- {}".format(t))
+    if args["list_compatible_targets"]:
+        tlist = targets.get_compatible_names()
+        print("Compatible targets are:")
+        for t in tlist:
+            print("\t- {}".format(t))
 
-        if args["list_enabled_targets"]:
-            tlist = targets.get_enabled()
-            print("Enabled targets are:")
-            for t in tlist:
-                print("\t- {}".format(t.__name__))
-        return
+    if args["list_enabled_targets"]:
+        tlist = targets.get_enabled()
+        print("Enabled targets are:")
+        for t in tlist:
+            print("\t- {}".format(t.__name__))
+
+    if args["enable"] is not None:
+        tlist = args["enable"]
+        if tlist == ["all"]:
+            tlist = targets.get_compatible_names()
+        for t in tlist:
+            if targets.enable(t):
+                print("Target {} was already enabled.".format(t))
+            else:
+                print("Enabled target {}.".format(t))
+
+    if args["disable"] is not None:
+        tlist = args["disable"]
+        if tlist == ["all"]:
+            tlist = targets.get_compatible_names()
+        for t in tlist:
+            if targets.disable(t):
+                print("Target {} was already disabled.".format(t))
+            else:
+                print("Disabled target {}.".format(t))
+
+    if args["reconfigure"] is not None:
+        tlist = args["reconfigure"]
+        if tlist == []:
+            tlist = targets.get_compatible_names()
+        for t in tlist:
+            helpers.bold("Reconfiguring target {}".format(t))
+            targets.reconfigure(t)
+            print()
 
     if args["json"] or args["dir"]:
         img_list = []
@@ -114,52 +155,19 @@ def main(args=None):
 
         for img in img_list:
             print("Processing file {}".format(img))
-            try:
-                palette = raw_colors.get(img, num_colors=200)
-            except exceptions.InvalidImageException as e:
-                print(e)
-                return
+            palette = raw_colors.get(img, num_colors=150)
             palette = filters.apply(palette)
             add_palette_json(os.path.abspath(img), palette, "palettes.json")
         print()
         print("Palette saved to palettes.json")
+        return
 
-    elif args["reconfigure"] is not None:
-        tlist = args["reconfigure"]
-        if tlist == []:
-            tlist = targets.get_compatible_names()
-        for t in tlist:
-            helpers.bold("Reconfiguring target {}".format(t))
-            targets.reconfigure(t)
-            print()
-
-    elif args["enable"] is not None:
-        tlist = args["enable"]
-        if tlist == ["all"]:
-            tlist = targets.get_compatible_names()
-        for t in tlist:
-            if targets.enable(t):
-                print("Target {} was already enabled.".format(t))
-            else:
-                print("Enabled target {}.".format(t))
-    elif args["disable"] is not None:
-        tlist = args["disable"]
-        if tlist == ["all"]:
-            tlist = targets.get_compatible_names()
-        for t in tlist:
-            if targets.disable(t):
-                print("Target {} was already disabled.".format(t))
-            else:
-                print("Disabled target {}.".format(t))
-
-    else:
-        try:
-            palette = raw_colors.get(img_name, num_colors=200)
-        except exceptions.InvalidImageException as e:
-            print(e)
-            return
-        visual.print_palette(palette.colors, size=2)
+    if args["file"]:
+        palette = raw_colors.get(img_name, num_colors=150)
         palette = filters.apply(palette)
+    if args["export"]:
+        palette = helpers.load_json(args["export"])
+    if args["file"] or args["export"]:
         targets.initialize()
         targets.export(palette, args["file"])
         display_palette(palette)
