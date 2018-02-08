@@ -14,21 +14,23 @@ class Vim(base.Target):
     initializing the target.
 
     Currently, it supports 8bit and 24bit terminals, but by default, vim only
-    supports 8bit colors. To enable 24bit support, the option 'set termguicolor',
-    available since Vim 7.4, should be set in your vimrc.
+    supports 8bit colors. To enable 24bit support, the option 'set
+    termguicolor', available since Vim 7.4, should be set in your vimrc.
 
     .. todo:: Check if the option was introduced with Vim 7.4
 
     """
+    exclusive_groups = [
+             ["Comment"],
+             ["Search"],
+            ]
 
     groups = [
-              ["Comment"],
               ["Boolean"],
               ["Character"],
               ["Keyword"],
-              ["Number"],
+              ["Number", "Float"],
               ["String"],
-              ["Float"],
               ["Conditional", "Repeat"],
               ["Include"],
               ["Macro"],
@@ -53,7 +55,6 @@ class Vim(base.Target):
               ["LineNr"],
               ["CursorLineNr"],
               ["CursorColumn"],
-              ["Search"],
              ]
 
     configuration_key = "colorscheme_vim"
@@ -66,11 +67,12 @@ class Vim(base.Target):
 
     def initialize_config():
         """
-        Creates the path where the colorscheme will be generated, and stores it in
-        the project's configuration file.
+        Creates the path where the colorscheme will be generated, and stores it
+        in the project's configuration file.
         """
         if not VimHelpers.is_vim_installed():
-            print("Vim is not installed, this target will be disabled. Once you install vim, ")
+            print("Vim is not installed, this target will be disabled. Once"
+                  + "  you install vim, ")
             return
 
         p = None
@@ -82,8 +84,7 @@ class Vim(base.Target):
         p = p / "hapycolor" / "colors"
         if not p.exists():
             p.mkdir(parents=True)
-        Vim.save_config({Vim.configuration_key : (p / "hapycolor.vim").as_posix()})
-
+        Vim.save_config({Vim.configuration_key: (p / "hapycolor.vim").as_posix()})
 
     def custom_path():
         p = config.input_path("Path to vim's custom plugins directory: ")
@@ -129,8 +130,8 @@ let g:colors_name = "%s"''' % config.app_name()
                  "ctermfg=" + str(eight_bit_colors.rgb2short(fg))]
 
         if bg is not None:
-             entry.extend(["guibg=" + helpers.rgb_to_hex(bg),
-                           "ctermbg=" + str(eight_bit_colors.rgb2short(bg))])
+            entry.extend(["guibg=" + helpers.rgb_to_hex(bg),
+                          "ctermbg=" + str(eight_bit_colors.rgb2short(bg))])
 
         elements = 3 if bg is None else 5
         f.write(("{: <20} " * elements + "\n").format(*entry))
@@ -144,8 +145,14 @@ let g:colors_name = "%s"''' % config.app_name()
 
     @staticmethod
     def __print_body(vim_colors, f):
+        for i, G in enumerate(Vim.exclusive_groups):
+            color = vim_colors.get_next_color()
+            vim_colors.remove_last()
+            for g in G:
+                Vim.__write_entry(f, g, color)
+
         for i, G in enumerate(Vim.groups):
-            color = vim_colors.get_color(i)
+            color = vim_colors.get_next_color()
             for g in G:
                 Vim.__write_entry(f, g, color)
 
@@ -162,6 +169,9 @@ class VimColorManager:
 
         hsl_colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
         self.colors = self.__label_colors(hsl_colors)
+        self.index = 0
+        self.size = len(rgb_colors)
+        self.removed = []
 
     def __label_colors(self, colors):
         """ Sorts a list of hsl colors by labels """
@@ -177,15 +187,22 @@ class VimColorManager:
                 return i
         return -1
 
-    def get_color(self, index):
+    def remove_last(self):
+        self.removed.append(self.index)
+
+    def get_next_color(self):
         """
         Considering a sequence of incrementing indexes, this function will
         return the first color of each label. Once all the labels' first
         values have been returned, it retrives the seconds and so on.
         Once all the colors will been used, it repeates the pattern.
         """
-        label = index % len(self.colors)
+        while self.index in self.removed:
+            self.index = (self.index + 1) % self.size
+
+        label = self.index % len(self.colors)
         while len(self.colors[label]) == 0:
             label = (label + 1) % len(self.colors)
-        i = (index // len(self.colors)) % len(self.colors[label])
+        i = (self.index // len(self.colors)) % len(self.colors[label])
+        self.index = (self.index + 1) % self.size
         return helpers.hsl_to_rgb(self.colors[label][i])

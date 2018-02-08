@@ -122,5 +122,5 @@ class TestVim(unittest.TestCase):
         vcm = VimColorManager(colors)
         sorted_colors = []
         for i in range(len(colors) * 2):
-            sorted_colors.append(vcm.get_color(i))
+            sorted_colors.append(vcm.get_next_color())
         self.assertEqual(sorted_colors, expected_sorted_colors)
