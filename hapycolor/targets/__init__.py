@@ -79,7 +79,7 @@ def is_target_subclass(target_str):
         clazz = eval(target_str + "." + clazz_str)
         if not issubclass(clazz, base.Target):
             return False
-    except NameError:
+    except (NameError, AttributeError):
         return False
     return True
 
@@ -93,9 +93,14 @@ def get_class(target_str):
         resolve from the provided string, or if there are no matching classes
         defined in the module that implement a :class:`Target`.
     """
+    if target_str not in globals().keys():
+        raise exceptions.InvalidTarget("Input does not match a module"
+                                       + " from targets")
+
     if not is_target_subclass(target_str):
         raise exceptions.InvalidTarget("Input does not match a module"
                                        + " containing a Target class")
+
     clazz_str = "".join([t.title() for t in target_str.split("_")])
     clazz = eval(target_str + "." + clazz_str)
     return clazz

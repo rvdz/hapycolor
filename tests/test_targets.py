@@ -1,12 +1,11 @@
-from hapycolor import config
-from hapycolor import targets
+from hapycolor import config, exceptions, targets
 from hapycolor.targets import base, vim, lightline, iterm, wallpaper
 from tests import helpers
 from unittest.mock import patch
 import unittest
 
 
-class TestTarget(unittest.TestCase):
+class TestTargets(unittest.TestCase):
     def test_target_compatible_os_implemented(self):
         for t in targets.get():
             try:
@@ -32,19 +31,19 @@ class TestTarget(unittest.TestCase):
         for t in targets.get_compatible():
             self.assertIn(config.OS.DARWIN, t.compatible_os())
 
-    def test_reconfigure_valid_target(self):
+    def test_get_valid_module(self):
         try:
-            target_str = "vim"
-            clazz_str = "".join([t.title() for t in target_str.split("_")])
-            clazz = eval(target_str + "." + clazz_str)
+            clazz = targets.get_class("vim")
             self.assertIsInstance(clazz(), base.Target)
         except Exception as e:
             self.fails(str(e))
 
-    def test_reconfigure_valid_target_module(self):
-        with self.assertRaises(NameError):
-            target_str = "Vim"
-            eval(target_str)
+    def test_get_invalid_module(self):
+        with self.assertRaises(exceptions.InvalidTarget):
+            targets.get_class("Vim")
+
+        with self.assertRaises(exceptions.InvalidTarget):
+            targets.get_class("__doc__")
 
     def test_target_class_names(self):
         """
