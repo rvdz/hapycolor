@@ -1,7 +1,9 @@
 import enum
 import datetime
+import re
 from . import base
 from . import eight_bit_colors
+from . import vim_helpers
 from hapycolor import config
 from hapycolor import exceptions
 from hapycolor import palette as pltte
@@ -43,6 +45,8 @@ class Lightline(base.Target):
     # The colorscheme's path
     colorscheme_key = "colorscheme"
 
+    plugin_name = "lightline.vim"
+
     # Will be asked during target's configuration
     theme_key = "theme"
 
@@ -70,24 +74,10 @@ class Lightline(base.Target):
             colorscheme_path = Lightline.select_colorscheme_path()
             Lightline.save_config({Lightline.colorscheme_key : colorscheme_path})
 
-
     def select_colorscheme_path():
-        p = config.input_path("Path to lightline's plugin folder: ")
-        try:
-            if not p.is_absolute():
-                p = p.resolve()
-        except FileNotFoundError as e:
-            raise exceptions.WrongInputError("Cannot resolve path: " + str(e))
-
-        if not p.is_dir():
-            raise exceptions.WrongInputError("Must be a directory")
-
+        p = vim_helpers.VimHelpers.find_plugin(Lightline.plugin_name)
         file_path = (p / "autoload/lightline/colorscheme/hapycolor.vim")
-
-        if not file_path.parents[0].is_dir():
-            raise exceptions.WrongInputError("Invalid folder, must contain a "
-                                             + "'colorscheme' folder")
-        return file_path.as_posix()
+        return file_path.expanduser().as_posix()
 
     def select_theme():
         try:

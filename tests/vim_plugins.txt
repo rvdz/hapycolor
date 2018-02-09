@@ -1,0 +1,120 @@
+
+
+  1: ~/.vimrc
+  2: ~/.vim_runtime/vimrcs/basic.vim
+  3: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/filetype.vim
+  4: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/ftplugin.vim
+  5: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/indent.vim
+  6: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/delmenu.vim
+  7: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/menu.vim
+  8: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/autoload/paste.vim
+  9: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/syntax/syntax.vim
+ 10: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/syntax/synload.vim
+ 11: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/syntax/syncolor.vim
+ 12: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/colors/desert.vim
+ 13: ~/.vim_runtime/vimrcs/plugins_config.vim
+ 14: ~/.vim_runtime/autoload/pathogen.vim
+ 15: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/ftoff.vim
+ 16: ~/.vim_runtime/sources_non_forked/nginx-vim-syntax/ftdetect/nginx.vim
+ 17: ~/.vim_runtime/sources_non_forked/vim-bundle-mako/ftdetect/mako.vim
+ 18: ~/.vim_runtime/sources_non_forked/vim-coffee-script/ftdetect/coffee.vim
+ 19: ~/.vim_runtime/sources_non_forked/vim-coffee-script/ftdetect/vim-literate-coffeescript.vim
+ 20: ~/.vim_runtime/sources_non_forked/vim-go/ftdetect/gofiletype.vim
+ 21: ~/.vim_runtime/sources_non_forked/vim-markdown/ftdetect/markdown.vim
+ 22: ~/.vim_runtime/sources_non_forked/vim-pug/ftdetect/pug.vim
+ 23: ~/.vim_runtime/vimrcs/extended.vim
+ 24: ~/.vim_runtime/sources_forked/peaksea/colors/peaksea.vim
+ 25: ~/.vim_runtime/my_configs.vim
+ 26: ~/.vim_runtime/sources_non_forked/hapycolor/colors/hapycolor.vim
+ 27: ~/.vim_runtime/sources_non_forked/ack.vim/plugin/ack.vim
+ 28: ~/.vim_runtime/sources_non_forked/Align/plugin/AlignMapsPlugin.vim
+ 29: ~/.vim_runtime/sources_non_forked/Align/plugin/AlignPlugin.vim
+ 30: ~/.vim_runtime/sources_non_forked/Align/plugin/cecutil.vim
+ 31: ~/.vim_runtime/sources_non_forked/Colorizer/plugin/ColorizerPlugin.vim
+ 32: ~/.vim_runtime/sources_non_forked/ctrlp.vim/plugin/ctrlp.vim
+ 33: ~/.vim_runtime/sources_non_forked/ctrlp.vim/autoload/ctrlp/mrufiles.vim
+ 34: ~/.vim_runtime/sources_non_forked/goyo.vim/plugin/goyo.vim
+ 35: ~/.vim_runtime/sources_non_forked/hardmode/plugin/hardmode.vim
+ 36: ~/.vim_runtime/sources_non_forked/lightline.vim/plugin/lightline.vim
+ 37: ~/.vim_runtime/sources_non_forked/mru.vim/plugin/mru.vim
+ 38: ~/.vim_runtime/sources_non_forked/nerdtree/plugin/NERD_tree.vim
+ 39: ~/.vim_runtime/sources_non_forked/nerdtree/autoload/nerdtree.vim
+ 40: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/path.vim
+ 41: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/menu_controller.vim
+ 42: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/menu_item.vim
+ 43: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/key_map.vim
+ 44: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/bookmark.vim
+ 45: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/tree_file_node.vim
+ 46: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/tree_dir_node.vim
+ 47: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/opener.vim
+ 48: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/creator.vim
+ 49: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/flag_set.vim
+ 50: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/nerdtree.vim
+ 51: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/ui.vim
+ 52: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/event.vim
+ 53: ~/.vim_runtime/sources_non_forked/nerdtree/lib/nerdtree/notifier.vim
+ 54: ~/.vim_runtime/sources_non_forked/nerdtree/autoload/nerdtree/ui_glue.vim
+ 55: ~/.vim_runtime/sources_non_forked/nerdtree/nerdtree_plugin/exec_menuitem.vim
+ 56: ~/.vim_runtime/sources_non_forked/nerdtree/nerdtree_plugin/fs_menu.vim
+ 57: ~/.vim_runtime/sources_non_forked/open_file_under_cursor.vim/plugin/open_file_under_cursor.vim
+ 58: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/autoloclist.vim
+ 59: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/balloons.vim
+ 60: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/checker.vim
+ 61: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/cursor.vim
+ 62: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/highlighting.vim
+ 63: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/loclist.vim
+ 64: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/modemap.vim
+ 65: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/notifiers.vim
+ 66: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/registry.vim
+ 67: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic/signs.vim
+ 68: ~/.vim_runtime/sources_non_forked/syntastic/plugin/syntastic.vim
+ 69: ~/.vim_runtime/sources_non_forked/syntastic/autoload/syntastic/util.vim
+ 70: ~/.vim_runtime/sources_non_forked/tabular/plugin/Tabular.vim
+ 71: ~/.vim_runtime/sources_non_forked/tlib/plugin/02tlib.vim
+ 72: ~/.vim_runtime/sources_non_forked/tpope-vim-abolish/plugin/abolish.vim
+ 73: ~/.vim_runtime/sources_non_forked/vim-commentary/plugin/commentary.vim
+ 74: ~/.vim_runtime/sources_non_forked/vim-expand-region/plugin/expand_region.vim
+ 75: ~/.vim_runtime/sources_non_forked/vim-expand-region/autoload/expand_region.vim
+ 76: ~/.vim_runtime/sources_non_forked/vim-fugitive/plugin/fugitive.vim
+ 77: ~/.vim_runtime/sources_non_forked/vim-gitgutter/plugin/gitgutter.vim
+ 78: ~/.vim_runtime/sources_non_forked/vim-gitgutter/autoload/gitgutter/highlight.vim
+ 79: ~/.vim_runtime/sources_non_forked/vim-go/plugin/go.vim
+ 80: ~/.vim_runtime/sources_non_forked/vim-indent-object/plugin/indent-object.vim
+ 81: ~/.vim_runtime/sources_non_forked/vim-multiple-cursors/plugin/multiple_cursors.vim
+ 82: ~/.vim_runtime/sources_non_forked/vim-snipmate/plugin/snipMate.vim
+ 83: ~/.vim_runtime/sources_non_forked/vim-addon-mw-utils/autoload/funcref.vim
+ 84: ~/.vim_runtime/sources_non_forked/vim-snippets/plugin/vimsnippets.vim
+ 85: ~/.vim_runtime/sources_non_forked/vim-surround/plugin/surround.vim
+ 86: ~/.vim_runtime/sources_non_forked/vim-tmux-navigator/plugin/tmux_navigator.vim
+ 87: ~/.vim_runtime/sources_non_forked/vim-yankstack/plugin/yankstack.vim
+ 88: ~/.vim_runtime/sources_non_forked/vim-yankstack/autoload/yankstack.vim
+ 89: ~/.vim_runtime/sources_non_forked/vim-zenroom2/plugin/zenroom2.vim
+ 90: ~/.vim_runtime/sources_non_forked/YouCompleteMe/plugin/youcompleteme.vim
+ 91: ~/.vim_runtime/sources_forked/set_tabline/plugin/set_tabline.vim
+ 92: ~/.vim_runtime/sources_forked/vim-peepopen/plugin/peepopen.vim
+ 93: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/getscriptPlugin.vim
+ 94: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/gzip.vim
+ 95: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/logiPat.vim
+ 96: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/manpager.vim
+ 97: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/matchparen.vim
+ 98: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/netrwPlugin.vim
+ 99: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/rrhelper.vim
+100: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/spellfile.vim
+101: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/tarPlugin.vim
+102: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/tohtml.vim
+103: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/vimballPlugin.vim
+104: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/plugin/zipPlugin.vim
+105: /usr/local/Cellar/fzf/0.17.3/plugin/fzf.vim
+106: ~/.vim_runtime/sources_non_forked/vim-snipmate/after/plugin/snipMate.vim
+107: ~/.vim_runtime/sources_non_forked/tabular/after/plugin/TabularMaps.vim
+108: ~/.vim_runtime/sources_non_forked/tabular/autoload/tabular.vim
+109: /usr/local/Cellar/vim/8.0.1350/share/vim/vim80/scripts.vim
+110: ~/.vim_runtime/sources_non_forked/lightline.vim/autoload/lightline.vim
+111: ~/.vim_runtime/sources_non_forked/lightline.vim/autoload/lightline/tab.vim
+112: ~/.vim_runtime/sources_non_forked/lightline.vim/autoload/lightline/colorscheme/hapycolor.vim
+113: ~/.vim_runtime/sources_non_forked/lightline.vim/autoload/lightline/colorscheme.vim
+114: ~/.vim_runtime/sources_non_forked/syntastic/autoload/syntastic/log.vim
+115: ~/.vim_runtime/sources_non_forked/vim-gitgutter/autoload/gitgutter.vim
+116: ~/.vim_runtime/sources_non_forked/vim-gitgutter/autoload/gitgutter/utility.vim
+117: ~/.vim_runtime/sources_non_forked/vim-gitgutter/autoload/gitgutter/hunk.vim
+118: ~/.vim_runtime/sources_non_forked/YouCompleteMe/autoload/youcompleteme.vim

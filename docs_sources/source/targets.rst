@@ -68,8 +68,19 @@ of providing, when initializing the target, a path where it will be installed
 as a plugin. So, you should make sure that the plugin 'hapycolor' is enabled
 in your environment.
 
+When configuring vim, if you are using common paths to manage your plugins, such as 
+`~/.vim/bundle`, `~/.vim_runtime/sources_non_forked` or `~/.vim_runtime/sources_forked`,
+hapycolor should automatically install the colorscheme. Else, you will be prompted to input
+the path of the location where the plugin should be installed. If you are not using any plugin manager,
+enter the following commands in your vimrc:
+
+.. code-block:: vim
+
+    ! Using plug
+    Plug 'hapycolor'
+
 To activate the generated colorscheme, use the command :vim:`colorscheme hapycolor` from the
-`Ex` command line or in your `vimrc`.
+`Ex` command line or add it to your `vimrc`.
 
 Currently, it supports 8bit and 24bit color terminals, but by default, vim only
 supports 8bit colors. If your terminal supports 24bit colors, it is highly advised

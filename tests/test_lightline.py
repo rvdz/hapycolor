@@ -29,19 +29,6 @@ class TestLightline(unittest.TestCase):
     def test_theme_selection_valid_third_attempt(self, mock_input):
         self.assertIsInstance(Lightline.select_theme(), Lightline.ThemeEnum)
 
-    @patch('builtins.input', return_value="./tests/lightline.vim")
-    def test_config_colorscheme_file_valid(self, mock_input):
-        valid_colorscheme = "./tests/lightline.vim/autoload/lightline/colorscheme"
-        os.makedirs(valid_colorscheme)
-        p = Lightline.select_colorscheme_path()
-        self.assertIsNotNone(p)
-        shutil.rmtree("./tests/lightline.vim")
-
-    @patch('builtins.input', return_value="./tests/lightline.vim")
-    def test_config_colorscheme_file_invalid(self, mock_input):
-        with self.assertRaises(exceptions.WrongInputError):
-            Lightline.select_colorscheme_path()
-
     def test_theme_exist(self):
         for t in Lightline.ThemeEnum:
             self.assertTrue(pathlib.Path(t.value).exists())

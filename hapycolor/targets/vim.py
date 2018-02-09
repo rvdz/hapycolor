@@ -2,6 +2,7 @@ from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
+from hapycolor.targets.vim_helpers import VimHelpers
 from . import eight_bit_colors
 from . import base
 
@@ -68,17 +69,29 @@ class Vim(base.Target):
         Creates the path where the colorscheme will be generated, and stores it in
         the project's configuration file.
         """
+        if not VimHelpers.is_vim_installed():
+            print("Vim is not installed, this target will be disabled. Once you install vim, ")
+            return
+
+        p = None
+        try:
+            p = VimHelpers.pathogen_plugins_path()
+        except exceptions.NoCommonPathFound:
+            p = Vim.custom_path()
+
+        p = p / "hapycolor" / "colors"
+        if not p.exists():
+            p.mkdir(parents=True)
+        Vim.save_config({Vim.configuration_key : (p / "hapycolor.vim").as_posix()})
+
+
+    def custom_path():
         p = config.input_path("Path to vim's custom plugins directory: ")
         if not p.is_absolute():
             p = p.resolve()
 
         if not p.is_dir():
             raise exceptions.WrongInputError("Must be a directory")
-
-        p = p / "hapycolor" / "colors"
-        if not p.exists():
-            p.mkdir(parents=True)
-        Vim.save_config({Vim.configuration_key : (p / "hapycolor.vim").as_posix()})
 
     def compatible_os():
         return [config.OS.LINUX, config.OS.DARWIN]
