@@ -73,7 +73,7 @@ class TestConfiguration(unittest.TestCase):
     @unittest.skipUnless(config.os() == config.OS.DARWIN, "Tests Darwin's"
                          + " environment")
     def test_configuration_wallpaper(self):
-        raw_path = Wallpaper.load_config()[Wallpaper.configuration_key]
+        raw_path = Wallpaper.load_config()[Wallpaper.configuration_darwin]
         wallpaper_path = pathlib.Path(raw_path).expanduser()
         self.assertTrue(wallpaper_path.exists())
 
