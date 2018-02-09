@@ -12,11 +12,21 @@ import unittest
 def vimtesting(fails=0):
     import shutil
     import pathlib
-    valid_entry = ["./tests"]
-    invalid_entry = ["./tests/run_suite.py"]
-    entries = invalid_entry * fails + valid_entry
+
+    valid_entry = "./tests"
+    invalid_entry = "./tests/run_suite.py"
+    entries = []
+    try:
+        VimHelpers.pathogen_plugins_path()
+    except:
+        entries = [invalid_entry] * fails + [valid_entry]
+
+    pathogen_mock = pathlib.Path(valid_entry)
+    pathogen_finder = 'hapycolor.targets.vim_helpers.VimHelpers.pathogen_plugins_path'
+
     with mock.patch('builtins.input', side_effect=entries):
-        yield
+        with mock.patch(pathogen_finder, return_value=pathogen_mock):
+            yield
     if pathlib.Path("./tests/hapycolor").exists():
         shutil.rmtree("./tests/hapycolor")
 
