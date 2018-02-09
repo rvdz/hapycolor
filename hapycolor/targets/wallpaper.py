@@ -17,7 +17,7 @@ class Wallpaper(base.Target):
     def compatible_os():
         return [config.OS.DARWIN, config.OS.LINUX]
 
-    configuration_key = "wallpaper"
+    configuration_darwin = "wallpaper_macos"
 
     def export(palette, image_path):
         """Sets a wallpaper.
@@ -44,7 +44,8 @@ class Wallpaper(base.Target):
 
 
     def __export_darwin(image_path):
-        db_file = pathlib.Path(Wallpaper.load_config()[Wallpaper.configuration_key]).expanduser()
+        value = Wallpaper.load_config()[Wallpaper.configuration_darwin]
+        db_file = pathlib.Path(value).expanduser()
         if not db_file.is_file():
             msg = "\nUnable to set the wallpaper, sorry\n"
             raise exceptions.ExportTargetFailure(msg, Wallpaper)

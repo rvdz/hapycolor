@@ -10,7 +10,7 @@ class TestWallpaper(unittest.TestCase):
     @unittest.skipUnless(config.os() == config.OS.DARWIN,
                          "targetted platform: Darwin")
     @patch('hapycolor.targets.wallpaper.Wallpaper.load_config',
-           return_value={Wallpaper.configuration_key: '~'})
+           return_value={Wallpaper.configuration_darwin: '~'})
     @helpers.configurationtesting()
     def test_incorrect_configuration_file(self, get_config):
         with self.assertRaises(exceptions.ExportTargetFailure):
