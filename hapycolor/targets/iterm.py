@@ -84,8 +84,10 @@ class Iterm(base.Target):
             Iterm.reconfigure()
 
     def set_configuration_path():
-        default = pathlib.Path("~/Library/Preferences/com.googlecode.iterm2.plist").expanduser()
-        p = config.input_path("Path to iTerm configuration file (" + default.as_posix() + "): ")
+        default_str = "~/Library/Preferences/com.googlecode.iterm2.plist"
+        default = pathlib.Path(default_str).expanduser()
+        p = config.input_path("Path to iTerm configuration file (" +
+                              default.as_posix() + "): ")
 
         # If default is selected:
         if p.as_posix() == ".":
@@ -95,10 +97,11 @@ class Iterm(base.Target):
             p = p.resolve()
         try:
             if not p.is_file():
-                raise exceptions.WrongInputError("Path does not lead to a file")
+                raise exceptions.WrongInputError("Path does not lead to a "
+                                                 + "file")
             if p.name != "com.googlecode.iterm2.plist":
-                raise exceptions.WrongInputError("The file does not match an iTerm"
-                                                 + " configuration file")
+                raise exceptions.WrongInputError("The file does not match an "
+                                                 + "iTerm configuration file")
         except exceptions.WrongInputError as e:
             print(str(e))
             return Iterm.set_configuration_path()
@@ -124,8 +127,10 @@ class Iterm(base.Target):
         file. It requires a palette of 16 colors defined in the rgb format and
         a name for the new profile.
 
-        :arg palette: an instance of the class :class:`hapycolor.palette.Palette`
-        :arg image_path: a string which will be used to name the newly created profile
+        :arg palette: an instance of the class
+            :class:`hapycolor.palette.Palette`
+        :arg image_path: a string which will be used to name the newly created
+             profile
         """
         if palette.__class__ != pltte.Palette or not palette.is_initialized:
             msg = "The palette has not been correctly initialized"
@@ -165,7 +170,6 @@ class Iterm(base.Target):
         with Iterm.open_preferences("wb") as f:
             f.write(ET.tostring(config_tree.getroot()))
 
-
     def __create_color_bloc(color):
         """ Creates a Color bloc. Requires a color in the rgb format """
         if color.__class__ != tuple \
@@ -174,20 +178,20 @@ class Iterm(base.Target):
             msg = "Requires a color un the rgb format"
             raise exceptions.ColorFormatError(msg)
 
-        new_line       = "\n\t\t"
-        red_key        = ET.Element(Iterm.Tag.KEY)
-        red_key.text   = "Red Component"
-        red_key.tail   = new_line
-        green_key      = ET.Element(Iterm.Tag.KEY)
+        new_line = "\n\t\t"
+        red_key = ET.Element(Iterm.Tag.KEY)
+        red_key.text = "Red Component"
+        red_key.tail = new_line
+        green_key = ET.Element(Iterm.Tag.KEY)
         green_key.text = "Green Component"
         green_key.tail = new_line
-        blue_key       = ET.Element(Iterm.Tag.KEY)
-        blue_key.text  = "Blue Component"
-        blue_key.tail  = new_line
+        blue_key = ET.Element(Iterm.Tag.KEY)
+        blue_key.text = "Blue Component"
+        blue_key.tail = new_line
 
         color_keys = [red_key, green_key, blue_key]
 
-        bloc      = ET.Element(Iterm.Tag.DICT)
+        bloc = ET.Element(Iterm.Tag.DICT)
         bloc.text = new_line
         bloc.tail = "\n\t"
         for i, c in enumerate(color):
@@ -250,7 +254,7 @@ class Iterm(base.Target):
         Iterm.__set_element(Iterm.Key.TRANSPARENCY, element, root)
 
     def __set_name(name, root):
-        name_element      = ET.Element(Iterm.Tag.STRING)
+        name_element = ET.Element(Iterm.Tag.STRING)
         name_element.text = name
         name_element.tail = "\n\t"
         Iterm.__set_element(Iterm.Key.NAME, name_element, root)
@@ -271,7 +275,8 @@ class TermColorManager():
     standard of high-intensity terminal color's number, returns the
     appropriate rgb color of the provided palette.
     For more details about standard and high-intensity terminal colors, see:
-    `Standard and Hight-intensity colors <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
+    `Standard and Hight-intensity colors
+    <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
 
     Initializes a :class:`TermColorManager`'s instance with a list of colors.
 
@@ -325,8 +330,8 @@ class TermColorManager():
 
     def get_color(self, index):
         """
-        Takes standard or high-intensity terminal color's number and retrives the
-        appropriate rgb color.
+        Takes standard or high-intensity terminal color's number and retrives
+        the appropriate rgb color.
 
         :arg index: an integer between 0 and 15
         """
@@ -336,7 +341,7 @@ class TermColorManager():
             raise exceptions.InvalidValueError(msg)
 
         if self.colors.__class__ != dict or len(self.colors) == 0:
-            msg = "TermColorManager's instance has not been initialized properly"
+            msg = "TermColorManager has not been initialized properly"
             raise exceptions.UninitializedError(msg)
 
         for tc in TermColorEnum:
@@ -369,10 +374,12 @@ class TermColorEnum(enum.Enum):
     Defines six enumerates which represent a label of the 'hue' dimension
 
     - First list defines the hue's range in degrees
-    - Second list defines to which terminal's standard and high-intensity color's number the label is related.
+    - Second list defines to which terminal's standard and high-intensity
+        color's number the label is related.
 
     For more details about standard and high-intensity terminal colors see:
-    `Standard and High-intensity colors <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
+    `Standard and High-intensity colors
+    <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
     """
     BLACK   = [[ ],         [ 0, 8]]
     WHITE   = [[ ],         [ 7, 15]]

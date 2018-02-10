@@ -89,13 +89,13 @@ class Reducer(base.Filter):
     @staticmethod
     def find_neighbours(node, graph):
         """
-        Returns all the nodes that are connected to the provided node and stores
-        them into the provided hash table.
+        Returns all the nodes that are connected to the provided node and
+        stores them into the provided hash table.
 
         :arg node: The starting node of the function, from which all the
             connected nodes are found.
-        :arg graph: The current connected graph, it is first set to the starting
-            node and then expanded for each iteration of
+        :arg graph: The current connected graph, it is first set to the
+            starting node and then expanded for each iteration of
             :func:`Reducer.find_neighbours()`.
         :return: The connected provided graph expanded with the neighbours of
             `node`.
@@ -108,11 +108,11 @@ class Reducer(base.Filter):
 
     def find_subgraphs(nodes):
         """
-        Given a list of nodes (color and neighbours), this function finds all the
-        connected graphs. In other words, it creates K disjoint subsets (graphs)
-        where for each couple of nodes of a graph, it exists a path that connects
-        them. Furthermore, given two nodes of two differents subsets, there are no
-        paths connecting them.
+        Given a list of nodes (color and neighbours), this function finds all
+        the connected graphs. In other words, it creates K disjoint subsets
+        (graphs) where for each couple of nodes of a graph, it exists a path
+        that connects them. Furthermore, given two nodes of two differents
+        subsets, there are no paths connecting them.
         """
         graphs = []
         while nodes:

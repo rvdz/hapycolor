@@ -13,7 +13,7 @@ class Palette:
     def __init__(self):
         self._foreground = None
         self._background = None
-        self._colors     = None
+        self._colors = None
 
     @property
     def foreground(self):
