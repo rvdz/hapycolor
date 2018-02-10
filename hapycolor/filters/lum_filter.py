@@ -107,37 +107,29 @@ class LumFilter(base.Filter):
         # Set background
         hsl_bg = helpers.rgb_to_hsl(palette.background)
         hsl_bg = (hsl_bg[0], hsl_bg[1], hsl_bg[2]*2)
-        if (not LumFilter.is_too_dark(helpers.hsl_to_rgb(hsl_bg))):
+        if not LumFilter.analyze(helpers.hsl_to_rgb(hsl_bg), "darkness"):
             palette.background = (0, 0, 0)
         # if (not LumFilter.is_too_bright(palette.foreground)):
             # palette.background = (255, 255, 255)
 
         # Set colors
-        palette.colors = list(filter(lambda c: not LumFilter.is_too_bright(c)
-                              and not LumFilter.is_too_dark(c)
-                              and LumFilter.is_enough_saturated(c),
+        palette.colors = list(filter(lambda c:
+                              not LumFilter.analyze(c, "brightness")
+                              and not LumFilter.analyze(c, "darkness")
+                              and not LumFilter.analyze(c, "saturation"),
                               palette.colors))
         return palette
 
-    def is_too_bright(rgb_color):
+    def analyze(rgb_color, kind):
         """
-        Returns 'True' if the color is considered too bright, else 'False'.
+        Analyzes a provided color according to a specific type of analysis. It
+        can be: brightness, darkness or saturation.
 
-        :arg hsl_color: a tuple representing an hsl color
-        """
-        if not helpers.can_be_rgb(rgb_color):
-            raise exceptions.ColorFormatError("Color must be defined in the"
-                                              + " rgb base")
-
-        hsl_color = helpers.rgb_to_hsl(rgb_color)
-        x, y, z = LumFilter.polar_to_cartesian(hsl_color)
-        return z > LumFilter.bright_interp(x, y)
-
-    def is_too_dark(rgb_color):
-        """
-        Returns 'True' if the color is considered too dark, else 'False'.
-
-        :arg rgb_color: a tuple representing an rgb color
+        :arg rgb_color: The input color to be analyzed.
+        :arg kind: Type of analysis available: 'brightness', 'darkness' or
+            'saturation'.
+        :return: This function will return 'True' if the color is too bright,
+            too dark, or not enough satured, else, 'False'.
         """
         if not helpers.can_be_rgb(rgb_color):
             raise exceptions.ColorFormatError("Color must be defined in the"
@@ -145,7 +137,17 @@ class LumFilter(base.Filter):
 
         hsl_color = helpers.rgb_to_hsl(rgb_color)
         x, y, z = LumFilter.polar_to_cartesian(hsl_color)
-        return z < LumFilter.dark_interp(x, y)
+
+        if kind == "brightness":
+            return z > LumFilter.bright_interp(x, y)
+        elif kind == "darkness":
+            return z < LumFilter.dark_interp(x, y)
+        elif kind == "saturation":
+            return not LumFilter.is_enough_saturated(rgb_color)
+        else:
+            msg = str(kind) + "is not a supported analysis type"
+            raise exceptions.UnknownAnalysisTypeException(msg)
+
 
     def half_circle_interp(half_circle):
         cartesian_p = [LumFilter.polar_to_cartesian(e) for e in half_circle]
@@ -155,6 +157,16 @@ class LumFilter(base.Filter):
         return interpolate.interp1d(X, Y, kind="linear")
 
     def is_enough_saturated(rgb_color):
+        """
+        To interpolate the saturation that separates the saturated enough
+        colors with those that aren't, for a specific hue and luminosity,
+        some 2D points (hue, saturation), are interpolated for the same
+        luminosity (the one of the provided argument), and should form a
+        circle. Then, this circle is divided into an upper circle and a
+        bottom circle, from which an interpolation function can be computed
+        with `scipy`. With these two functions, it is possible to assert if a
+        color is saturated enough.
+        """
         hsl_color = helpers.rgb_to_hsl(rgb_color)
         x, y, z = LumFilter.polar_to_cartesian(hsl_color)
 

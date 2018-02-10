@@ -163,3 +163,9 @@ class NotPolarException(HapycolorError):
     def __init__(self, msg):
         super(NotPolarException, self).__init__(msg)
         self.msg = msg
+
+
+class UnknownAnalysisTypeException(HapycolorError):
+    def __init__(self, msg):
+        super(UnknownAnalysisTypeException, self).__init__(msg)
+        self.msg = msg
