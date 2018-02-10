@@ -35,8 +35,8 @@ class LumFilter(base.Filter):
                                    or c[0] == math.floor(h), hsl_points),
                             key=lambda c: c[1])[2]
             inner_lum = min(filter(lambda c: c[0] == math.ceil(h)
-                                    or c[0] == math.floor(h), hsl_points),
-                             key=lambda c: c[1])[2]
+                                   or c[0] == math.floor(h), hsl_points),
+                            key=lambda c: c[1])[2]
 
             # Adding outer circles
             for s in [1.2, 1.5, 1.7, 2]:
@@ -52,10 +52,10 @@ class LumFilter(base.Filter):
 
         # scipy raises:
         # /usr/local/lib/python3.6/site-packages/scipy/interpolate/_fitpack_impl.py:975:
-        # RuntimeWarning: No more knots can be added because the number of B-spline
-        # coefficients already exceeds the number of data points m.
+        # RuntimeWarning: No more knots can be added because the number of
+        # B-spline coefficients already exceeds the number of data points m.
         # Probable causes: either s or m too small. (fp>s)
-	#       kx,ky=1,1 nx,ny=16,14 m=160 fp=0.004157 s=0.000000
+        # kx,ky=1,1 nx,ny=16,14 m=160 fp=0.004157 s=0.000000
         # warnings.warn(RuntimeWarning(_iermess2[ierm][0] + _mess))
         #
         # I don't really know how to avoid that, so I'll just silence it,
@@ -89,8 +89,8 @@ class LumFilter(base.Filter):
         """
         theta, r, z = polar_point
         # if r < 0 or r > 1 or theta < 0 or theta >= 360 or z < 0 or z > 1:
-        #     raise exceptions.NotPolarException("The input tuple does not match"
-        #                                        + " polar coordinates")
+        #     raise exceptions.NotPolarException("The input tuple does not"
+        #                                        + "match polar coordinates")
         return r * np.cos(np.radians(theta)), r * np.sin(np.radians(theta)), z
 
     @staticmethod
@@ -147,7 +147,6 @@ class LumFilter(base.Filter):
         else:
             msg = str(kind) + "is not a supported analysis type"
             raise exceptions.UnknownAnalysisTypeException(msg)
-
 
     def half_circle_interp(half_circle):
         cartesian_p = [LumFilter.polar_to_cartesian(e) for e in half_circle]

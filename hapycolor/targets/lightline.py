@@ -1,13 +1,12 @@
 import enum
 import datetime
-import re
 from . import base
 from . import eight_bit_colors
 from . import vim_helpers
 from hapycolor import config
 from hapycolor import exceptions
-from hapycolor import palette as pltte
 from hapycolor import helpers
+
 
 class Lightline(base.Target):
     """
@@ -38,9 +37,9 @@ class Lightline(base.Target):
 
     _themes = ["landscape.vim", "one.vim", "wombat.vim", "solarized.vim"]
     ThemeEnum = enum.Enum("ThemeEnum",
-                             [(t.split('.')[0].upper(),
-                               "hapycolor/targets/lightline_themes/" + t)
-                              for t in _themes])
+                          [(t.split('.')[0].upper(),
+                            "hapycolor/targets/lightline_themes/" + t)
+                           for t in _themes])
 
     # The colorscheme's path
     colorscheme_key = "colorscheme"
@@ -54,8 +53,8 @@ class Lightline(base.Target):
         colorscheme_path = Lightline.select_colorscheme_path()
         theme = Lightline.select_theme()
         Lightline.save_config({
-                               Lightline.colorscheme_key : colorscheme_path,
-                               Lightline.theme_key       : str(theme.value)
+                               Lightline.colorscheme_key: colorscheme_path,
+                               Lightline.theme_key: str(theme.value)
                               })
 
     def reconfigure():
@@ -69,10 +68,10 @@ class Lightline(base.Target):
 
         if entry == 1:
             theme = Lightline.select_theme()
-            Lightline.save_config({Lightline.theme_key : str(theme.value)})
+            Lightline.save_config({Lightline.theme_key: str(theme.value)})
         elif entry == 2:
             colorscheme_path = Lightline.select_colorscheme_path()
-            Lightline.save_config({Lightline.colorscheme_key : colorscheme_path})
+            Lightline.save_config({Lightline.colorscheme_key: colorscheme_path})
 
     def select_colorscheme_path():
         p = vim_helpers.VimHelpers.find_plugin(Lightline.plugin_name)
@@ -97,7 +96,7 @@ class Lightline(base.Target):
         try:
             config = Lightline.load_config()
             return (Lightline.colorscheme_key in config) \
-                   and (Lightline.theme_key in config)
+                and (Lightline.theme_key in config)
         except exceptions.InvalidConfigKeyError:
             return False
 
@@ -116,8 +115,10 @@ class Lightline(base.Target):
 
             # Defines input palette's variables
             colors = Lightline.get_colors(palette)
-            f.write(Lightline.set_variable("foreground", palette.foreground) + "\n")
-            f.write(Lightline.set_variable("background", palette.background) + "\n")
+            f.write(Lightline.set_variable("foreground", palette.foreground))
+            f.write("\n")
+            f.write(Lightline.set_variable("background", palette.background))
+            f.write("\n")
 
             for label in colors:
                 f.write(Lightline.set_variable(label, colors[label]) + "\n")
@@ -130,9 +131,9 @@ class Lightline(base.Target):
 
             f.write(Lightline.footer())
 
-
     def footer():
-        return "let g:lightline#colorscheme#hapycolor#palette = lightline#colorscheme#flatten(s:p)"
+        return "let g:lightline#colorscheme#hapycolor#palette \
+            = lightline#colorscheme#flatten(s:p)"
 
     def header(image_path):
         now = datetime.datetime.now()
@@ -160,8 +161,8 @@ class Lightline(base.Target):
         return colors
 
     def set_variable(label, color):
-        return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', " \
-                                       + str(eight_bit_colors.rgb2short(color)) + "]"
+        return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', "\
+            + str(eight_bit_colors.rgb2short(color)) + "]"
 
 
 class ColorEnum(enum.Enum):
@@ -190,14 +191,12 @@ class ColorManager:
     For each variable needed by the theme, defines a dictionary which binds
     a the enumerate to a value of the palette's colors.
 
-    .. todo:: Apply another reduction filter? Since we need only a few colors, it
-        makes sense.
+    .. todo:: Apply another reduction filter? Since we need only a few colors,
+        it makes sense.
     """
     def __init__(self, colors):
         if not all([helpers.can_be_rgb(c) for c in colors]):
             raise exceptions.ColorFormatError("Must be a list of rgb colors")
-
-        hsl_colors = [helpers.rgb_to_hsl(c) for c in colors]
 
         # Classify the colors according to their hue
         sorted_colors = {}

@@ -54,7 +54,8 @@ def load(section):
     try:
         return config[section]
     except KeyError as e:
-        raise exceptions.InvalidConfigKeyError("Configuration entry not found", e)
+        raise exceptions.InvalidConfigKeyError("Configuration entry not found",
+                                               e)
 
 
 def save(section, target_config):
@@ -63,7 +64,8 @@ def save(section, target_config):
 
     :arg section: a string representing a section in the configuration file
     :arg key: a string representing an entry in the given section
-    :arg value: the value relative to the key to be added in the project's configuration file
+    :arg value: the value relative to the key to be added in the project's
+        configuration file
     """
     config = configparser.ConfigParser()
     config.read(get_config())
@@ -75,7 +77,8 @@ def save(section, target_config):
             for key in target_config:
                 config[section][key] = str(target_config[key])
     except KeyError as e:
-        raise exceptions.InvalidConfigKeyError("Configuration entry not found", e)
+        raise exceptions.InvalidConfigKeyError("Configuration entry not found",
+                                               e)
 
     with open(get_config(), "w") as f:
         config.write(f)
@@ -83,8 +86,8 @@ def save(section, target_config):
 
 def input_path(prompt_str):
     """
-    Prompts the user with a string and returns a :class:`pathlib.Path` from the user's
-    input:
+    Prompts the user with a string and returns a :class:`pathlib.Path` from the
+    user's input:
 
     :arg prompt_str: the string to display before the user's entry
     """
@@ -118,7 +121,8 @@ def hyperplan_file(filter_type):
     elif filter_type == Filter.SATURATION:
         path /= config["saturation"]
     else:
-        raise exceptions.UnknownLuminosityFilterTypeError("Unknown filter type")
+        raise exceptions.UnknownLuminosityFilterTypeError("Unknown filter "
+                                                          + "type")
     return path.as_posix()
 
 

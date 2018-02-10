@@ -3,6 +3,7 @@ from hapycolor import exceptions
 import contextlib
 import os
 
+
 @contextlib.contextmanager
 def download(url):
     """
@@ -16,7 +17,8 @@ def download(url):
     .. _Imgur: http://imgur.com/
     """
     if url.find("/a/") != -1:
-        raise exceptions.UnsupportedFeatureError("Hapycolor does not yet support imgur's albums")
+        raise exceptions.UnsupportedFeatureError("Hapycolor does not yet"
+                                                 + " support imgur's albums")
     dest = os.path.join(os.getcwd(), "/tmp/test_imgur_downloads")
     name = url.split("/")[-1]
     try:
@@ -25,4 +27,5 @@ def download(url):
         yield image_path
         os.remove(image_path)
     except imguralbum.ImgurException:
-        raise exceptions.ImageNotFoundException("The provided url does not lead to an image")
+        raise exceptions.ImageNotFoundException("The provided url does not"
+                                                + " lead to an image")

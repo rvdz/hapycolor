@@ -2,17 +2,20 @@ import abc
 from hapycolor import config
 from hapycolor import exceptions
 
+
 class Target(metaclass=abc.ABCMeta):
     """
-    Abstract class introducting the basic methods needed to initialize the target
-    and export the palette or the image to the environment. The subclasses need
-    to implement:
+    Abstract class introducting the basic methods needed to initialize the
+    target and export the palette or the image to the environment. The
+    subclasses need to implement:
 
     - How to initialize the target
-    - How to reconfigure the target (default: calls target initialization method)
+    - How to reconfigure the target (default: calls target initialization
+        method)
     - Function that states if the target has already be correctly initialized
     - A function that retrives a list of the compatible operating systems
-    - The export function which will be called by passing the palette and the path of the image
+    - The export function which will be called by passing the palette and the
+        path of the image
 
     Each target has a dedicated section in the configuration file from which
     it can load or save its own data. To do so, the class provides five class
@@ -23,7 +26,6 @@ class Target(metaclass=abc.ABCMeta):
     - Enabling the target
     - Disabling the target
     - Check if the target is enabled
-
     """
     # Main method
     @abc.abstractstaticmethod
@@ -51,7 +53,8 @@ class Target(metaclass=abc.ABCMeta):
     @classmethod
     def load_config(cls):
         """
-        Loads the configuration related to the subclass and returns a dictionary.
+        Loads the configuration related to the subclass and returns a
+        dictionary.
         """
         return config.load(cls.__name__)
 
@@ -61,11 +64,11 @@ class Target(metaclass=abc.ABCMeta):
 
     @classmethod
     def enable(cls):
-        config.save(cls.__name__, {"enabled" : True})
+        config.save(cls.__name__, {"enabled": True})
 
     @classmethod
     def disable(cls):
-        config.save(cls.__name__, {"enabled" : False})
+        config.save(cls.__name__, {"enabled": False})
 
     @classmethod
     def is_enabled(cls):
