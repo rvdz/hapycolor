@@ -43,11 +43,12 @@ def parse_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", help="File path to the image")
     ap.add_argument("-d", "--dir", help="Directory path to the images "
-                    + "(this option will NOT export variables, use -f instead)."
-                    + "This option implicitly enables -j option")
+                    + "(this option will NOT export variables, use -f instead)"
+                    + ". This option implicitly enables -j option")
     ap.add_argument("-j", "--json", action="store_true", help="Saves output "
                     + "(RGB format) in a Json file palettes.json instead of "
-                    + "exporting variables. Json file is updated if the file exists.")
+                    + "exporting variables. Json file is updated if the file "
+                    + "exists.")
     args = vars(ap.parse_args())
     if not (args["file"] or args["dir"]):
         ap.error('expected either argument -f or -d')

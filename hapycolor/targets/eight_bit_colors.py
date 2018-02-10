@@ -14,17 +14,14 @@ I'm not sure where this script was inspired from. I think I must have
 written it from scratch, though it's been several years now.
 """
 
-__author__    = 'Micah Elliott http://MicahElliott.com'
-__version__   = '0.1'
+__author__ = 'Micah Elliott http://MicahElliott.com'
+__version__ = '0.1'
 __copyright__ = 'Copyright (C) 2011 Micah Elliott.  All rights reserved.'
-__license__   = 'WTFPL http://sam.zoy.org/wtfpl/'
+__license__ = 'WTFPL http://sam.zoy.org/wtfpl/'
 
-#---------------------------------------------------------------------
-
-import sys, re
 
 CLUT = [  # color look-up table
-#    8-bit, RGB hex
+          # 8-bit, RGB hex
 
     # Primary 3-bit (8 colors). Unique representation!
     (0,  '000000'),
@@ -291,6 +288,7 @@ CLUT = [  # color look-up table
     (255, 'eeeeee'),
 ]
 
+
 def _create_dicts():
     short2rgb_dict = dict(CLUT)
     rgb2short_dict = {}
@@ -298,8 +296,10 @@ def _create_dicts():
         rgb2short_dict[v] = k
     return rgb2short_dict, short2rgb_dict
 
+
 def short2rgb(short):
     return helpers.hex_to_rgb("#" + SHORT2RGB_DICT[short])
+
 
 def rgb2short(rgb):
     """ Find the closest xterm-256 approximation to the given RGB value.
@@ -316,13 +316,16 @@ def rgb2short(rgb):
             if s <= part <= b:
                 s1 = abs(s - part)
                 b1 = abs(b - part)
-                if s1 < b1: closest = s
-                else: closest = b
+                if s1 < b1:
+                    closest = s
+                else:
+                    closest = b
                 res.append(closest)
                 break
             i += 1
-    res = ''.join([ ('%02.x' % i) for i in res ])
-    equiv = RGB2SHORT_DICT[ res ]
+    res = ''.join([('%02.x' % i) for i in res])
+    equiv = RGB2SHORT_DICT[res]
     return equiv
+
 
 RGB2SHORT_DICT, SHORT2RGB_DICT = _create_dicts()

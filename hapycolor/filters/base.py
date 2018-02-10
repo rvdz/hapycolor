@@ -1,5 +1,6 @@
 import abc
 
+
 class Filter(metaclass=abc.ABCMeta):
     """
     This is the base class for all filters. Currently, it only asks to
