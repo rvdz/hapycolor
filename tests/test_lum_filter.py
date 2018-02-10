@@ -122,19 +122,40 @@ class TestLumFilter(unittest.TestCase):
             else:
                 self.assertFalse(above_0 ^ above_1)
 
+    def test_analyze_inputs(self):
+        # HSL input format instead of RGB
+        color_inputs = [
+                        ((0, 0.5, 1), "brightness"),
+                        ((300, 1, 1), "brightness"),
+                       ]
+
+        # Invalid type of analysis
+        kind_inputs = [
+                       ((200, 200, 200), "asdfjk"),
+                       ((100, 100, 100), "")
+                      ]
+
+        for i in color_inputs:
+            with self.assertRaises(exceptions.ColorFormatError):
+                lf.LumFilter.analyze(i[0], i[1])
+
+        for i in kind_inputs:
+            with self.assertRaises(exceptions.UnknownAnalysisTypeException):
+                lf.LumFilter.analyze(i[0], i[1])
+
     @configurationtesting()
     def test_limit_cases_bright(self):
         lf.LumFilter.bright_interp = lf.LumFilter.interpolate_hyperplans(
                 config.hyperplan_file(config.Filter.BRIGHT), "bright")
         bright = [(0, 0, 1), (12, 1, 0.9), (240, 1, 0.95), (0, 0.5, 0.9)]
         for c in [helpers.hsl_to_rgb(c) for c in bright]:
-            self.assertTrue(lf.LumFilter.is_too_bright(c))
+            self.assertTrue(lf.LumFilter.analyze(c, "brightness"))
 
         not_bright = [(0, 1, 0.2), (150, 0.5, 0.5), (250, 0.2, 0.2), (50, 0.2, 0.1),
                       (300, 0.9, 0.1), (275, 0, 0.2), (40, 1, 0.4), (30, 0.9, 0.1),
                       (0, 0.5, 0), (50, 0, 0), (100, 1, 0), (0, 0, 0)]
         for c in [helpers.hsl_to_rgb(c) for c in not_bright]:
-            self.assertFalse(lf.LumFilter.is_too_bright(c))
+            self.assertFalse(lf.LumFilter.analyze(c, kind="brightness"))
 
     @configurationtesting()
     def test_limit_cases_dark(self):
@@ -144,8 +165,8 @@ class TestLumFilter(unittest.TestCase):
             dark = [(0, 0, 0), (240, 1, 0.1), (81, 1, 0.1), (300, 1, 0.1), (0, 1, 0),
                     (300, 0.5, 0.1)]
             for c in [helpers.hsl_to_rgb(c) for c in dark]:
-                self.assertTrue(lf.LumFilter.is_too_dark(c))
+                self.assertTrue(lf.LumFilter.analyze(c, kind="darkness"))
 
             not_dark = [(0, 0, 1), (0, 1, 1), (300, 0.5, 0.7), (0, 0, 0.5), (200, 0.2, 0.6)]
             for c in [helpers.hsl_to_rgb(c) for c in not_dark]:
-                self.assertFalse(lf.LumFilter.is_too_dark(c))
+                self.assertFalse(lf.LumFilter.analyze(c, kind="darkness"))
