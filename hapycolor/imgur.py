@@ -9,9 +9,9 @@ def download(url):
     Downloads an image from Imgur_ and returns its local path.
 
     :arg url: The image's url
-    :return: The local path of the downloaded image.
-    :raises :class:`UnsupportedFeatureError`: if the url points to an album
-    :raises :class:`ImageNotFoundException`: if the image does not exist
+    :return: The local path of the downloaded image
+    :raises: :class:`UnsupportedFeatureError` if the url points to an album
+    :raises: :class:`ImageNotFoundException` if the image does not exist
 
     .. _Imgur: http://imgur.com/
     """
