@@ -39,7 +39,7 @@ def extract_rgb(raw_color):
 
     :param raw_color: en entry line of the result of the imagemagick extraction
     :raises exceptions.BlackAndWhitePictureException: if the colors are encoded
-    in a greyscale format.
+        in a greyscale format.
     :return: A tuple of rgb values
     """
     if re.search("gray", raw_color):
