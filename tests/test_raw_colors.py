@@ -14,8 +14,8 @@ class TestRawColors(unittest.TestCase):
 
     def test_no_failures_greyscale(self):
         with self.assertRaises(exceptions.BlackAndWhitePictureException):
-            image = "./images/greyscale.png"
-            raw_colors.get(image, 15)
+            raw = "b'0,0: (1194.25)  #050505  gray(5)\n'"
+            raw_colors.extract_rgb(raw)
 
     def test_no_failures_alpha(self):
         try:
@@ -23,3 +23,11 @@ class TestRawColors(unittest.TestCase):
             raw_colors.get(image, 15)
         except Exception as e:
             self.fail(str(e))
+
+    def test_trolling(self):
+        """
+        TODO: Working on chrome, but should be tested on firefox or chromium
+        """
+       proc = raw_colors.trolling("--version")
+       regex = "(Google Chrome)|(Firefox)|(Chromium)"
+       self.assertRegex(proc.stdout.decode(), regex)

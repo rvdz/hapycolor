@@ -16,6 +16,7 @@ from . import helpers
 from . import targets
 from . import raw_colors
 from . import filters
+from . import exceptions
 
 from PIL import Image, ImageDraw
 import argparse
@@ -94,13 +95,21 @@ def main(args=None):
 
         for img in img_list:
             print("Processing file {}".format(img))
-            palette = raw_colors.get(img, num_colors=200)
+            try:
+                palette = raw_colors.get(img, num_colors=200)
+            except exceptions.InvalidImageException as e:
+                print(e)
+                return
             palette = filters.apply(palette)
             add_palette_json(os.path.abspath(img), palette, "palettes.json")
         print()
         print("Palette saved to palettes.json")
     else:
-        palette = raw_colors.get(img_name, num_colors=200)
+        try:
+            palette = raw_colors.get(img_name, num_colors=200)
+        except exceptions.InvalidImageException as e:
+            print(e)
+            return
         visual.print_palette(palette.colors, size=2)
         palette = filters.apply(palette)
         targets.initialize()

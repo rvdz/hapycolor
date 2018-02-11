@@ -169,3 +169,8 @@ class UnknownAnalysisTypeException(HapycolorError):
     def __init__(self, msg):
         super(UnknownAnalysisTypeException, self).__init__(msg)
         self.msg = msg
+
+class InvalidImageException(HapycolorError):
+    def __init__(self, msg):
+        super(InvalidImageException, self).__init__(msg)
+        self.msg = msg

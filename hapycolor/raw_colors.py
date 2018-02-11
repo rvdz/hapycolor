@@ -6,12 +6,28 @@ import re
 import subprocess as sp
 from ast import literal_eval as make_tuple
 
+def trolling(url):
+    browsers = ["firefox",
+                "chrome",
+                "chromium",
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+    for b in browsers:
+        try:
+            sp.run([b, "--version"], stdout=sp.PIPE)
+        except FileNotFoundError as e:
+            pass
+        else:
+            proc = sp.run([b, url], stdout=sp.PIPE)
+            return proc
 
 def get(image_path, num_colors):
     """
     Returns a palette filled with colors provided by ImageMagic.
     The foreground (resp. background) is the brightest (resp. darkest)
     color of them.
+
+    :raise: :class:`hapycolor.exceptions.InvalidImageException` if the provided
+        image uses a grayscale.
     """
     magic_proc = sp.Popen(["convert", image_path, "+dither", "-colors",
                            str(num_colors), "-unique-colors", "txt:-"],
@@ -23,7 +39,11 @@ def get(image_path, num_colors):
     del raw_colors[0]
 
     # Select only the rgb colors from output
-    rgb_colors = [extract_rgb(str(col)) for col in raw_colors]
+    try:
+        rgb_colors = [extract_rgb(str(col)) for col in raw_colors]
+    except exceptions.BlackAndWhitePictureException as e:
+        trolling("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        raise exceptions.InvalidImageException(str(e))
 
     palette = pltte.Palette()
     palette.colors = rgb_colors
@@ -43,8 +63,9 @@ def extract_rgb(raw_color):
     :return: A tuple of rgb values
     """
     if re.search("gray", raw_color):
-        msg = "Some minimalist hipster thinks he deserves using Hapycolor. " \
-                "Fortunately, Hapycolor does not accept b&w images."
+        msg = "Found a minimalist hipster that thinks he deserves using" \
+                " Hapycolor. Fortunately, Hapycolor does not supports b&w" \
+                " images."
         raise exceptions.BlackAndWhitePictureException(msg)
     elif re.search("srgba", raw_color):
         match = re.search("srgba\(.*\)", raw_color).group(0)
