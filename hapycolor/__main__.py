@@ -28,8 +28,11 @@ help_msg = """Hapycolor.
 
 Usage:
   hapycolor (-f [-j] | -d | -x) FILE
-  hapycolor [--list-compatible-targets | --list-enabled-targets] ...
-  hapycolor [-r | -e | -s] TARGETS ...
+  hapycolor --reconfigure TARGETS ...
+  hapycolor --print-config TARGETS ...
+  hapycolor [-e EN_TARGETS ... | -s DIS_TARGETS ...] ...
+  hapycolor -l | --list-all
+  hapycolor [--list-compatible-targets | --list-enabled-targets | --list-all-targets] ...
   hapycolor -h | --help
   hapycolor --version
 
@@ -40,15 +43,22 @@ Options:
   -f, --file     Export image's palette.
   -j, --json     Save image's palette into palettes.json file.
   -x, --export   Export json palette to enabled targets.
-  -d, --dir      For each image in the dir, save palette into palettes.json file.
+  -d, --dir      For each image in the dir, saves palette into palettes.json file.
 
   -r, --reconfigure
                  Reconfigure every target passed in arguments.
+                 (Separated by spaces)
+  -p, --print-config
+                 Print configuration of targets passed in arguments.
+                 Argument 'all' prints the whole config.
+
   -e, --enable   Enable targets passed in arguments.
                  Argument 'all' enables every compatible targets.
   -s, --disable  Disable targets passed in arguments.
                  Argument 'all' disables every targets.
 
+  -l, --list-all
+                 Triggers all following listing options.
   --list-enabled-targets
                  List all enabled targets.
   --list-compatible-targets
@@ -100,24 +110,46 @@ def main(args=None):
     args = parse_arguments()
 
     img_path = args['FILE']
-    targs = args['TARGETS']
+    targs = args['TARGETS'] if args['TARGETS'] else args['EN_TARGETS']
+    distargs = args['DIS_TARGETS']
+    if targs == ["all"]:
+        targs = targets.get_compatible_names()
+    if distargs == ["all"]:
+        distargs = targets.get_compatible_names()
+    # Capitalize first letter for esthetics and access
+    targs = [t[0].upper() + t[1:] for t in sorted(targs)]
+    distargs = [t[0].upper() + t[1:] for t in sorted(distargs)]
+
+    if args['--list-all']:
+        args['--list-all-targets'] = True
+        args['--list-compatible-targets'] = True
+        args['--list-enabled-targets'] = True
+
+    if args['--list-all-targets']:
+        tlist = targets.get_all_names()
+        helpers.bold("Targets are:")
+        for t in tlist:
+            print("    - {}".format(t))
 
     if args['--list-compatible-targets']:
         tlist = targets.get_compatible_names()
-        print("Compatible targets are:")
-        for t in tlist:
-            print("\t- {}".format(t))
+        if not tlist:
+            helpers.bold("No compatible targets.")
+        else:
+            helpers.bold("Compatible targets are:")
+            for t in tlist:
+                print("    - {}".format(t))
 
     if args['--list-enabled-targets']:
         tlist = targets.get_enabled()
-        print("Enabled targets are:")
-        for t in tlist:
-            print("\t- {}".format(t.__name__))
+        if not tlist:
+            helpers.bold("No enabled targets.")
+        else:
+            helpers.bold("Enabled targets are:")
+            for t in tlist:
+                print("    - {}".format(t.__name__))
 
     if args['--enable']:
-        print(targs)
-        if targs == ["all"]:
-            targs = targets.get_compatible_names()
         for t in targs:
             if targets.enable(t):
                 print("Target {} was already enabled.".format(t))
@@ -125,21 +157,24 @@ def main(args=None):
                 print("Enabled target {}.".format(t))
 
     if args['--disable']:
-        if targs == ["all"]:
-            targs = targets.get_compatible_names()
-        for t in targs:
+        for t in distargs:
             if targets.disable(t):
                 print("Target {} was already disabled.".format(t))
             else:
                 print("Disabled target {}.".format(t))
 
+    if args['--print-config']:
+        for t in targs:
+            helpers.bold("Configuration of target {}:".format(t))
+            cfg = config.load(t)
+            print("    enabled: {}".format(cfg["enabled"]))
+            for key in (k for k in cfg if k != "enabled"):
+                print("    {}: {}".format(key, cfg[key]))
+
     if args['--reconfigure']:
-        if targs == []:
-            targs = targets.get_compatible_names()
         for t in targs:
             helpers.bold("Reconfiguring target {}".format(t))
             targets.reconfigure(t)
-            print()
 
     if args['--json'] or args['--dir']:
         img_list = []

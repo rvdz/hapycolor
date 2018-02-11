@@ -97,6 +97,7 @@ def get_class(target_str):
         raise exceptions.InvalidTarget("Input does not match a module"
                                        + " from targets")
 
+    target_str = target_str.lower()
     if not is_target_subclass(target_str):
         raise exceptions.InvalidTarget("Input does not match a module"
                                        + " containing a Target class")
@@ -154,6 +155,14 @@ def retry():
     return res
 
 
+def get_all_names():
+    """
+    Get all target names
+    """
+    all_targets = base.Target.__subclasses__()
+    return [t.__name__ for t in all_targets]
+
+
 def get_compatible():
     """
     Get all compatible targets
@@ -168,7 +177,7 @@ def get_compatible_names():
     """
     Get str names of all compatible targets
     """
-    return [t.__name__.lower() for t in get_compatible()]
+    return [t.__name__ for t in get_compatible()]
 
 
 def get_enabled():
