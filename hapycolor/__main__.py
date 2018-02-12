@@ -27,10 +27,10 @@ version = 1.0
 help_msg = """Hapycolor.
 
 Usage:
-  hapycolor (-f [-j] | -d | -x) FILE
+  hapycolor (-f [-j] | --dir | -x) FILE
   hapycolor --reconfigure TARGETS ...
   hapycolor --print-config TARGETS ...
-  hapycolor [-e EN_TARGETS ... | -s DIS_TARGETS ...] ...
+  hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
   hapycolor -l | --list-all
   hapycolor [--list-compatible-targets | --list-enabled-targets | --list-all-targets] ...
   hapycolor -h | --help
@@ -43,7 +43,7 @@ Options:
   -f, --file     Export image's palette.
   -j, --json     Save image's palette into palettes.json file.
   -x, --export   Export json palette to enabled targets.
-  -d, --dir      For each image in the dir, saves palette into palettes.json file.
+  --dir      For each image in the dir, saves palette into palettes.json file.
 
   -r, --reconfigure
                  Reconfigure every target passed in arguments.
@@ -54,7 +54,7 @@ Options:
 
   -e, --enable   Enable targets passed in arguments.
                  Argument 'all' enables every compatible targets.
-  -s, --disable  Disable targets passed in arguments.
+  -d, --disable  Disable targets passed in arguments.
                  Argument 'all' disables every targets.
 
   -l, --list-all
@@ -117,8 +117,8 @@ def main(args=None):
     if distargs == ["all"]:
         distargs = targets.get_compatible_names()
     # Capitalize first letter for esthetics and access
-    targs = [t[0].upper() + t[1:] for t in sorted(targs)]
-    distargs = [t[0].upper() + t[1:] for t in sorted(distargs)]
+    targs = [t.title() for t in sorted(targs)]
+    distargs = [t.title() for t in sorted(distargs)]
 
     if args['--list-all']:
         args['--list-all-targets'] = True
@@ -166,6 +166,9 @@ def main(args=None):
     if args['--print-config']:
         for t in targs:
             helpers.bold("Configuration of target {}:".format(t))
+            if not targets.get_class(t).is_config_initialized():
+                print("    Target has not been initialized.")
+                continue
             cfg = config.load(t)
             print("    enabled: {}".format(cfg["enabled"]))
             for key in (k for k in cfg if k != "enabled"):
@@ -183,7 +186,7 @@ def main(args=None):
         elif args['--dir']:
             for f in os.listdir(img_path):
                 if os.path.splitext(f)[1] in [".jpg", "jpeg"]:
-                    img_list.append(os.path.join(path, f))
+                    img_list.append(os.path.join(img_path, f))
 
         for img in img_list:
             print("Processing file {}".format(img))
