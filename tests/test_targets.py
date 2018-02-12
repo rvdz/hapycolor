@@ -40,7 +40,7 @@ class TestTargets(unittest.TestCase):
 
     def test_get_invalid_module(self):
         with self.assertRaises(exceptions.InvalidTarget):
-            targets.get_class("Vim")
+            targets.get_class("emacs")
 
         with self.assertRaises(exceptions.InvalidTarget):
             targets.get_class("__doc__")

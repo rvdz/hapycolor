@@ -93,11 +93,12 @@ def get_class(target_str):
         resolve from the provided string, or if there are no matching classes
         defined in the module that implement a :class:`Target`.
     """
+    target_str = target_str.lower()
+
     if target_str not in globals().keys():
         raise exceptions.InvalidTarget("Input does not match a module"
                                        + " from targets")
 
-    target_str = target_str.lower()
     if not is_target_subclass(target_str):
         raise exceptions.InvalidTarget("Input does not match a module"
                                        + " containing a Target class")
