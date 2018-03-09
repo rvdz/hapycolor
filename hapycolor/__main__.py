@@ -17,6 +17,7 @@ from . import targets
 from . import raw_colors
 from . import filters
 from . import exceptions
+from . import imgur
 
 from PIL import Image, ImageDraw
 from docopt import docopt
@@ -28,6 +29,7 @@ help_msg = """Hapycolor.
 
 Usage:
   hapycolor (-f [-j] | --dir | -x) FILE
+  hapycolor -i [-j] [-x] URL
   hapycolor --reconfigure TARGETS ...
   hapycolor --print-config TARGETS ...
   hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
@@ -40,7 +42,8 @@ Options:
   -h, --help     Show this screen.
   --version      Show version.
 
-  -f, --file     Export image's palette.
+  -f, --file     The path of the source image from which the palette will be generated.
+  -i, --imgur    The url of an image from imgur.com from which the palette will be generated.
   -j, --json     Save image's palette into palettes.json file.
   -x, --export   Export json palette to enabled targets.
   --dir      For each image in the dir, saves palette into palettes.json file.
@@ -110,6 +113,7 @@ def main(args=None):
     args = parse_arguments()
 
     img_path = args['FILE']
+    imgur_url = args['URL']
     targs = args['TARGETS'] if args['TARGETS'] else args['EN_TARGETS']
     distargs = args['DIS_TARGETS']
     if targs == ["all"]:
@@ -197,12 +201,17 @@ def main(args=None):
         print("Palette saved to palettes.json")
         return
 
+    max_colors = 150
     if args['--file']:
-        palette = raw_colors.get(img_path, num_colors=150)
+        palette = raw_colors.get(img_path, num_colors=max_colors)
+        palette = filters.apply(palette)
+    elif args['--imgur']:
+        with imgur.download(imgur_url) as local_path:
+            palette = raw_colors.get(local_path, num_colors=max_colors)
         palette = filters.apply(palette)
     if args['--export']:
         palette = helpers.load_json(img_path)
-    if args['--file'] or args['--export']:
+    if args['--imgur'] or args['--file'] or args['--export']:
         targets.initialize()
         targets.export(palette, img_path)
         display_palette(palette)
