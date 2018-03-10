@@ -26,6 +26,6 @@ def download(url):
         image_path = dest + "/" + name
         yield image_path
         os.remove(image_path)
-    except imguralbum.ImgurException:
-        raise exceptions.ImageNotFoundException("The provided url does not"
-                                                + " lead to an image")
+    except imguralbum.ImgurException as exc:
+        msg = "ERROR: The provided url does not lead to an image"
+        raise exceptions.ImageNotFoundException(msg)

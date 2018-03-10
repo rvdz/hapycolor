@@ -2,6 +2,7 @@ from hapycolor import palette as pltte
 from hapycolor import helpers
 from hapycolor import exceptions
 
+import pathlib
 import re
 import subprocess as sp
 from ast import literal_eval as make_tuple
@@ -29,6 +30,10 @@ def get(image_path, num_colors):
     :raise: :class:`hapycolor.exceptions.InvalidImageException` if the provided
         image uses a grayscale.
     """
+
+    if pathlib.Path(image_path).suffix not in ['.jpg', '.jpeg', '.png']:
+        msg = "ERROR: Image's format must be: '.jgp', '.jpeg', or '.png'"
+        raise exceptions.InvalidImageException(msg)
     magic_proc = sp.Popen(["convert", image_path, "+dither", "-colors",
                            str(num_colors), "-unique-colors", "txt:-"],
                           stdout=sp.PIPE)

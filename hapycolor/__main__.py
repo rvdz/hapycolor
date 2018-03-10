@@ -10,26 +10,23 @@
 
 """
 
-from . import config
-from . import visual
-from . import helpers
-from . import targets
-from . import raw_colors
-from . import filters
+from . import config, visual, helpers, targets, raw_colors, filters, imgur
 from . import exceptions
-from . import imgur
+from . import palette as pltte
 
 from PIL import Image, ImageDraw
 from docopt import docopt
 import os
+import pathlib
 
 version = 1.0
 
 help_msg = """Hapycolor.
 
 Usage:
-  hapycolor (-f [-j] | --dir | -x) FILE
-  hapycolor -i [-j] [-x] URL
+  hapycolor (-i URL | -f FILE) [-j OUTPUT_DIR]
+  hapycolor --export-from-json FILE
+  hapycolor --dir DIRECTORY -o OUTPUT_DIR
   hapycolor --reconfigure TARGETS ...
   hapycolor --print-config TARGETS ...
   hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
@@ -45,7 +42,7 @@ Options:
   -f, --file     The path of the source image from which the palette will be generated.
   -i, --imgur    The url of an image from imgur.com from which the palette will be generated.
   -j, --json     Save image's palette into palettes.json file.
-  -x, --export   Export json palette to enabled targets.
+  --export_from_json   Export json palette to enabled targets.
   --dir      For each image in the dir, saves palette into palettes.json file.
 
   -r, --reconfigure
@@ -99,11 +96,14 @@ def display_palette(palette):
     visual.print_palette([palette.background], size=4)
 
     colors_to_file([c for c in palette.colors], "palette.png")
-    helpers.save_json("palette.json", palette.colors)
+    palette.to_json("palette.json")
 
 
 def add_palette_json(img_name, palette, filename):
-    data_dict = {img_name: palette.hexcolors}
+    hexcolors = palette.hexcolors()
+    data_dict = {foreground: hexcolors[0],
+                 background: hexcolors[1],
+                 colors: hexcolors[2]}
     helpers.update_json(filename, data_dict)
 
 
@@ -112,8 +112,6 @@ def main(args=None):
     config.create_config()
     args = parse_arguments()
 
-    img_path = args['FILE']
-    imgur_url = args['URL']
     targs = args['TARGETS'] if args['TARGETS'] else args['EN_TARGETS']
     distargs = args['DIS_TARGETS']
     if targs == ["all"]:
@@ -183,38 +181,62 @@ def main(args=None):
             helpers.bold("Reconfiguring target {}".format(t))
             targets.reconfigure(t)
 
-    if args['--json'] or args['--dir']:
+    try:
+        max_colors = 150
         img_list = []
+
+        # Checking provided files and directories
+        if args['--export-from-json'] or args['--file']:
+            if not pathlib.Path(args['FILE']).resolve().exists():
+                msg = "ERROR: The provided image does not exist"
+                raise exceptions.ImageNotFoundException(msg)
+            img_list.append(args['FILE'])
+
+        if args['--json'] or args['--dir']:
+            if not pathlib.Path(args['OUTPUT_DIR']).exists():
+                msg = "ERROR: The provided output directory does not exist"
+                raise exceptions.InvalidDirectoryException(msg)
+            if args['--dir']:
+                for f in os.listdir(args['DIRECTORY']):
+                    img_list.append(os.path.join(args['DIRECTORY'], f))
+
+        # Extracting palettes
+        palettes = []
+        if args['--imgur']:
+            with imgur.download(args['URL']) as local_path:
+                print("Processing file {}".format(local_path))
+                palettes.append(raw_colors.get(local_path,
+                                               num_colors=max_colors))
+                palettes[-1] = filters.apply(palettes[-1])
+                img_list.append(local_path)
+        if args['--file'] or args['--dir']:
+            for img in img_list:
+                print("Processing file {}".format(img))
+                palettes.append(raw_colors.get(img, num_colors=max_colors))
+                palettes[-1] = filters.apply(palettes[-1])
+        if args['--export-from-json']:
+            palettes.append(pltte.Palette.from_json(img_list[0]))
+
+        # Saving palettes in a json file
         if args['--json']:
-            img_list.append(img_path)
-        elif args['--dir']:
-            for f in os.listdir(img_path):
-                if os.path.splitext(f)[1] in [".jpg", "jpeg"]:
-                    img_list.append(os.path.join(img_path, f))
-
-        for img in img_list:
-            print("Processing file {}".format(img))
-            palette = raw_colors.get(img, num_colors=150)
-            palette = filters.apply(palette)
-            add_palette_json(os.path.abspath(img), palette, "palettes.json")
-        print()
-        print("Palette saved to palettes.json")
-        return
-
-    max_colors = 150
-    if args['--file']:
-        palette = raw_colors.get(img_path, num_colors=max_colors)
-        palette = filters.apply(palette)
-    elif args['--imgur']:
-        with imgur.download(imgur_url) as local_path:
-            palette = raw_colors.get(local_path, num_colors=max_colors)
-        palette = filters.apply(palette)
-    if args['--export']:
-        palette = helpers.load_json(img_path)
-    if args['--imgur'] or args['--file'] or args['--export']:
-        targets.initialize()
-        targets.export(palette, img_path)
-        display_palette(palette)
+            for i in range(len(img_list)):
+                name = pathlib.Path(img_list[i]).with_suffix('.json').name
+                output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()
+                path = (output_dir / name).resolve().as_posix()
+                palettes[i].to_json(path)
+        # Exporting the first palette
+        elif args['--imgur'] or args['--file'] or args['--export-from-json']:
+            targets.initialize()
+            targets.export(palettes[0], img_list[0])
+            display_palette(palettes[0])
+    except exceptions.ImageNotFoundException as inf:
+        print(inf.msg)
+    except exceptions.InvalidDirectoryException as ide:
+        print(ide.msg)
+    except exceptions.PaletteFormatError as pfe:
+        print(pfe.msg)
+    except exceptions.InvalidImageException as iie:
+        print(iie.msg)
 
 
 if __name__ == '__main__':

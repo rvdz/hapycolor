@@ -28,6 +28,6 @@ class TestRawColors(unittest.TestCase):
         """
         TODO: Working on chrome, but should be tested on firefox or chromium
         """
-       proc = raw_colors.trolling("--version")
-       regex = "(Google Chrome)|(Firefox)|(Chromium)"
-       self.assertRegex(proc.stdout.decode(), regex)
+        proc = raw_colors.trolling("--version")
+        regex = "(Google Chrome)|(Firefox)|(Chromium)"
+        self.assertRegex(proc.stdout.decode(), regex)
