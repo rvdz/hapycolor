@@ -87,6 +87,7 @@ def parse_arguments():
     return docopt(help_msg, version="Hapycolor " + str(version))
 
 
+
 def display_palette(palette):
     print("\nFinal palette (" + str(len(palette.colors)) + "):")
     visual.print_palette(palette.colors, size=2)
@@ -99,6 +100,7 @@ def display_palette(palette):
 
     colors_to_file([c for c in palette.colors], "palette.png")
     palette.to_json("palette.json")
+
 
 
 def add_palette_json(img_name, palette, filename):
