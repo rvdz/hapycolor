@@ -111,9 +111,6 @@ def get_keys():
     return ROOT_DIR + load_config("hyerplan")["keys"]
 
 
-def yabar_config():
-    return load_config("export")["yabar_config"]
-
 def hyperplan_file(filter_type):
     config = load_config("hyperplan")
     path = ROOT_DIR

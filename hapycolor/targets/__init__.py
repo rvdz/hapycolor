@@ -1,12 +1,30 @@
-__all__ = [
-           "vim",
-           "iterm",
-           "wallpaper",
-           "base",
-           "lightline",
-          ]
+"""
+.. role:: python(code)
+    :language: python
 
-from . import *
+This module defines all the methods needed to interact with all the targets
+implemented in the :mod:`hapycolor.targets` package.
+
+To add a new target, a class inheriting from :class:`base.Target` needs to be
+implemented and its module should be imported in this very module, else,
+hapycolor will fail to find the new target. Currently, the :func:`reconfigure`
+function needs the class to be named after a PascalCase version of its module's
+name.
+
+.. note::
+    A list `__all__` could be used to define all the modules to be imported and
+    then :python:`from . import *` would import them all, but strangely,
+    in this case, sphinx_ fails to generate the documentation of this file.
+
+.. _sphinx: http://www.sphinx-doc.org/en/stable/
+
+.. note:: Maybe, a future version of this project would be able to get rid of
+    the class name/module name constraint by analyzing the classes contained
+    in the module and retrieving the one that implements :class:`base.Target`.
+"""
+
+from . import vim, iterm, wallpaper, lightline, gnome, yabar
+from . import base
 from hapycolor import config
 from hapycolor import exceptions
 

@@ -22,7 +22,6 @@ import argparse
 import os
 
 
-
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
     """ Creates a color palette and saves it to file """
     pal = Image.new('RGB', (swatchsize*len(colors) + 10, swatchsize))
