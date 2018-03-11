@@ -54,8 +54,8 @@ def load(section):
     try:
         return config[section]
     except KeyError as e:
-        raise exceptions.InvalidConfigKeyError("Configuration entry not found",
-                                               e)
+        msg = "Configuration entry not found", str(e)
+        raise exceptions.InvalidConfigKeyError(msg)
 
 
 def save(section, target_config):

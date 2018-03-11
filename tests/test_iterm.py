@@ -36,7 +36,7 @@ class TestIterm(unittest.TestCase):
         """ Checks that the template file is valid """
         import xml.etree.ElementTree as ET
         try:
-            ET.parse(Iterm.load_config()[Iterm.template_key])
+            ET.parse(Iterm.template)
         except ET.ParseError as err:
             self.fail(str(err))
 

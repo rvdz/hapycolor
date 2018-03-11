@@ -123,7 +123,7 @@ def reconfigure(target_str):
 
 def enable(target_str):
     """
-    Calls the :func:enable method of the appropriate class
+    Calls the :func:targets.base.Target.enable() method of the appropriate class
     contained in the target module provided in the arguments.
     """
     clazz = get_class(target_str)
@@ -135,7 +135,7 @@ def enable(target_str):
 
 def disable(target_str):
     """
-    Calls the :func:disable method of the appropriate class
+    Calls the :func:targets.base.Target.disable() method of the appropriate class
     contained in the target module provided in the arguments.
     """
     clazz = get_class(target_str)
