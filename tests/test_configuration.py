@@ -32,8 +32,8 @@ class TestConfiguration(unittest.TestCase):
 
         configuration = configparser.ConfigParser()
         configuration.read(config.get_default_config())
-        expected_sections = ["core", "hyperplan", "Iterm", "Wallpaper",
-                             "Filters", "Gnome"]
+        expected_sections = ["core", "hyperplan", "Wallpaper", "Filters",
+                "Gnome"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))
 
     @patch('platform.system', return_value="Windows")
@@ -67,7 +67,7 @@ class TestConfiguration(unittest.TestCase):
     @unittest.skipUnless(config.os() == config.OS.DARWIN, "Tests Darwin's"
                          + " environment")
     def test_configuration_iterm_template(self):
-        raw_path = Iterm.load_config()[Iterm.template_key]
+        raw_path = Iterm.template
         iterm_template_path = pathlib.Path(raw_path).resolve()
         self.assertTrue(iterm_template_path.exists())
 

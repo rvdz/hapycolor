@@ -24,7 +24,7 @@ version = 1.0
 help_msg = """Hapycolor.
 
 Usage:
-  hapycolor (-i URL | -f FILE) [-j OUTPUT_DIR]
+  hapycolor (--imgur URL | -f FILE) [--json OUTPUT_DIR]
   hapycolor --export-from-json FILE
   hapycolor --dir DIRECTORY -o OUTPUT_DIR
   hapycolor --reconfigure TARGETS ...
@@ -40,10 +40,12 @@ Options:
   --version      Show version.
 
   -f, --file     The path of the source image from which the palette will be generated.
-  -i, --imgur    The url of an image from imgur.com from which the palette will be generated.
-  -j, --json     Save image's palette into palettes.json file.
-  --export_from_json   Export json palette to enabled targets.
-  --dir      For each image in the dir, saves palette into palettes.json file.
+  --dir          Generates a palette for each image in the provided directory, without exporting them.
+  -o, --output   Target directory where the palettes will be saved.
+  --imgur    The url of an image from imgur.com from which the palette will be generated.
+  --json     Save image's palette into the provided directory, without exporting it.
+  --export-from-json
+                 Export json palette to enabled targets.
 
   -r, --reconfigure
                  Reconfigure every target passed in arguments.
@@ -82,7 +84,7 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 
 def parse_arguments():
-    return docopt(help_msg, version=version)
+    return docopt(help_msg, version="Hapycolor " + str(version))
 
 
 def display_palette(palette):
@@ -152,11 +154,15 @@ def main(args=None):
                 print("    - {}".format(t.__name__))
 
     if args['--enable']:
-        for t in targs:
-            if targets.enable(t):
-                print("Target {} was already enabled.".format(t))
+        for t in [targets.get_class(c) for c in targs]:
+            if t.is_enabled():
+                print("Target {} was already enabled.".format(t.__name__))
+            elif not t.is_config_initialized():
+                targets.initialize_target(t)
+                print("Enabled target {}.".format(t.__name__))
             else:
-                print("Enabled target {}.".format(t))
+                t.enable()
+                print("Enabled target {}.".format(t.__name__))
 
     if args['--disable']:
         for t in distargs:
@@ -198,7 +204,8 @@ def main(args=None):
                 raise exceptions.InvalidDirectoryException(msg)
             if args['--dir']:
                 for f in os.listdir(args['DIRECTORY']):
-                    img_list.append(os.path.join(args['DIRECTORY'], f))
+                    if os.path.splitext(f)[1] in [".jpg", ".jpeg", ".png"]:
+                        img_list.append(os.path.join(args['DIRECTORY'], f))
 
         # Extracting palettes
         palettes = []
@@ -218,7 +225,7 @@ def main(args=None):
             palettes.append(pltte.Palette.from_json(img_list[0]))
 
         # Saving palettes in a json file
-        if args['--json']:
+        if args['--json'] or args['--dir']:
             for i in range(len(img_list)):
                 name = pathlib.Path(img_list[i]).with_suffix('.json').name
                 output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()

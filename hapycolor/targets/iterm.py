@@ -50,9 +50,13 @@ class Iterm(base.Target):
 
     preferences_key = "iterm_preferences"
     default_key = "default"
-    template_key = "iterm_template"
+    template = "./hapycolor/targets/iterm_template.xml"
+
     def is_config_initialized():
-        return Iterm.preferences_key in Iterm.load_config()
+        try:
+            return Iterm.preferences_key in Iterm.load_config()
+        except exceptions.InvalidConfigKeyError:
+            return False
 
     def initialize_config():
         """
@@ -86,8 +90,9 @@ class Iterm(base.Target):
     def set_configuration_path():
         default_str = "~/Library/Preferences/com.googlecode.iterm2.plist"
         default = pathlib.Path(default_str).expanduser()
-        p = config.input_path("Path to iTerm configuration file (" +
-                              default.as_posix() + "): ")
+        msg = """Path to iTerm configuration file
+(Keep empty to use default path '""" + default.as_posix() + """'): """
+        p = config.input_path(msg)
 
         # If default is selected:
         if p.as_posix() == ".":
@@ -97,11 +102,11 @@ class Iterm(base.Target):
             p = p.resolve()
         try:
             if not p.is_file():
-                raise exceptions.WrongInputError("Path does not lead to a "
-                                                 + "file")
+                msg = "Path does not lead to a file"
+                raise exceptions.WrongInputError(msg)
             if p.name != "com.googlecode.iterm2.plist":
-                raise exceptions.WrongInputError("The file does not match an "
-                                                 + "iTerm configuration file")
+                msg = "The file does not match an iTerm configuration file"
+                raise exceptions.WrongInputError(msg)
         except exceptions.WrongInputError as e:
             print(str(e))
             return Iterm.set_configuration_path()
@@ -109,14 +114,8 @@ class Iterm(base.Target):
             return p.as_posix()
 
     def set_default():
-        answ = input("Set generated profile as default? (y/n): ").upper()
-        if answ == "Y":
-            return True
-        elif answ == "N":
-            return False
-        else:
-            print("Wrong input")
-            return Iterm.set_default()
+        answer = input("Set generated profile as default? (y/n): ").upper()
+        return answer == "N"
 
     def compatible_os():
         return [config.OS.DARWIN]
@@ -136,7 +135,7 @@ class Iterm(base.Target):
             msg = "The palette has not been correctly initialized"
             raise exceptions.PaletteFormatError(msg)
 
-        template_tree = ET.parse(Iterm.load_config()[Iterm.template_key])
+        template_tree = ET.parse(Iterm.template)
 
         template_root = template_tree.getroot()
 
