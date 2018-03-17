@@ -23,6 +23,7 @@ class Vim(base.Target):
     exclusive_groups = [
              ["Comment"],
              ["Search"],
+             ["String"],
             ]
 
     groups = [
@@ -30,7 +31,6 @@ class Vim(base.Target):
               ["Character"],
               ["Keyword"],
               ["Number", "Float"],
-              ["String"],
               ["Conditional", "Repeat"],
               ["Include"],
               ["Macro"],
@@ -144,15 +144,15 @@ let g:colors_name = "%s"''' % config.app_name()
         Vim.__write_entry(f, "Visual", fg, bg)
 
     @staticmethod
-    def __print_body(vim_colors, f):
+    def __print_body(color_manager, f):
         for i, G in enumerate(Vim.exclusive_groups):
-            color = vim_colors.get_next_color()
-            vim_colors.remove_last()
+            color = color_manager.get_next_color()
+            color_manager.remove_last()
             for g in G:
                 Vim.__write_entry(f, g, color)
 
         for i, G in enumerate(Vim.groups):
-            color = vim_colors.get_next_color()
+            color = color_manager.get_next_color()
             for g in G:
                 Vim.__write_entry(f, g, color)
 
@@ -169,7 +169,7 @@ class VimColorManager:
 
         hsl_colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
         self.colors = self.__label_colors(hsl_colors)
-        self.index = 0
+        self.current = 0
         self.size = len(rgb_colors)
         self.removed = []
 
@@ -188,7 +188,7 @@ class VimColorManager:
         return -1
 
     def remove_last(self):
-        self.removed.append(self.index)
+        self.removed.append(self.current)
 
     def get_next_color(self):
         """
@@ -197,12 +197,12 @@ class VimColorManager:
         values have been returned, it retrives the seconds and so on.
         Once all the colors will been used, it repeates the pattern.
         """
-        while self.index in self.removed:
-            self.index = (self.index + 1) % self.size
+        while self.current in self.removed:
+            self.current = (self.current + 1) % self.size
 
-        label = self.index % len(self.colors)
+        label = self.current % len(self.colors)
         while len(self.colors[label]) == 0:
             label = (label + 1) % len(self.colors)
-        i = (self.index // len(self.colors)) % len(self.colors[label])
-        self.index = (self.index + 1) % self.size
+        i = (self.current // len(self.colors)) % len(self.colors[label])
+        self.current = (self.current + 1) % self.size
         return helpers.hsl_to_rgb(self.colors[label][i])

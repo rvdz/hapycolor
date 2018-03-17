@@ -9,7 +9,10 @@ import numpy as np
 class LumFilter(base.Filter):
     # Set up grid
     dark_interp = None
+    dark_max = None
+
     bright_interp = None
+    bright_min = None
 
     def interpolate_hyperplans(json_file, filter_type):
         """
@@ -27,10 +30,17 @@ class LumFilter(base.Filter):
             for c in data[s][filter_type]:
                 hsl_points.append(helpers.rgb_to_hsl(tuple(c)))
 
+        if filter_type == "bright":
+            LumFilter.bright_min = min(hsl_points, key=lambda c: c[2])[2]
+        elif filter_type == "dark":
+            LumFilter.dark_max = max(hsl_points, key=lambda c: c[2])[2]
+
+        hues_step = 22.5
+        hues_divisions = 16
         # Adding outer and inner circles for better results
-        for h in [22.5*i for i in range(16)]:
+        for h in [hues_step * i for i in range(hues_divisions)]:
             # When the json_file was encoded, some precision has been lost for
-            # the hues, this is why we have to ceil the hues
+            # the hues, this is why we have to ceil or floor the hues
             outer_lum = max(filter(lambda c: c[0] == math.ceil(h)
                                    or c[0] == math.floor(h), hsl_points),
                             key=lambda c: c[1])[2]
@@ -93,16 +103,25 @@ class LumFilter(base.Filter):
         #                                        + "match polar coordinates")
         return r * np.cos(np.radians(theta)), r * np.sin(np.radians(theta)), z
 
-    @staticmethod
-    def apply(palette):
+    def initialization():
+        """
+        Initializes the interpolation functions and the max/min values of
+        the dark/bright surfaces
+        """
+        from hapycolor.config import Filter, hyperplan_file
         LumFilter.dark_interp = LumFilter.interpolate_hyperplans(
-                config.hyperplan_file(config.Filter.DARK), "dark")
+                hyperplan_file(Filter.DARK), "dark")
 
         LumFilter.bright_interp = LumFilter.interpolate_hyperplans(
-                config.hyperplan_file(config.Filter.BRIGHT), "bright")
+                hyperplan_file(Filter.BRIGHT), "bright")
 
         LumFilter.saturation_interp = LumFilter.gen_sat_interpolation(
-                config.hyperplan_file(config.Filter.SATURATION))
+                hyperplan_file(Filter.SATURATION))
+
+
+    @staticmethod
+    def apply(palette):
+        LumFilter.initialization()
 
         # Set background
         hsl_bg = helpers.rgb_to_hsl(palette.background)
@@ -139,9 +158,9 @@ class LumFilter(base.Filter):
         x, y, z = LumFilter.polar_to_cartesian(hsl_color)
 
         if kind == "brightness":
-            return z > LumFilter.bright_interp(x, y)
+            return z > LumFilter.bright_min or z > LumFilter.bright_interp(x, y)
         elif kind == "darkness":
-            return z < LumFilter.dark_interp(x, y)
+            return z < LumFilter.dark_max or z < LumFilter.dark_interp(x, y)
         elif kind == "saturation":
             return not LumFilter.is_enough_saturated(rgb_color)
         else:
