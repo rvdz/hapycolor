@@ -91,7 +91,7 @@ class Yabar(base.Target):
         hsl_colors = list(map(lambda x: helpers.rgb_to_hsl(x),
                               palette._colors))
 
-        with open(ya_conf, 'r') as f, open(hapyconf, 'a') as hapy:
+        with open(ya_conf, 'r') as f, open(hapyconf, 'w') as hapy:
             body = f.read()
 
             # TOKEN BACKGROUND
