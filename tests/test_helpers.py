@@ -4,6 +4,16 @@ import unittest
 
 
 class TestHelpers(unittest.TestCase):
+    def test_is_hex_valid(self):
+        colors = ["0x123456", "0X234567", "0x12afDC"]
+        for c in colors:
+            self.assertTrue(helpers.is_hex(c))
+
+    def test_is_hex_invalid(self):
+        colors = ["asdf", "", "123456", "abcdef", "0x12345", "0x12345G"]
+        for c in colors:
+            self.assertFalse(helpers.is_hex(c))
+
     def test_hsl_to_rgb_1(self):
         colors = []
         colors.append((0, 0, 0))
