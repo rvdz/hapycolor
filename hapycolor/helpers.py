@@ -8,6 +8,10 @@ import pathlib
 """ Utilitary methods to convert color types  """
 
 
+def is_hex(color):
+    return re.match(r"0[xX][0-9a-fA-F]{6}", color) is not None
+
+
 def can_be_hsl(color):
     if color.__class__ != tuple or len(color) != 3:
         return False

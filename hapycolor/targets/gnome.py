@@ -4,11 +4,12 @@ from hapycolor.helpers import rgb_to_hex
 from hapycolor import palette as pltte
 from . import base
 
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 
 
 class Gnome(base.Target):
-
 
     """
         Creates a Gnome-Terminal theme
@@ -24,15 +25,17 @@ class Gnome(base.Target):
             Set the path for themes
         """
         default_path = '/org/gnome/terminal/legacy/profiles:'
-        p = helpers.input_path("Path to gnome-terminal's dconf profiles\n(Keep empty to use default path '{}'): ".format(default_path))
+        p = helpers.input_path("Path to gnome-terminal's dconf profiles\n\
+                               (Keep empty to use default path '{}'): "
+                               .format(default_path))
         if str(p) == '.':
-            Gnome.save_config({Gnome.configuration_key : default_path})
+            Gnome.save_config({Gnome.configuration_key: default_path})
             return
 
         if str(p)[-1] != ':':
             raise exceptions.WrongInputError("Must end with ':'")
 
-        Gnome.save_config({Gnome.configuration_key : str(p)})
+        Gnome.save_config({Gnome.configuration_key: str(p)})
 
     def is_config_initialized():
         try:
@@ -77,7 +80,10 @@ class Gnome(base.Target):
                 f.write('%s\n' % c)
             f.close()
 
-        process = subprocess.Popen(['bash',  './hapycolor/targets/export_gnome.sh', name, tmp_file, saved_profiles_path], stdout=subprocess.PIPE, bufsize=1)
+        process = subprocess.Popen(['bash',
+                                    './hapycolor/targets/export_gnome.sh',
+                                    name, tmp_file, saved_profiles_path],
+                                   stdout=subprocess.PIPE, bufsize=1)
         with process.stdout:
             for line in iter(process.stdout.readline, b''):
                 print(line, )

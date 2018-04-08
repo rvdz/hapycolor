@@ -34,14 +34,15 @@ class Wallpaper(base.Target):
         try:
             subprocess.call(['feh', '--bg-scale', image_path])
             return
-        except:
+        except Exception:
             pass
         try:
-            subprocess.call(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', "file:///" + image_path])
-        except:
+            subprocess.call(['gsettings', 'set',
+                             'org.gnome.desktop.background', 'picture-uri',
+                             "file:///" + image_path])
+        except Exception:
             msg = '\nUnable to set the wallpaper\n'
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
-
 
     def __export_darwin(image_path):
         value = Wallpaper.load_config()[Wallpaper.configuration_darwin]
@@ -51,5 +52,6 @@ class Wallpaper(base.Target):
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
         full_path = pathlib.Path(image_path).resolve().as_posix()
-        subprocess.call(["sqlite3", db_file, "update data set value = '%s'" % full_path])
+        subprocess.call(["sqlite3", db_file, "update data set value = '{}'"
+                         .format(full_path)])
         subprocess.call(["killall", "Dock"])

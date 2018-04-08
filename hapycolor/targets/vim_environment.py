@@ -15,9 +15,9 @@ class VimEnvironments:
             return False
 
     def bundle_plugins_path():
-        common_paths = [pathlib.Path(p) for p in ["~/.vim/bundle",
-                                                  "~/.vim/pack/bundle/start",
-                                                  "~/.vim_runtime/sources_non_forked"]]
+        common_paths = ["~/.vim/bundle", "~/.vim/pack/bundle/start",
+                        "~/.vim_runtime/sources_non_forked"]
+        common_paths = [pathlib.Path(p) for p in common_paths]
         for p in common_paths:
             if p.expanduser().exists():
                 return p.expanduser()

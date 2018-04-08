@@ -84,7 +84,8 @@ class Vim(base.Target):
         p = p / "hapycolor" / "colors"
         if not p.exists():
             p.mkdir(parents=True)
-        Vim.save_config({Vim.configuration_key: (p / "hapycolor.vim").as_posix()})
+        entry = {Vim.configuration_key: (p / "hapycolor.vim").as_posix()}
+        Vim.save_config(entry)
 
     def custom_path():
         p = helpers.input_path("Path to vim's custom plugins directory: ")

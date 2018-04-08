@@ -14,6 +14,7 @@ import uuid
 import re
 import xml.etree.ElementTree as ET
 
+
 class Iterm(base.Target):
 
     @contextlib.contextmanager
@@ -30,27 +31,28 @@ class Iterm(base.Target):
                 setattr(Iterm, k, key_values[k])
 
     Tag = Enumeration({
-                       "DICT"   : "dict",
-                       "REAL"   : "real",
-                       "KEY"    : "key",
-                       "STRING" : "string"
-                      })
+        "DICT"   : "dict",
+        "REAL"   : "real",
+        "KEY"    : "key",
+        "STRING" : "string",
+        })
 
     Key = Enumeration({
-                       "DEFAULT"           : "Default Bookmark Guid",
-                       "NEW_BOOKMARKS"     : "New Bookmarks",
-                       "GUID"              : "Guid",
-                       "NAME"              : "Name",
-                       "TRANSPARENCY"      : "Transparency",
-                       "BACKGROUND_COLOR"  : "Background Color",
-                       "FOREGROUND_COLOR"  : "Foreground Color",
-                       "CURSOR_TEXT_COLOR" : "Cursor Text Color",
-                       "CURSOR_COLOR"      : "Cursor Color"
-                      })
+        "DEFAULT"           : "Default Bookmark Guid",
+        "NEW_BOOKMARKS"     : "New Bookmarks",
+        "GUID"              : "Guid",
+        "NAME"              : "Name",
+        "TRANSPARENCY"      : "Transparency",
+        "BACKGROUND_COLOR"  : "Background Color",
+        "FOREGROUND_COLOR"  : "Foreground Color",
+        "CURSOR_TEXT_COLOR" : "Cursor Text Color",
+        "CURSOR_COLOR"      : "Cursor Color"
+        })
 
     preferences_key = "iterm_preferences"
     default_key = "default"
     template_key = "iterm_template"
+
     def is_config_initialized():
         return Iterm.preferences_key in Iterm.load_config()
 
@@ -87,7 +89,7 @@ class Iterm(base.Target):
         default_str = "~/Library/Preferences/com.googlecode.iterm2.plist"
         default = pathlib.Path(default_str).expanduser()
         p = helpers.input_path("Path to iTerm configuration file (" +
-                              default.as_posix() + "): ")
+                               default.as_posix() + "): ")
 
         # If default is selected:
         if p.as_posix() == ".":
@@ -97,11 +99,11 @@ class Iterm(base.Target):
             p = p.resolve()
         try:
             if not p.is_file():
-                raise exceptions.WrongInputError("Path does not lead to a "
-                                                 + "file")
+                raise exceptions.WrongInputError("Path does not lead to a " +
+                                                 "file")
             if p.name != "com.googlecode.iterm2.plist":
-                raise exceptions.WrongInputError("The file does not match an "
-                                                 + "iTerm configuration file")
+                raise exceptions.WrongInputError("The file does not match an" +
+                                                 " iTerm configuration file")
         except exceptions.WrongInputError as e:
             print(str(e))
             return Iterm.set_configuration_path()
@@ -357,7 +359,8 @@ class TermColorManager():
                     # If the label is empty, pick another one
                     while not self.colors[label]:
                         label = random.choice(list(self.colors))
-                    return helpers.hsl_to_rgb(random.choice(self.colors[label]))
+                    hsl_color = random.choice(self.colors[label])
+                    return helpers.hsl_to_rgb(hsl_color)
 
                 if max(tc.value[1]) == index:
                     # Return the brightest color of the label

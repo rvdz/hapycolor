@@ -71,7 +71,8 @@ class Lightline(base.Target):
             Lightline.save_config({Lightline.theme_key: str(theme.value)})
         elif entry == 2:
             colorscheme_path = Lightline.select_colorscheme_path()
-            Lightline.save_config({Lightline.colorscheme_key: colorscheme_path})
+            entry = {Lightline.colorscheme_key: colorscheme_path}
+            Lightline.save_config(entry)
 
     def select_colorscheme_path():
         p = vim_environment.VimEnvironments.find_plugin(Lightline.plugin_name)

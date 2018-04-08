@@ -4,11 +4,12 @@ from hapycolor import targets
 from hapycolor import palette as pltte
 from . import eight_bit_colors
 from . import base
-import random, os, re
+import random
+import os
+import re
 
 
 class Yabar(base.Target):
-
 
     """
         Replace tokens by their defined color in yabar conf file
@@ -42,7 +43,6 @@ class Yabar(base.Target):
     configuration_key = "yabar_conf"
     configuration_hue_key = "yabar_default_hue"
 
-
     def is_config_initialized():
 
         try:
@@ -59,14 +59,14 @@ class Yabar(base.Target):
         if not p.is_absolute():
             p = p.resolve()
 
-        Yabar.save_config({Yabar.configuration_key : p.as_posix()})
+        Yabar.save_config({Yabar.configuration_key: p.as_posix()})
 
         p = input("Default hue for defined colors: ")
 
         try:
             if not 0 <= int(p) <= 360:
                 raise exceptions.WrongInputError("Must be between 0 and 360")
-        except:
+        except Exception:
             raise exceptions.WrongInputError("Must be an int")
 
         Yabar.save_config({Yabar.configuration_hue_key: p})

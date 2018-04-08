@@ -26,7 +26,9 @@ def create_config():
 
 
 def get_config():
-    return pathlib.Path(LOCAL_DIR / ("." + LOCAL_CONFIG)).expanduser().as_posix()
+    return pathlib.Path(LOCAL_DIR / ("." + LOCAL_CONFIG)) \
+            .expanduser() \
+            .as_posix()
 
 
 def get_default_config():
