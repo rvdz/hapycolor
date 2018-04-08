@@ -123,4 +123,3 @@ class TestVim(unittest.TestCase):
         """ Assert that 'save_vim' fails when a file is provided """
         with self.assertRaises(exceptions.WrongInputError):
             Vim.initialize_config()
-

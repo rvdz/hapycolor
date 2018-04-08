@@ -23,7 +23,7 @@ name.
     in the module and retrieving the one that implements :class:`base.Target`.
 """
 
-from . import vim, iterm, wallpaper, lightline, gnome, yabar
+from . import vim, iterm, wallpaper, lightline, gnome, yabar, i3
 from . import base
 import platform
 import enum

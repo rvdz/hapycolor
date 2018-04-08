@@ -57,7 +57,8 @@ class TestTarget(unittest.TestCase):
             `targets.__all__`, defined in this test.
         """
         import inspect
-        targets.__all__ = ['vim', 'lightline', 'iterm', 'wallpaper', 'gnome']
+        targets.__all__ = ['vim', 'lightline', 'iterm', 'wallpaper', 'gnome',
+                           'i3']
         target_modules = inspect.getmembers(targets)[1][1]
         for m in target_modules:
             try:

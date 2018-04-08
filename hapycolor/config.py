@@ -4,6 +4,7 @@ import shutil
 from . import exceptions
 
 
+
 ROOT_DIR = pathlib.Path(__file__).parent
 CONFIG = "hapycolor.config"
 
@@ -37,10 +38,6 @@ class ConfigurationManager:
     This class is meant to be inherited by a class that interacts with
     hapycolor's configuration file. It provides the basic methods to read
     and write in it.
-
-    .. todo::
-        We should change the name of this class, since it can be
-        confused with :class:`ConfigurationManager`
     """
 
     def load(section):
