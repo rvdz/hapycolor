@@ -115,13 +115,13 @@ class Lightline(base.Target):
 
             # Defines input palette's variables
             colors = Lightline.get_colors(palette)
-            f.write(Lightline.set_variable("foreground", palette.foreground))
+            f.write(Lightline.replace_line("foreground", palette.foreground))
             f.write("\n")
-            f.write(Lightline.set_variable("background", palette.background))
+            f.write(Lightline.replace_line("background", palette.background))
             f.write("\n")
 
             for label in colors:
-                f.write(Lightline.set_variable(label, colors[label]) + "\n")
+                f.write(Lightline.replace_line(label, colors[label]) + "\n")
             f.write("\n")
 
             body_path = Lightline.load_config()[Lightline.theme_key]
@@ -160,7 +160,7 @@ class Lightline(base.Target):
             colors[e.name.lower()] = lcm.get(e)
         return colors
 
-    def set_variable(label, color):
+    def replace_line(label, color):
         return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', "\
             + str(eight_bit_colors.rgb2short(color)) + "]"
 
