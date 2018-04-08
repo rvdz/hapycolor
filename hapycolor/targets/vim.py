@@ -2,7 +2,7 @@ from hapycolor import targets
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
-from hapycolor.targets.vim_helpers import VimHelpers
+from hapycolor.targets.vim_environment import VimEnvironments
 from . import eight_bit_colors
 from . import base
 
@@ -70,14 +70,14 @@ class Vim(base.Target):
         Creates the path where the colorscheme will be generated, and stores it
         in the project's configuration file.
         """
-        if not VimHelpers.is_vim_installed():
+        if not VimEnvironments.is_vim_installed():
             print("Vim is not installed, this target will be disabled. Once"
                   + "  you install vim, ")
             return
 
         p = None
         try:
-            p = VimHelpers.bundle_plugins_path()
+            p = VimEnvironments.bundle_plugins_path()
         except exceptions.NoCommonPathFound:
             p = Vim.custom_path()
 

@@ -2,7 +2,7 @@ import enum
 import datetime
 from . import base
 from . import eight_bit_colors
-from . import vim_helpers
+from . import vim_environment
 from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor import helpers
@@ -74,9 +74,9 @@ class Lightline(base.Target):
             Lightline.save_config({Lightline.colorscheme_key: colorscheme_path})
 
     def select_colorscheme_path():
-        p = vim_helpers.VimHelpers.find_plugin(Lightline.plugin_name)
-        file_path = (p / "autoload/lightline/colorscheme/hapycolor.vim")
-        return file_path.expanduser().as_posix()
+        p = vim_environment.VimEnvironments.find_plugin(Lightline.plugin_name)
+        file_path = p + "/autoload/lightline/colorscheme/hapycolor.vim"
+        return file_path
 
     def select_theme():
         try:
