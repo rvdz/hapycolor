@@ -1,6 +1,6 @@
-from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
+from hapycolor import targets
 from hapycolor import palette as pltte
 from . import eight_bit_colors
 from . import base
@@ -52,7 +52,7 @@ class Yabar(base.Target):
 
     def initialize_config():
 
-        p = config.input_path("Path to yabar's custom config file: ")
+        p = helpers.input_path("Path to yabar's custom config file: ")
 
         if not p.is_file():
             raise exceptions.WrongInputError("Must be a file")
@@ -73,7 +73,7 @@ class Yabar(base.Target):
 
     def compatible_os():
 
-        return [config.OS.LINUX]
+        return [targets.OS.LINUX]
 
     def export(palette, image_path):
 

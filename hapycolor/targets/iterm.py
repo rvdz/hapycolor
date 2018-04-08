@@ -1,5 +1,5 @@
-from hapycolor import config
 from hapycolor import helpers
+from hapycolor import targets
 
 from hapycolor import exceptions
 from hapycolor import palette as pltte
@@ -86,7 +86,7 @@ class Iterm(base.Target):
     def set_configuration_path():
         default_str = "~/Library/Preferences/com.googlecode.iterm2.plist"
         default = pathlib.Path(default_str).expanduser()
-        p = config.input_path("Path to iTerm configuration file (" +
+        p = helpers.input_path("Path to iTerm configuration file (" +
                               default.as_posix() + "): ")
 
         # If default is selected:
@@ -119,7 +119,7 @@ class Iterm(base.Target):
             return Iterm.set_default()
 
     def compatible_os():
-        return [config.OS.DARWIN]
+        return [targets.OS.DARWIN]
 
     def export(palette, image_path):
         """

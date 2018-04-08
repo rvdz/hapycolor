@@ -4,6 +4,7 @@ from hapycolor import palette
 from hapycolor.targets import vim_helpers
 from hapycolor.targets.vim import Vim, VimColorManager
 from tests.helpers import generate_palette, configurationtesting
+import pathlib
 from unittest import mock
 import contextlib
 import unittest
@@ -113,3 +114,13 @@ class TestVim(unittest.TestCase):
         for i in range(len(colors) * 2):
             sorted_colors.append(vcm.get_next_color())
         self.assertEqual(sorted_colors, expected_sorted_colors)
+
+    @mock.patch('hapycolor.helpers.input_path',
+           return_value=pathlib.Path("./README.md").expanduser())
+    @mock.patch('hapycolor.targets.vim_helpers.VimHelpers.bundle_plugins_path',
+           side_effect=exceptions.NoCommonPathFound(""))
+    def test_vim_file(self, mock_input, mock_bundle_path):
+        """ Assert that 'save_vim' fails when a file is provided """
+        with self.assertRaises(exceptions.WrongInputError):
+            Vim.initialize_config()
+

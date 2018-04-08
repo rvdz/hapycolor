@@ -1,7 +1,7 @@
 import subprocess
 import pathlib
 import platform
-from hapycolor import config
+from hapycolor import targets
 from hapycolor import exceptions
 from . import base
 
@@ -15,7 +15,7 @@ class Wallpaper(base.Target):
         return True
 
     def compatible_os():
-        return [config.OS.DARWIN, config.OS.LINUX]
+        return [targets.OS.DARWIN, targets.OS.LINUX]
 
     configuration_darwin = "wallpaper_macos"
 
@@ -24,10 +24,10 @@ class Wallpaper(base.Target):
 
         :arg img: the image's path
         """
-        os = config.os()
-        if os == config.OS.DARWIN:
+        os = targets.os()
+        if os == targets.OS.DARWIN:
             Wallpaper.__export_darwin(image_path)
-        elif os == config.OS.LINUX:
+        elif os == targets.OS.LINUX:
             Wallpaper.__export_linux(image_path)
 
     def __export_linux(image_path):

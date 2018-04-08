@@ -1,10 +1,30 @@
 from . import base
 import warnings
+import enum
 from hapycolor import config, exceptions, helpers
 from scipy import interpolate
 import math
 import numpy as np
 
+
+class Filter(enum.Enum):
+    BRIGHT = 1
+    DARK = 2
+    SATURATION = 3
+
+def hyperplan_file(filter_type):
+    configuration = config.ConfigurationManager.load("hyperplan")
+    path = config.ROOT_DIR
+    if filter_type == Filter.DARK:
+        path /= configuration["dark"]
+    elif filter_type == Filter.BRIGHT:
+        path /= configuration["bright"]
+    elif filter_type == Filter.SATURATION:
+        path /= configuration["saturation"]
+    else:
+        msg = "Unknown filter type"
+        raise exceptions.UnknownLuminosityFilterTypeError(msg)
+    return path.as_posix()
 
 class LumFilter(base.Filter):
     # Set up grid
@@ -108,7 +128,6 @@ class LumFilter(base.Filter):
         Initializes the interpolation functions and the max/min values of
         the dark/bright surfaces
         """
-        from hapycolor.config import Filter, hyperplan_file
         LumFilter.dark_interp = LumFilter.interpolate_hyperplans(
                 hyperplan_file(Filter.DARK), "dark")
 

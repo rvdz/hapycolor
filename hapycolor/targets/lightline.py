@@ -3,7 +3,7 @@ import datetime
 from . import base
 from . import eight_bit_colors
 from . import vim_helpers
-from hapycolor import config
+from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor import helpers
 
@@ -101,7 +101,7 @@ class Lightline(base.Target):
             return False
 
     def compatible_os():
-        return [config.OS.DARWIN, config.OS.LINUX]
+        return [targets.OS.DARWIN, targets.OS.LINUX]
 
     def export(palette, image_path):
         """

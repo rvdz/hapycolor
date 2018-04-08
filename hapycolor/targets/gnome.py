@@ -1,5 +1,5 @@
-from hapycolor import config
 from hapycolor import exceptions
+from hapycolor import targets
 from hapycolor.helpers import rgb_to_hex
 from hapycolor import palette as pltte
 from . import base
@@ -24,7 +24,7 @@ class Gnome(base.Target):
             Set the path for themes
         """
         default_path = '/org/gnome/terminal/legacy/profiles:'
-        p = config.input_path("Path to gnome-terminal's dconf profiles\n(Keep empty to use default path '{}'): ".format(default_path))
+        p = helpers.input_path("Path to gnome-terminal's dconf profiles\n(Keep empty to use default path '{}'): ".format(default_path))
         if str(p) == '.':
             Gnome.save_config({Gnome.configuration_key : default_path})
             return
@@ -42,7 +42,7 @@ class Gnome(base.Target):
         return is_init
 
     def compatible_os():
-        return [config.OS.LINUX]
+        return [targets.OS.LINUX]
 
     def export(palette, image_path):
         """
