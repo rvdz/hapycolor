@@ -7,7 +7,14 @@ let s:grey0 = [ '#808080', 244 ]
 let s:grey1 = [ '#969696', 247 ]
 let s:grey2 = [ '#a8a8a8', 248 ]
 let s:grey3 = [ '#d0d0d0', 252 ]
-let s:cyan = s:blue
+
+let s:yellow = [ '#d3bb06', 204 ]
+let s:red = [ '#d35506', 190 ]
+
+let s:normal = [ $NORMAL ]
+let s:insert = [ $INSERT ]
+let s:visual = [ $VISUAL ]
+let s:replace = [ $REPLACE ]
 
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 let s:p.normal.left = [ [ s:grey02, s:blue ], [ s:grey3, s:grey01 ] ]
