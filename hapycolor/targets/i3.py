@@ -5,7 +5,8 @@ from hapycolor import config
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import targets
-from hapycolor.targets.yabar import Yabar
+from hapycolor.targets import yabar
+from hapycolor.targets import wallpaper
 import contextlib
 from hapycolor import targets
 import contextlib
@@ -20,8 +21,8 @@ class I3(base.Target, config.ConfigurationEditor):
     file
     """
 
-    border_variable = "$focused_border_color"
-    split_variable = "$focused_split_color"
+    border_variable = "$border_color"
+    split_variable = "$split_color"
     configuration_key = "config"
 
     def get_config_file():
@@ -58,8 +59,9 @@ class I3(base.Target, config.ConfigurationEditor):
             p = helpers.input_path("Path to i3 configuration file: ")
             if not p.is_file():
                 raise exceptions.WrongInputError("Must be a file")
-            if not p.is_absolute():
-                p = p.resolve()
+            # Seems not useful
+            # if not p.is_absolute():
+            #     p = p.resolve()
 
         I3.save_config({I3.configuration_key: p.as_posix()})
 
@@ -67,16 +69,28 @@ class I3(base.Target, config.ConfigurationEditor):
         return [targets.OS.LINUX]
 
     def export(palette, image_path):
+        """
+        .. todo::
+            Change :func:`Target.is_enabled` so that it returns False
+            when not present in the configuration file instead of letting
+            an exception being raised.
+        """
         border_color = palette.colors[0]
-        split_color = palette.colors[0]
+        split_color = palette.colors[1]
         I3.declare_border_colors(border_color, split_color)
         I3.assign_border_colors()
 
-        if targets.Wallpaper.is_enabled():
-            I3.set_wallpaper(image_path)
+        try:
+            if targets.wallpaper.Wallpaper.is_enabled():
+                I3.set_wallpaper(image_path)
+        except exceptions.InvalidConfigKeyError:
+            pass
 
-        if target.Yabar.is_enabled():
-            I3.set_yabar()
+        try:
+            if targets.yabar.Yabar.is_enabled():
+                I3.set_yabar()
+        except exceptions.InvalidConfigKeyError:
+            pass
 
     def declare_border_colors(border_color, split_color):
         """
@@ -87,19 +101,19 @@ class I3(base.Target, config.ConfigurationEditor):
             set $focused_split_color = <hex_color>
         """
         for c in [border_color, split_color]:
-            if not helpers.is_hex(c):
-                msg = "Color should be formatted as a hex color "
-                msg += "'0[xX][0-9a-fA-F]{6}'. Instead, {} was provided"
-                msg += str(c)
+            if not helpers.can_be_rgb(c):
+                msg = "Color should be formatted as an RGB color. "
+                msg += "Instead, {} was provided".format(c)
                 raise exceptions.ColorFormatError(msg)
 
-        I3.replace_line(I3.border_variable,
-                        lambda m: "set {} = {}".format(I3.border_variable,
-                                                       border_color))
+        bc = helpers.rgb_to_hex(border_color)
+        sc = helpers.rgb_to_hex(split_color)
 
-        I3.replace_line(I3.split_variable,
-                        lambda m: "set {} = {}".format(I3.split_variable,
-                                                       split_color))
+        I3.replace_line(".*{}.*".format(I3.border_variable),
+                        lambda m: "set {} {}\n".format(I3.border_variable, bc))
+
+        I3.replace_line(".*{}.*".format(I3.split_variable),
+                        lambda m: "set {} {}\n".format(I3.split_variable, sc))
 
     def assign_border_colors():
         """
@@ -115,7 +129,7 @@ class I3(base.Target, config.ConfigurationEditor):
 
         .. note::
             If `client.focused` wasn't already defined the text color will be
-            set to black (0x000000), otherwise, the former color will be used.
+            set to black (#000000), otherwise, the former color will be used.
         """
         pattern = "^client.focused\t.*\t.*\t(.*)\t.*"
         base = "client.focused\t{}\t{}\t{}\t{}" \
@@ -123,8 +137,8 @@ class I3(base.Target, config.ConfigurationEditor):
                     "{}", I3.split_variable)
 
         def new_line(match=None):
-            c = match.group(1) if match else "0x000000"
-            return base.format(c)
+            c = match.group(1) if match else "#000000"
+            return base.format(c) + '\n'
 
         I3.replace_line(pattern, new_line)
 
@@ -136,6 +150,6 @@ class I3(base.Target, config.ConfigurationEditor):
 
     def set_yabar():
         pattern = r".*yabar.*"
-        config_key = Yabar.configuration_key
-        command = "yabar -c {}".format(Yabar.load_config()[config_key])
+        config_key = yabar.Yabar.configuration_key
+        command = "yabar -c {}".format(yabar.Yabar.load_config()[config_key])
         I3.replace_line(pattern, lambda m: command)

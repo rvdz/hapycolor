@@ -53,7 +53,7 @@ class ConfigurationManager:
         config = configparser.ConfigParser()
         config.read(get_config())
         try:
-            return config[section]
+            return dict(config[section])
         except KeyError as e:
             msg = "Configuration entry not found"
             raise exceptions.InvalidConfigKeyError(msg, e)

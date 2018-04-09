@@ -73,14 +73,6 @@ class TestReducer(unittest.TestCase):
             reduced_colors.extend(Reducer.get_maximum_clique(g, threshold))
         self.assertEqual(set(expected_output), set(reduced_colors))
 
-    @unittest.skip("Still developing, might never be finished")
-    def test_cpp(self):
-        proc = sp.run("cd ./hapycolor/filters/reducer/ && make test",
-                      shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-        if proc.returncode != 0:
-            self.fail("C++ reducer tests failed, for more details, run: cd"
-                      + "  ./hapycolor/filters/reducer/ && make test")
-
     def test_find_subgraphs(self):
         """
         Asserts that the function
