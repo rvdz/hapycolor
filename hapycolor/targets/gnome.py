@@ -1,6 +1,7 @@
 from hapycolor import exceptions
 from hapycolor import targets
 from hapycolor.helpers import rgb_to_hex
+from hapycolor import helpers
 from hapycolor import palette as pltte
 from . import base
 

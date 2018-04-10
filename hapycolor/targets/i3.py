@@ -48,14 +48,14 @@ class I3(base.Target, config.ConfigurationEditor):
         location, and save the result in hapycolor's configuration file.
         """
         config_path = None
-        common_paths = [pathlib.Path(p) for p in
+        common_paths = [pathlib.Path(p).expanduser() for p in
                         ["~/.config/i3/config", "~/.i3/config"]]
 
         for p in common_paths:
             if p.is_file():
                 config_path = p
 
-        if not config_path:
+        if config_path is None:
             p = helpers.input_path("Path to i3 configuration file: ")
             if not p.is_file():
                 raise exceptions.WrongInputError("Must be a file")
@@ -63,7 +63,7 @@ class I3(base.Target, config.ConfigurationEditor):
             # if not p.is_absolute():
             #     p = p.resolve()
 
-        I3.save_config({I3.configuration_key: p.as_posix()})
+        I3.save_config({I3.configuration_key: config_path.as_posix()})
 
     def compatible_os():
         return [targets.OS.LINUX]
@@ -109,11 +109,13 @@ class I3(base.Target, config.ConfigurationEditor):
         bc = helpers.rgb_to_hex(border_color)
         sc = helpers.rgb_to_hex(split_color)
 
-        I3.replace_line(".*{}.*".format(I3.border_variable),
-                        lambda m: "set {} {}\n".format(I3.border_variable, bc))
+        pattern_border = ".*{}.*".format(re.escape(I3.border_variable))
+        I3.replace_line(pattern_border, lambda m: "set {}\t{}\n"
+                                            .format(I3.border_variable, bc))
 
-        I3.replace_line(".*{}.*".format(I3.split_variable),
-                        lambda m: "set {} {}\n".format(I3.split_variable, sc))
+        pattern_split = ".*{}.*".format(re.escape(I3.split_variable))
+        I3.replace_line(pattern_split, lambda m: "set {}\t{}\n"
+                                            .format(I3.split_variable, sc))
 
     def assign_border_colors():
         """
@@ -131,7 +133,7 @@ class I3(base.Target, config.ConfigurationEditor):
             If `client.focused` wasn't already defined the text color will be
             set to black (#000000), otherwise, the former color will be used.
         """
-        pattern = "^client.focused\t.*\t.*\t(.*)\t.*"
+        pattern = "^client.focused .*"
         base = "client.focused\t{}\t{}\t{}\t{}" \
             .format(I3.border_variable, I3.border_variable,
                     "{}", I3.split_variable)
@@ -151,5 +153,5 @@ class I3(base.Target, config.ConfigurationEditor):
     def set_yabar():
         pattern = r".*yabar.*"
         config_key = yabar.Yabar.configuration_key
-        command = "yabar -c {}".format(yabar.Yabar.load_config()[config_key])
+        command = "status_command yabar -c {}".format(yabar.Yabar.load_config()[config_key])
         I3.replace_line(pattern, lambda m: command)
