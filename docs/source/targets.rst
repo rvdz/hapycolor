@@ -138,6 +138,24 @@ a flattened [1]_ format, as the other themes, and can use the following undefine
 
 Those variables will then be defined when exporting a palette to the target.
 
+i3
+--
+The class :class:`hapycolor.targets.i3.I3` implements three features:
+
+- Sets the border and split colors. Currently it defines two variables,
+    `$split_color` and `$border_color` and sets the i3's variable
+    `client.focused`. This last variable asks for four colors: the border,
+    the background, the text and the split color, but currently it only
+    defines the border, background with `$border_color` and the split color
+    with, as you guessed, `$split_color`, leaving the text color unaltered.
+    There are other options regarding i3's colors: `client.focused_inactive`,
+    `client.unfocused`, `client.urgent` and `client.background`, but this
+    class does not supports them yet.
+- Inserts yabar's execution command into i3's configuration, if yabar is
+    enabled
+- Inserts `feh`'s command in order to set the wallpaper, if this target was
+    enabled
+
 How to add a target?
 --------------------
 In order to add a target, two steps are required:
