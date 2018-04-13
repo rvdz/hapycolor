@@ -77,8 +77,8 @@ class I3(base.Target, config.ConfigurationEditor):
         """
         border_color = palette.colors[0]
         split_color = palette.colors[1]
-        I3.declare_border_colors(border_color, split_color)
         I3.assign_border_colors()
+        I3.declare_border_colors(border_color, split_color)
 
         try:
             if targets.wallpaper.Wallpaper.is_enabled():
@@ -109,12 +109,12 @@ class I3(base.Target, config.ConfigurationEditor):
         bc = helpers.rgb_to_hex(border_color)
         sc = helpers.rgb_to_hex(split_color)
 
-        pattern_border = ".*{}.*".format(re.escape(I3.border_variable))
-        I3.replace_line(pattern_border, lambda m: "set {}\t{}\n"
+        pattern_border = "set *{}.*".format(re.escape(I3.border_variable))
+        I3.replace_line(pattern_border, lambda m: "set {}    {}"
                                             .format(I3.border_variable, bc))
 
-        pattern_split = ".*{}.*".format(re.escape(I3.split_variable))
-        I3.replace_line(pattern_split, lambda m: "set {}\t{}\n"
+        pattern_split = "set *{}.*".format(re.escape(I3.split_variable))
+        I3.replace_line(pattern_split, lambda m: "set {}    {}"
                                             .format(I3.split_variable, sc))
 
     def assign_border_colors():
@@ -133,14 +133,16 @@ class I3(base.Target, config.ConfigurationEditor):
             If `client.focused` wasn't already defined the text color will be
             set to black (#000000), otherwise, the former color will be used.
         """
-        pattern = "^client.focused .*"
-        base = "client.focused\t{}\t{}\t{}\t{}" \
+        pattern = "^client\.focused (.*)$"
+        base = "client.focused    {}     {}    {}    {}" \
             .format(I3.border_variable, I3.border_variable,
                     "{}", I3.split_variable)
 
         def new_line(match=None):
-            c = match.group(1) if match else "#000000"
-            return base.format(c) + '\n'
+            if match is not None:
+                text_color = [e for e in match.group(1).split(' ') if e != '']
+            c = text_color[2] if match else "#000000"
+            return base.format(c)
 
         I3.replace_line(pattern, new_line)
 
@@ -153,5 +155,6 @@ class I3(base.Target, config.ConfigurationEditor):
     def set_yabar():
         pattern = r".*yabar.*"
         config_key = yabar.Yabar.configuration_key
-        command = "status_command yabar -c {}".format(yabar.Yabar.load_config()[config_key])
+        config_file = pathlib.Path(yabar.Yabar.load_config()[config_key]).parent / "hapy.conf"
+        command = "status_command yabar -c {}".format(config_file.as_posix())
         I3.replace_line(pattern, lambda m: command)
