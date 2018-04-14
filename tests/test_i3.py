@@ -69,20 +69,20 @@ fourth line
         I3.declare_border_colors((250, 250, 250), (12, 0, 1))
         self._test_declare_border()
 
-    @test_context("set {} #00FF00".format(I3.split_variable) + "\nLast line")
+    @test_context("set {}    #00FF00".format(I3.split_variable) + "\nLast line")
     def test_declare_border_colors_redeclare_one(self):
         I3.declare_border_colors((250, 250, 250), (12, 0, 1))
         self._test_declare_border()
 
-    @test_context("set {} #FF00FF\nset {} #123456\nLastLine"
+    @test_context("set {}    #FF00FF\nset {}    #123456\nLastLine"
                   .format(I3.split_variable, I3.border_variable))
     def test_declare_border_colors_redeclare_both(self):
         I3.declare_border_colors((250, 250, 250), (12, 0, 1))
         self._test_declare_border()
 
     def _test_declare_border(self):
-        res1 = "set {} #fafafa".format(I3.border_variable, (250, 250, 250))
-        res2 = "set {} #0c0001".format(I3.split_variable, (12, 0, 1))
+        res1 = "set {}    #fafafa".format(I3.border_variable, (250, 250, 250))
+        res2 = "set {}    #0c0001".format(I3.split_variable, (12, 0, 1))
 
         match1 = 0
         match2 = 0
@@ -96,26 +96,26 @@ fourth line
     @test_context()
     def test_assign_border_colors_first_time(self):
         I3.assign_border_colors()
-        expected = "client.focused\t{}\t{}\t#000000\t{}" \
+        expected = "client.focused    {}    {}    #000000    {}" \
                 .format(I3.border_variable, I3.border_variable,
                         I3.split_variable)
         self._test_assign_border_colors(expected)
 
-    @test_context("client.focused\t#bbbbbb\t#cccccc\t#ababab\t#ffffff")
+    @test_context("\nclient.focused    #bbbbbb    #cccccc    #ababab    #ffffff")
     def test_assign_border_colors_second_time(self):
         I3.assign_border_colors()
-        not_expected = "client.focused\t#bbbbbb\t#cccccc\t#ababab\t#ffffff"
-        expected = "client.focused\t{}\t{}\t#ababab\t{}" \
+        not_expected = "client.focused    #bbbbbb    #cccccc    #ababab    #ffffff"
+        expected = "client.focused    {}    {}    #ababab    {}" \
                 .format(I3.border_variable, I3.border_variable,
                         I3.split_variable)
         self._test_assign_border_colors(expected, not_expected)
 
-    @test_context("\nclient.focused\t#bbbbbb\t#cccccc\t#bbbbbb\t#ffffff\n"
+    @test_context("\nclient.focused    #bbbbbb    #cccccc    #bbbbbb    #ffffff\n"
                   + "Last line")
     def test_assign_border_colors_second_time_not_last_line(self):
         I3.assign_border_colors()
-        not_expected = "client.focused\t#bbbbbb\t#cccccc\t#bbbbbb\t#ffffff"
-        expected = "client.focused\t{}\t{}\t#bbbbbb\t{}" \
+        not_expected = "client.focused    #bbbbbb    #cccccc    #bbbbbb    #ffffff"
+        expected = "client.focused    {}    {}    #bbbbbb    {}" \
                 .format(I3.border_variable, I3.border_variable,
                         I3.split_variable)
         self._test_assign_border_colors(expected, not_expected)
@@ -148,12 +148,12 @@ fourth line
                               .format(l))
         self.assertEqual(match, 1)
 
-    @test_context("exec yabar")
+    @test_context("status_command yabar")
     @mock.patch("hapycolor.targets.yabar.Yabar.load_config",
         return_value={targets.yabar.Yabar.configuration_key: "test.conf"})
     def test_set_yabar(self, mock_config):
         I3.set_yabar()
-        expected = "yabar -c test.conf"
+        expected = "status_command yabar -c hapy.conf"
         match = 0
         with open(TestI3.test_file, 'r') as f:
             for l in f.readlines():
@@ -170,8 +170,8 @@ fourth line
         I3.export(mm, "/path/to/image.png")
 
         with open(TestI3.test_file, 'r') as f:
-            expected_1 = "set \$border_color #646464\n"
-            expected_2 = "set \$split_color #c8c8c8\n"
+            expected_1 = "set \$border_color *#646464\n"
+            expected_2 = "set \$split_color *#c8c8c8\n"
             expected_3 = "client\.focused.*\$border_color.*\$border_color.*" \
                     "#000000.*\$split_color.*"
             expected = [expected_1, expected_2, expected_3]
