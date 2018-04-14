@@ -134,7 +134,7 @@ class I3(base.Target, config.ConfigurationEditor):
             set to black (#000000), otherwise, the former color will be used.
         """
         pattern = "^client\.focused (.*)$"
-        base = "client.focused    {}     {}    {}    {}" \
+        base = "client.focused    {}    {}    {}    {}" \
             .format(I3.border_variable, I3.border_variable,
                     "{}", I3.split_variable)
 
@@ -153,7 +153,7 @@ class I3(base.Target, config.ConfigurationEditor):
         I3.replace_line(pattern, lambda m: command)
 
     def set_yabar():
-        pattern = r".*yabar.*"
+        pattern = r".* status_command *yabar.*"
         config_key = yabar.Yabar.configuration_key
         config_file = pathlib.Path(yabar.Yabar.load_config()[config_key]).parent / "hapy.conf"
         command = "status_command yabar -c {}".format(config_file.as_posix())
