@@ -2,9 +2,9 @@ from hapycolor import targets
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
-from hapycolor.targets.vim_environment import VimEnvironments
-from . import eight_bit_colors
-from . import base
+from hapycolor.targets import eight_bit_colors
+from hapycolor.targets import base
+from hapycolor.targets.vim.environment import VimEnvironments
 
 
 class Vim(base.Target):

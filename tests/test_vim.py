@@ -1,8 +1,7 @@
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import palette
-from hapycolor.targets import vim_environment
-from hapycolor.targets.vim import Vim, VimColorManager
+from hapycolor.targets.vim import Vim, VimColorManager, environment
 from tests.helpers import generate_palette, configurationtesting
 import pathlib
 from unittest import mock
@@ -19,12 +18,12 @@ def vimtesting(fails=0):
     invalid_entry = "./tests/run_suite.py"
     entries = []
     try:
-        vim_environment.VimEnvironments.bundle_plugins_path()
+        environment.VimEnvironments.bundle_plugins_path()
     except exceptions.NoCommonPathFound:
         entries = [invalid_entry] * fails + [valid_entry]
 
     bundle_mock = pathlib.Path(valid_entry)
-    bundle_finder = 'hapycolor.targets.vim_environment.VimEnvironments.bundle_plugins_path'
+    bundle_finder = 'hapycolor.targets.vim.environment.VimEnvironments.bundle_plugins_path'
 
     with mock.patch('builtins.input', side_effect=entries):
         with mock.patch(bundle_finder, return_value=bundle_mock):
@@ -117,7 +116,7 @@ class TestVim(unittest.TestCase):
 
     @mock.patch('hapycolor.helpers.input_path',
            return_value=pathlib.Path("./README.md").expanduser())
-    @mock.patch('hapycolor.targets.vim_environment.VimEnvironments.bundle_plugins_path',
+    @mock.patch('hapycolor.targets.vim.environment.VimEnvironments.bundle_plugins_path',
            side_effect=exceptions.NoCommonPathFound(""))
     def test_vim_file(self, mock_input, mock_bundle_path):
         """ Assert that 'save_vim' fails when a file is provided """
