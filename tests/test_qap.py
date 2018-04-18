@@ -1,5 +1,5 @@
 import unittest
-from hapycolor.targets.qap import QAP, Node
+from hapycolor.targets.vim.qap import QAP, Node
 from hapycolor import helpers
 
 class TestQAP(unittest.TestCase):
