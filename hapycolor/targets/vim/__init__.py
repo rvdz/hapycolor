@@ -5,6 +5,7 @@ from hapycolor import palette as pltte
 from hapycolor.targets import eight_bit_colors
 from hapycolor.targets import base
 from hapycolor.targets.vim.environment import VimEnvironments
+from hapycolor.targets.vim.pam import PAM
 
 
 class Vim(base.Target):
@@ -20,41 +21,18 @@ class Vim(base.Target):
     .. todo:: Check if the option was introduced with Vim 7.4
 
     """
-    exclusive_groups = [
-             ["Comment"],
-             ["Search"],
-             ["String"],
-            ]
-
     groups = [
-              ["Boolean"],
-              ["Character"],
-              ["Keyword"],
-              ["Number", "Float"],
-              ["Conditional", "Repeat"],
-              ["Include"],
-              ["Macro"],
-              ["Todo"],
-              ["Constant"],
-              ["Define"],
-              ["Statement"],
-              ["Cursor"],
-              ["Delimiter"],
-              ["Directory"],
-              ["Structure"],
-              ["Type"],
-              ["Error", "ErrorMsg", "Exception"],
-              ["PreCondit"],
-              ["Function"],
-              ["MatchParen"],
-              ["Ignore"],
-              ["Identifier"],
-              ["Typedef"],
-              ["Label"],
-              ["Operator"],
-              ["LineNr"],
-              ["CursorLineNr"],
-              ["CursorColumn"],
+              ["Comment"],
+              ["Constant", "String", "Character", "Number", "Boolean", "Float"],
+              ["Identifier", "Function"],
+              ["Statement", "Conditional", "Repeat", "Label", "Operator",
+               "Keyword", "Exception"],
+              ["PreProc", "Include", "Define", "Macro", "PreCondit"],
+              ["Type", "StorageClass", "Structure", "Typedef"],
+              ["Special", "SpecialChar", "Tag", "Delimiter", "SpecialComment",
+               "Debug"],
+              ["Underlined"],
+              # ["Ignore"], ["Error"], ["Todo"],
              ]
 
     configuration_key = "colorscheme_vim"
@@ -103,11 +81,13 @@ class Vim(base.Target):
             msg = "The palette does not respect the appropriate structure"
             raise exceptions.PaletteFormatError(msg)
 
+        vcm = VimColorManager(palette.colors, len(Vim.groups))
+
         with open(Vim.load_config()[Vim.configuration_key], "w+") as f:
             Vim.__print_header(f)
             Vim.__print_base(palette.foreground, palette.background, f)
             Vim.__print_visual(palette.foreground, palette.background, f)
-            Vim.__print_body(VimColorManager(palette.colors), f)
+            Vim.__print_body(vcm, f)
 
     @staticmethod
     def __print_header(f):
@@ -146,64 +126,24 @@ let g:colors_name = "Hapycolor"'''
 
     @staticmethod
     def __print_body(color_manager, f):
-        for i, G in enumerate(Vim.exclusive_groups):
-            color = color_manager.get_next_color()
-            color_manager.remove_last()
-            for g in G:
-                Vim.__write_entry(f, g, color)
-
-        for i, G in enumerate(Vim.groups):
-            color = color_manager.get_next_color()
-            for g in G:
-                Vim.__write_entry(f, g, color)
+        for i, minor_groups in enumerate(Vim.groups):
+            colors = color_manager.cast(i, len(minor_groups))
+            for (group, color) in zip(minor_groups, colors):
+                Vim.__write_entry(f, group, color)
 
 
 class VimColorManager:
     """ Manages vim's color's distribution """
-    def __init__(self, rgb_colors):
+    def __init__(self, rgb_colors, number_groups):
         if rgb_colors.__class__ != list or len(rgb_colors) == 0 \
                 or not all([helpers.can_be_rgb(c) for c in rgb_colors]):
             msg = "The colors must be defined in the rgb base"
             raise exceptions.ColorFormatError(msg)
-        self.labels = [[15+30*i, 15+30*(i+1)] for i in range(12)]
-        self.labels.append([345, 15])       # Special case for red
 
-        hsl_colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
-        self.colors = self.__label_colors(hsl_colors)
-        self.current = 0
-        self.size = len(rgb_colors)
-        self.removed = []
+        dict_colors = PAM(rgb_colors, number_groups)()
+        self.colors = [dict_colors[cluster] for cluster in dict_colors]
 
-    def __label_colors(self, colors):
-        """ Sorts a list of hsl colors by labels """
-        labeled_colors = [[] for k in range(12)]
-        for col in colors:
-            id_label = self.__find_label(col)
-            labeled_colors[id_label].append(col)
-        return labeled_colors
-
-    def __find_label(self, hslcol):
-        for i, l in enumerate(self.labels):
-            if hslcol[0] >= l[0] and hslcol[0] < l[1]:
-                return i
-        return -1
-
-    def remove_last(self):
-        self.removed.append(self.current)
-
-    def get_next_color(self):
-        """
-        Considering a sequence of incrementing indexes, this function will
-        return the first color of each label. Once all the labels' first
-        values have been returned, it retrives the seconds and so on.
-        Once all the colors will been used, it repeates the pattern.
-        """
-        while self.current in self.removed:
-            self.current = (self.current + 1) % self.size
-
-        label = self.current % len(self.colors)
-        while len(self.colors[label]) == 0:
-            label = (label + 1) % len(self.colors)
-        i = (self.current // len(self.colors)) % len(self.colors[label])
-        self.current = (self.current + 1) % self.size
-        return helpers.hsl_to_rgb(self.colors[label][i])
+    def cast(self, group_id, group_length):
+        cluster_size = len(self.colors[group_id])
+        return [self.colors[group_id][i % cluster_size]
+                for i in range(group_length)]
