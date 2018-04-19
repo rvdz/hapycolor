@@ -8,16 +8,18 @@ class PAM:
     """
     Partition Around Medoids algorithm
     The goal of the algorithm is to minimize the average dissimilarity of
-    objects to their closest selected object
+    objects to their closest selected object.
+    A k-medoid algorithm was chosen instead of a regular k-means, since it is
+    often useful to have a color representing a cluster of colors that is also
+    contained in the picture.
     """
-    def __init__(self, palette, K):
-        if K > len(palette.colors):
+    def __init__(self, rgb_colors, K):
+        if K > len(rgb_colors):
             msg = "Impossible to classify the provided palette into {} " \
                     + "classes, since it only has {} colors."
             raise exceptions.PAMException(msg)
 
-        self.colors = [PAM.rgb_to_lab(c) for c in palette.colors]
-        PAM.distances = self._evaluate_distances()
+        self.colors = [PAM.rgb_to_lab(c) for c in rgb_colors]
         self.K = K
         self.selected = []
         self.unselected = self.colors[:]
@@ -25,11 +27,12 @@ class PAM:
     @staticmethod
     def rgb_to_lab(c):
         rgb = sRGBColor(c[0], c[1], c[2])
-        return convert_color(rgb2, LabColor)
+        return convert_color(rgb, LabColor)
 
     @staticmethod
-    def lab_to_rgb(c):
-        return convert_color(rgb2, sRGBColor)
+    def lab_to_rgb(lab_c):
+        c = convert_color(lab_c, sRGBColor)
+        return (round(c.rgb_r), round(c.rgb_g), round(c.rgb_b))
 
     def __call__(self):
         """
@@ -60,7 +63,15 @@ class PAM:
 
         # Initialize `selected` by adding to it an object for which the sum
         # of the distances to all other objects is minimal.
-        mean_distances = [np.array(dist).mean() for dist in PAM.distances]
+
+        distances = {}
+        for c_1 in self.colors:
+            distances[c_1] = []
+            for c_2 in self.colors:
+                distances[c_1].append(PAM.distance(c_1, c_2))
+
+        mean_distances = [np.array(distances[key]).mean()
+                          for key in distances]
         min_index = mean_distances.index(min(mean_distances))
         self.selected.append(self.colors[min_index])
         del self.unselected[min_index]
@@ -156,14 +167,4 @@ class PAM:
         :arg c2: a tuple representing a Lab color
         :see: `<https://en.wikipedia.org/wiki/Color_difference/>`_
         """
-        return delta_e_cie2000(lab1, lab2)
-
-    def _evaluate_distances(self):
-        distances = {}
-        for c_1 in self.colors:
-            for c_2 in self.colors:
-                if c_1 in distances:
-                    distances[c_1][c_2] = PAM.distance(c_1, c_2)
-                else:
-                    distances[c_1] = {c_2: PAM.distance(c_1, c_2)}
-        return distances
+        return delta_e_cie2000(c1, c2)

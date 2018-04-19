@@ -23,52 +23,47 @@ class TestPAM(unittest.TestCase):
 
     @pamcontext()
     def test_1_clusters(self):
-        palette = mock.Mock()
-        palette.colors = [1]
+        colors = [1]
         k = 1
         expected = {1: [1]}
 
-        res = PAM(palette, k)()
+        res = PAM(colors, k)()
         self.assertDictEqual(res, expected)
 
     @pamcontext()
     def test_2_clusters_2_colors(self):
-        palette = mock.Mock()
-        palette.colors = [1, 2]
+        colors = [1, 2]
         k = 2
         expected = {1: [1], 2: [2]}
 
-        res = PAM(palette, k)()
+        res = PAM(colors, k)()
         self.assertDictEqual(res, expected)
 
     @pamcontext()
     def test_2_clusters_10_colors(self):
-        palette = mock.Mock()
-        palette.colors = [1, 2, 3, 4, 5, 10, 11, 12, 13, 14]
+        colors = [1, 2, 3, 4, 5, 10, 11, 12, 13, 14]
         k = 2
         expected = {3: [1, 2, 3, 4, 5], 12: [10, 11, 12, 13, 14]}
 
-        res = PAM(palette, k)()
+        res = PAM(colors, k)()
         self.assertDictEqual(res, expected)
 
     @pamcontext()
     def test_3_clusters(self):
-        palette = mock.Mock()
-        palette.colors = [1, 2, 3, 7, 8, 9, 20, 21, 22]
+        colors = [1, 2, 3, 7, 8, 9, 20, 21, 22]
         k = 3
         expected = {2: [1, 2, 3], 8: [7, 8, 9], 21: [20, 21, 22]}
 
-        res = PAM(palette, k)()
+        res = PAM(colors, k)()
         self.assertDictEqual(res, expected)
 
     @pamcontext()
     def test_4_clusters_4_colors(self):
-        palette = mock.Mock()
-        palette.colors = [1, 2, 3, 7]
+        colors = [1, 2, 3, 7]
         k = 4
         expected = {1: [1], 2: [2], 3: [3], 7: [7]}
 
-        res = PAM(palette, k)()
+        res = PAM(colors, k)()
         self.assertDictEqual(res, expected)
 
     @unittest.skip("fixed in the next pull request")
