@@ -1,14 +1,16 @@
-" Usage:
-"   vim -s syntax_groups.vim
-"
-" This script generates an output file "./frequencies.py" which defines a
-" dictionnary, linking each syntaxic group to its frequency.
-" To do so, it requires a file named "./input_files.txt", located in the
-" current directory, listing the paths of files for which vim is able perform
-" a syntaxic analisis.
+:" Usage:
+:"   vim -s syntax_groups.vim
+:"
+:" This script generates an output file "./frequencies.json" which defines a
+:" dictionary, linking each syntaxic group to its frequency.
+:" To do so, it requires a file named "./input_files.txt", located in the
+:" current directory, listing the paths of files for which vim is able perform
+:" a syntaxic analisis.
+:" If the generated file containes an empty dictionary, make sure that the paths
+:" are reachable from were you run the script.
 :function! Frequencies()
 :    let filenames = readfile("input_files.txt")
-:    let dic_string = ['syntax_group_frequencies = {']
+:    let dic_string = ['{']
 :    let frequencies = {}
 :    for f in filenames
 :        execute 'edit' f
@@ -27,7 +29,7 @@
 :        let dic_string += ['"' . key . '" : ' . value . ',']
 :    endfor
 :    let dic_string += ['}']
-:    let a =  writefile(dic_string, "frequencies.py")
+:    let a =  writefile(dic_string, "frequencies.json")
 :    quit
 :endfunction
 :call Frequencies()

@@ -15,13 +15,13 @@ class TestQAP(unittest.TestCase):
         freq = [0.3]
         colors = [helpers.rgb_to_hsl(c) for c in [(20, 40, 50)]]
         qap = QAP(colors, freq)
-        self.assertEqual(qap.run(), list(zip(colors, freq)))
+        self.assertEqual(qap(), list(zip(colors, freq)))
 
     def test_two_values(self):
         freq = [0.3, 0.7]
         colors = [helpers.rgb_to_hsl(c) for c in [(15, 17, 20), (20, 40, 50)]]
         qap = QAP(colors, freq)
-        self.assertEqual(qap.run(), list(zip(colors, freq)))
+        self.assertEqual(qap(), list(zip(colors, freq)))
 
     def test_on_high_freq(self):
         freq = [0.15, 0.7, 0.15]
@@ -29,7 +29,7 @@ class TestQAP(unittest.TestCase):
         colors = [helpers.rgb_to_hsl(c) for c in [(255, 0, 0), (255, 129, 0), (0, 102, 204)]]
         qap = QAP(colors, freq)
         expected = (colors[2], 0.7)
-        self.assertIn(expected, qap.run())
+        self.assertIn(expected, qap())
 
     def test_size_four(self):
         freq = [0.1, 0.4, 0.4, 0.1]
@@ -37,7 +37,7 @@ class TestQAP(unittest.TestCase):
         rgb_colors = [(255, 0, 0), (255, 129, 0), (0, 102, 204), (0, 153, 0)]
         colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
         qap = QAP(colors, freq)
-        res = qap.run()
+        res = qap()
 
         expected_1 = (colors[2], 0.4)
         self.assertIn(expected_1, res)
@@ -50,7 +50,7 @@ class TestQAP(unittest.TestCase):
         rgb_colors = [(255, 0, 0), (255, 129, 0), (0, 102, 204), (0, 153, 0)]
         colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
         qap = QAP(colors, freq)
-        res = qap.run()
+        res = qap()
 
         expected_1 = (colors[2], 0.4)
         self.assertIn(expected_1, res)
@@ -62,8 +62,7 @@ class TestQAP(unittest.TestCase):
         # Green, Orange, Blue, Red
         rgb_colors = [(0, 153, 0), (255, 129, 0), (0, 102, 204), (255, 0, 0)]
         colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
-        qap = QAP(colors, freq)
-        res = qap.run()
+        res = QAP(colors, freq)()
 
         expected_1 = (colors[0], 0.4)
         self.assertIn(expected_1, res)

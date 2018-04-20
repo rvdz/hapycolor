@@ -6,17 +6,41 @@ from colormath.color_objects import LabColor, sRGBColor
 
 class PAM:
     """
-    Partition Around Medoids algorithm
+    Partition Around Medoids
+    ========================
     The goal of the algorithm is to minimize the average dissimilarity of
     objects to their closest selected object.
     A k-medoid algorithm was chosen instead of a regular k-means, since it is
     often useful to have a color representing a cluster of colors that is also
     contained in the picture.
+
+    The algorithm is divided in two steps: the build phase, and the swap
+    phase.
+
+    Build
+    -----
+    A collection of k objects are selected for an initial set S
+
+    Swap
+    ----
+    The second phase, SWAP, attempts to improve the the set of selected
+    object :math:`selected` and, therefore, to improve the quality of the
+    clustering. This is done by considering all pairs :math:`(i, h)` where
+    :math:`i` in :math:`selected` and :math:`h` in :math:`unselected` and
+    consists of computing the effect :math:`T_{i_h}` on the sum of
+    dissimilarities between objects and the closest selected object caused by
+    swapping :math:`i` and :math:`h`, that is, by transferring :math:`i` from
+    :math:`selected` to :math:`unselected` and transferring :math:`h` from
+    :math:`unselected` to :math:`selected`. The computation of :math:`T_{i_h}`
+    involves the computation of the contribution :math:`K_{j_i_h}` of each
+    object :math:`j \in unselected − {h}` to the swap of :math:`i`and
+    :math:`h`. Note that we have either :math:`d(j, i) > D_{j}` or
+    :math:`d(j, i) = D_{j}`.
     """
     def __init__(self, rgb_colors, K):
         if K > len(rgb_colors):
-            msg = "Impossible to classify the provided palette into {} " \
-                    + "classes, since it only has {} colors."
+            msg = "Impossible to classify the provided palette into {} \
+classes, since it only has {} colors.".format(K, len(rgb_colors))
             raise exceptions.PAMException(msg)
 
         self.colors = [PAM.rgb_to_lab(c) for c in rgb_colors]
@@ -57,10 +81,6 @@ class PAM:
         return clusters
 
     def _build(self):
-        """
-        A collection of k objects are selected for an initial set S
-        """
-
         # Initialize `selected` by adding to it an object for which the sum
         # of the distances to all other objects is minimal.
 
@@ -96,19 +116,6 @@ class PAM:
             del self.unselected[self.unselected.index(max_i)]
 
     def _swap(self):
-        """
-        The second phase, SWAP, attempts to improve the the set of selected
-        object `selected` and, therefore, to improve the quality of the
-        clustering. This is done by considering all pairs `(i, h)` where `i`
-        in `selected` and `h` in `unselected` and consists of computing
-        the effect `T_i_h` on the sum of dissimilarities between objects
-        and the closest selected object caused by swapping `i` and `h`,
-        that is,  by transferring `i` from `selected` to `unselected` and
-        transferring `h` from `unselected` to `selected`. The computation
-        of `T_i_h` involves the computation of the contribution `K_j_i_h`
-        of each object `j` in `unselected − {h}` to the swap of `i`and `h`.
-        Note that we have either `d(j, i) > D_j` or `d(j, i) = D_j`.
-        """
         T = -1
         while T < 0 and self.unselected:
             swaps = [(i, h) for i in self.selected for h in self.unselected]
