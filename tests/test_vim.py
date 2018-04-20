@@ -1,13 +1,13 @@
+from unittest import mock
+import contextlib
+import json
+import pathlib
+import unittest
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import palette
-from hapycolor.targets.vim import Vim, VimColorManager, environment
+from hapycolor.targets.vim import Vim, ColorManager, environment
 from tests.helpers import generate_palette, configurationtesting
-import pathlib
-from unittest import mock
-import contextlib
-import unittest
-
 
 @contextlib.contextmanager
 def vimtesting(fails=0):
@@ -80,7 +80,6 @@ class TestVim(unittest.TestCase):
 
     @vimtesting()
     @configurationtesting()
-    @unittest.skip("Too long to compute")
     def test_export(self):
         """
         Vim Integration test: provides a valid set of colors to the main
@@ -91,8 +90,6 @@ class TestVim(unittest.TestCase):
         pltte.background = (0, 0, 0)
         hsl_colors = ([(16, 0.5, 0.45), (2, 0.7, 0.64), (4, 0.9, 0.66),
                        (5, 0.3, 0.53), (5, 0.9, 0.67), (9, 0.8, 0.69),
-                       (14, 0.7, 0.48), (16, 0.6, 0.42), (17, 0.8, 0.54),
-                       (333, 0.57, 0.42), (338, 0.57, 0.60),
                        (342, 0.57, 0.44), (344, 0.60, 0.5),
                        (348, 0.92, 0.62)])
         pltte.colors = [helpers.hsl_to_rgb(c) for c in hsl_colors]
@@ -104,6 +101,7 @@ class TestVim(unittest.TestCase):
         except Exception as e:
             self.fail(str(e))
 
+
     def test_color_manager(self):
         """
         Tests the correct labelization of the colors and retrives them sorted
@@ -111,22 +109,80 @@ class TestVim(unittest.TestCase):
         """
         colors = [(12, 34, 56), (23, 45, 67), (150, 150, 150)]
 
-        groups = [
-                  ["group1_1", "group1_2", "group1_3"],
-                  ["group2"],
-                  ["group3"],
-                 ]
+        mock_frequencies = {'group_1_1': 101, 'group_2': 100, 'group_3': 1}
+        mock_groups = {
+                       "group_1_1": ["group_1_1", "group_1_2", "group_1_3"],
+                       "group_2": ["group_2"],
+                       "group_3": ["group_3"],
+                      }
 
         expected = colors[:]
-        vcm = VimColorManager(colors, 3)
-        for i, minor_groups in enumerate(groups):
-            result = []
-            casted_colors = vcm.cast(i, len(minor_groups))
-            for (group, color) in zip(minor_groups, casted_colors):
-                result.append(color)
-            color = result[-1]
-            self.assertTrue(all([color == c for c in result]))
-            self.assertIn(color, expected)
+        with mock.patch("hapycolor.targets.vim.Vim.groups", mock_groups), \
+                mock.patch("hapycolor.targets.vim.ColorManager.load_frequencies",
+                        return_value=mock_frequencies):
+            color_manager = ColorManager(colors)
+            for minor_group in mock_groups:
+                result = []
+                casted_colors = color_manager.cast(minor_group)
+
+                if minor_group == "group_1_1":
+                    occurrences = 3
+                    self.assertEqual(len(casted_colors), 3)
+                else:
+                    occurrences = 1
+                    self.assertEqual(len(casted_colors), 1)
+                self.assertEqual([casted_colors[0]] * occurrences, casted_colors)
+
+    def test_color_manager_correct_frequencies_cast(self):
+        colors = [(150, 10, 10), (160, 10, 10), (10, 10, 200), (20, 20, 200),
+                  (10, 255, 10)]
+        mock_frequencies = {
+                            'group_1': 5,
+                            'group_2': 100,
+                            'group_3': 4,
+                            'group_4': 3,
+                            'group_5': 101,
+                           }
+        mock_groups = {
+                       "group_1": ["group_1"],
+                       "group_2": ["group_2"],
+                       "group_3": ["group_3"],
+                       "group_4": ["group_4"],
+                       "group_5": ["group_5"],
+                      }
+
+        expected = colors[:]
+        groups_colors = {}
+        with mock.patch("hapycolor.targets.vim.Vim.groups", mock_groups), \
+                mock.patch("hapycolor.targets.vim.ColorManager.load_frequencies",
+                        return_value=mock_frequencies):
+            color_manager = ColorManager(colors)
+            for minor_group in mock_groups:
+                groups_colors[minor_group] = color_manager.cast(minor_group)
+
+        not_expected = [(150, 10, 10), (160, 10, 10)]
+        result = [groups_colors["group_5"], groups_colors["group_2"]]
+        self.assertNotEqual(result, not_expected)
+        not_expected = [(160, 10, 10), (150, 10, 10)]
+        self.assertNotEqual(result, not_expected)
+
+
+    @unittest.skip("TODO(yann): Still not supported")
+    def test_color_manager_duplicate_frequency(self, mock_frequencies):
+        colors = [(150, 10, 10), (160, 10, 10), (10, 10, 200)]
+        mock_frequencies = { 'group_1': 5, 'group_2': 100, 'group_3': 5 }
+        mock_groups = {
+                       "group_1": ["group_1"],
+                       "group_2": ["group_2"],
+                       "group_3": ["group_3"],
+                      }
+        with mock.patch("hapycolor.targets.vim.Vim.groups", mock_groups), \
+                mock.patch("hapycolor.targets.vim.ColorManager.load_frequencies",
+                        return_value=mock_frequencies):
+            try:
+                color_manager = ColorManager(colors)
+            except Exception as e:
+                self.fail(str(e))
 
     @mock.patch('hapycolor.helpers.input_path',
            return_value=pathlib.Path("./README.md").expanduser())

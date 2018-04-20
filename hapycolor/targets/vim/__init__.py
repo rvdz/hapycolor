@@ -1,3 +1,5 @@
+import json
+
 from hapycolor import targets
 from hapycolor import helpers
 from hapycolor import exceptions
@@ -5,7 +7,8 @@ from hapycolor import palette as pltte
 from hapycolor.targets import eight_bit_colors
 from hapycolor.targets import base
 from hapycolor.targets.vim.environment import VimEnvironments
-from hapycolor.targets.vim.pam import PAM
+import hapycolor.targets.vim.pam
+import hapycolor.targets.vim.qap
 
 
 class Vim(base.Target):
@@ -21,19 +24,21 @@ class Vim(base.Target):
     .. todo:: Check if the option was introduced with Vim 7.4
 
     """
-    groups = [
-              ["Comment"],
-              ["Constant", "String", "Character", "Number", "Boolean", "Float"],
-              ["Identifier", "Function"],
-              ["Statement", "Conditional", "Repeat", "Label", "Operator",
+
+    # {Minor group title: [Minor group names]}
+    groups = {
+              "Comment": ["Comment"],
+              "Constant": ["Constant", "String", "Character", "Number", "Boolean", "Float"],
+              "Identifier": ["Identifier", "Function"],
+              "Statement": ["Statement", "Conditional", "Repeat", "Label", "Operator",
                "Keyword", "Exception"],
-              ["PreProc", "Include", "Define", "Macro", "PreCondit"],
-              ["Type", "StorageClass", "Structure", "Typedef"],
-              ["Special", "SpecialChar", "Tag", "Delimiter", "SpecialComment",
+              "PreProc": ["PreProc", "Include", "Define", "Macro", "PreCondit"],
+              "Type": ["Type", "StorageClass", "Structure", "Typedef"],
+              "Special": ["Special", "SpecialChar", "Tag", "Delimiter", "SpecialComment",
                "Debug"],
-              ["Underlined"],
+              # ["Underlined"],
               # ["Ignore"], ["Error"], ["Todo"],
-             ]
+             }
 
     configuration_key = "colorscheme_vim"
 
@@ -81,13 +86,13 @@ class Vim(base.Target):
             msg = "The palette does not respect the appropriate structure"
             raise exceptions.PaletteFormatError(msg)
 
-        vcm = VimColorManager(palette.colors, len(Vim.groups))
+        color_manager = ColorManager(palette.colors)
 
         with open(Vim.load_config()[Vim.configuration_key], "w+") as f:
             Vim.__print_header(f)
             Vim.__print_base(palette.foreground, palette.background, f)
             Vim.__print_visual(palette.foreground, palette.background, f)
-            Vim.__print_body(vcm, f)
+            Vim.__print_body(color_manager, f)
 
     @staticmethod
     def __print_header(f):
@@ -126,24 +131,86 @@ let g:colors_name = "Hapycolor"'''
 
     @staticmethod
     def __print_body(color_manager, f):
-        for i, minor_groups in enumerate(Vim.groups):
-            colors = color_manager.cast(i, len(minor_groups))
-            for (group, color) in zip(minor_groups, colors):
+        for minor_group in Vim.groups:
+            colors = color_manager.cast(minor_group)
+            for (group, color) in zip(Vim.groups[minor_group], colors):
                 Vim.__write_entry(f, group, color)
 
 
-class VimColorManager:
-    """ Manages vim's color's distribution """
-    def __init__(self, rgb_colors, number_groups):
+class ColorManager:
+    """
+    ColorManager
+    ============
+    Manages vim's color's distribution
+
+    Step 1
+    ------
+    Runs a clustering algorithm on the palette's colors and classifies
+    them according to the number of major syntactic groups, i.e.:
+    "Comment", "Constant", "Identifier", "Statement", "PreProc", "Type",
+    "Special".
+
+    Step 2
+    ------
+    The problem of casting the colors to the syntactic groups is a
+    quadratic assignment problem. So, a QAP algorithm is ran with
+    the medoids of the clusters previously found as the input colors,alongside
+    the occurrence frequencies, of each main syntactic group. The former
+    elements represent the weights between two groups, for instance, the weight
+    between the group "Comment" and the group "Statement" is the product of
+    both their frequencies.
+
+    Then, once the algorithms finishes, each syntactic group is assigned to
+    a cluster, which will be retrieved by calling the method
+    :func:`ColorManager.cast(group_name)`.
+
+    .. note::
+        The occurrence frequencies are previously calculated and are located in
+        `hapycolor/targets/vim/frequencies.json`
+
+    .. see::
+        If you are interested in correctly alter the occurrence frequencies
+        of the syntactic groups, the vimscript
+        `hapycolor/targets/vim/syntax_groups.vim` might be useful. It uses
+        a list of files as the input, and generates a json file defining
+        the occurrences of each syntactic group. Keep in mind that the
+        result will be dependent on the syntax files and the active
+        colorscheme file that you currently have. For instance, some
+        does not define a specific color for minor syntactic groups and some
+        do. Currently, this class aims at defining a cluster for each 'group'
+        of syntactic groups, so it only defines frequences for the major
+        groups.
+
+    """
+    def __init__(self, rgb_colors):
         if rgb_colors.__class__ != list or len(rgb_colors) == 0 \
                 or not all([helpers.can_be_rgb(c) for c in rgb_colors]):
             msg = "The colors must be defined in the rgb base"
             raise exceptions.ColorFormatError(msg)
 
-        dict_colors = PAM(rgb_colors, number_groups)()
-        self.colors = [dict_colors[cluster] for cluster in dict_colors]
+        colors = pam.PAM(rgb_colors, len(Vim.groups))()
+        self.groups_colors = ColorManager._pair_group_to_color(colors)
 
-    def cast(self, group_id, group_length):
-        cluster_size = len(self.colors[group_id])
-        return [self.colors[group_id][i % cluster_size]
-                for i in range(group_length)]
+    def _pair_group_to_color(colors):
+        medoids = [medoid for medoid in colors]
+        groups_frequencies = ColorManager.load_frequencies()
+        frequencies_groups = {v: k for k, v in groups_frequencies.items()}
+        freq_values = [groups_frequencies[g]
+                       for g in groups_frequencies]
+        medoids_freqs = qap.QAP(medoids, freq_values)()
+        groups_colors = {}
+        for (m, freq) in medoids_freqs:
+            groups_colors[frequencies_groups[freq]] = colors[m]
+        return groups_colors
+
+    def load_frequencies():
+        frequencies_json = "hapycolor/targets/vim/frequencies.json"
+        with open(frequencies_json, 'r') as f:
+            frequencies = json.load(f)
+        return frequencies
+
+    def cast(self, group):
+        cluster_size = len(self.groups_colors[group])
+        minor_group_size = len(Vim.groups[group])
+        return [self.groups_colors[group][i % cluster_size]
+                for i in range(minor_group_size)]
