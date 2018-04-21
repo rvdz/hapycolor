@@ -1,4 +1,3 @@
-
 let s:white = [ '#ffffff', 255 ]
 let s:grey0 = [ '#121212', 233 ]
 let s:grey1 = [ '#606060', 241 ]
@@ -12,14 +11,25 @@ let s:grey8 = [ '#bcbcbc', 250 ]
 let s:grey9 = [ '#585858', 240 ]
 let s:grey10 = [ '#dadada', 255 ]
 
+let s:yellow = [ '#d3bb06', 204 ]
+let s:red = [ '#d35506', 190 ]
+
+let s:foreground = [ $FG ]
+let s:background = [ $BG ]
+
+let s:normal = [ $NORMAL ]
+let s:insert = [ $INSERT ]
+let s:visual = [ $VISUAL ]
+let s:replace = [ $REPLACE ]
+
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
-let s:p.normal.left = [ [ s:blue, s:white, 'bold' ], [ s:white, s:blue ] ]
+let s:p.normal.left = [ [ s:normal, s:white, 'bold' ], [ s:white, s:normal ] ]
 let s:p.normal.right = [ [ s:grey4, s:grey6 ], [ s:grey4, s:grey7 ], [ s:grey8, s:grey9 ] ]
 let s:p.inactive.right = [ [ s:grey0, s:grey1 ], [ s:grey0, s:grey2 ], [ s:grey0, s:grey3 ] ]
 let s:p.inactive.left = s:p.inactive.right[1:]
-let s:p.insert.left =  [ [ s:green, s:white, 'bold' ], [ s:white, s:green ] ]
-let s:p.replace.left = [ [ s:red, s:white, 'bold' ], [ s:white, s:red ] ]
-let s:p.visual.left = [ [ s:magenta, s:white, 'bold' ], [ s:white, s:magenta ] ]
+let s:p.insert.left =  [ [ s:insert, s:white, 'bold' ], [ s:white, s:insert ] ]
+let s:p.replace.left = [ [ s:replace, s:white, 'bold' ], [ s:white, s:replace ] ]
+let s:p.visual.left = [ [ s:visual, s:white, 'bold' ], [ s:white, s:visual ] ]
 let s:p.normal.middle = [ [ s:grey7, s:grey4 ] ]
 let s:p.inactive.middle = [ [ s:grey4, s:grey0 ] ]
 let s:p.tabline.left = [ [ s:grey6, s:grey5 ] ]
@@ -28,3 +38,5 @@ let s:p.tabline.middle = [ [ s:grey7, s:grey2 ] ]
 let s:p.tabline.right = [ [ s:grey6, s:grey5 ] ]
 let s:p.normal.error = [ [ s:grey6, s:red ] ]
 let s:p.normal.warning = [ [ s:grey3, s:yellow ] ]
+
+let g:lightline#colorscheme#hapycolor#palette = lightline#colorscheme#flatten(s:p)"

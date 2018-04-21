@@ -17,13 +17,13 @@ let s:visual = [ $VISUAL ]
 let s:replace = [ $REPLACE ]
 
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
-let s:p.normal.left = [ [ s:grey02, s:blue ], [ s:grey3, s:grey01 ] ]
+let s:p.normal.left = [ [ s:grey02, s:normal ], [ s:grey3, s:grey01 ] ]
 let s:p.normal.right = [ [ s:grey02, s:grey0 ], [ s:grey1, s:grey01 ] ]
 let s:p.inactive.right = [ [ s:grey023, s:grey01 ], [ s:grey00, s:grey02 ] ]
 let s:p.inactive.left =  [ [ s:grey1, s:grey02 ], [ s:grey00, s:grey023 ] ]
-let s:p.insert.left = [ [ s:grey02, s:green ], [ s:grey3, s:grey01 ] ]
-let s:p.replace.left = [ [ s:grey023, s:red ], [ s:grey3, s:grey01 ] ]
-let s:p.visual.left = [ [ s:grey02, s:magenta ], [ s:grey3, s:grey01 ] ]
+let s:p.insert.left = [ [ s:grey02, s:insert ], [ s:grey3, s:grey01 ] ]
+let s:p.replace.left = [ [ s:grey023, s:replace ], [ s:grey3, s:grey01 ] ]
+let s:p.visual.left = [ [ s:grey02, s:visual ], [ s:grey3, s:grey01 ] ]
 let s:p.normal.middle = [ [ s:grey2, s:grey02 ] ]
 let s:p.inactive.middle = [ [ s:grey1, s:grey023 ] ]
 let s:p.tabline.left = [ [ s:grey3, s:grey00 ] ]
@@ -32,3 +32,5 @@ let s:p.tabline.middle = [ [ s:grey2, s:grey02 ] ]
 let s:p.tabline.right = [ [ s:grey2, s:grey00 ] ]
 let s:p.normal.error = [ [ s:grey03, s:red ] ]
 let s:p.normal.warning = [ [ s:grey023, s:yellow ] ]
+
+let g:lightline#colorscheme#hapycolor#palette = lightline#colorscheme#flatten(s:p)"

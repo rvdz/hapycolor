@@ -1,13 +1,17 @@
+"""
+Lightline module
+"""
 import enum
-import pathlib
 import datetime
 from os import listdir
-from hapycolor.targets import base
-from hapycolor.targets import eight_bit_colors
-from hapycolor.targets import vim
+
 from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor import helpers
+from hapycolor.targets import base
+from hapycolor.targets import eight_bit_colors
+from hapycolor.targets import vim
+from hapycolor.targets import pam
 
 
 class Lightline(base.Target):
@@ -21,8 +25,8 @@ class Lightline(base.Target):
     - Landscape
     - One
     - Wombat
+    - Solarized
     """
-
     ThemeEnum = enum.Enum("ThemeEnum",
                           [(t.split('.')[0].upper(),
                             "hapycolor/targets/lightline/" + t)
@@ -34,14 +38,15 @@ class Lightline(base.Target):
     # Will be asked during target's configuration
     theme_key = "theme"
 
+    @staticmethod
     def initialize_config():
         colorscheme_path = Lightline.select_colorscheme_path()
         theme = Lightline.select_theme()
         Lightline.save_config({
-                               Lightline.colorscheme_key: colorscheme_path,
-                               Lightline.theme_key: str(theme.value)
-                              })
+            Lightline.colorscheme_key: colorscheme_path,
+            Lightline.theme_key: str(theme.value)})
 
+    @staticmethod
     def reconfigure():
         try:
             entry = int(input("\nTheme: 1\nLightline's path: 2\nEntry: "))
@@ -59,16 +64,18 @@ class Lightline(base.Target):
             entry = {Lightline.colorscheme_key: colorscheme_path}
             Lightline.save_config(entry)
 
+    @staticmethod
     def select_colorscheme_path():
         p = vim.environment.VimEnvironments.find_plugin("lightline.vim")
         file_path = p + "/autoload/lightline/colorscheme/hapycolor.vim"
         return file_path
 
+    @staticmethod
     def select_theme():
         try:
             print("\nSelect a theme:")
-            for i, t in enumerate(Lightline.ThemeEnum):
-                print(t.name + ": (" + str(i) + ")")
+            for i, theme in enumerate(Lightline.ThemeEnum):
+                print(theme.name + ": (" + str(i) + ")")
             theme_i = int(input("Theme: "))
             if theme_i < 0 or len(Lightline.ThemeEnum) <= theme_i:
                 raise ValueError
@@ -78,6 +85,7 @@ class Lightline(base.Target):
                   + str(len(Lightline.ThemeEnum)))
             return Lightline.select_theme()
 
+    @staticmethod
     def is_config_initialized():
         try:
             config = Lightline.load_config()
@@ -86,126 +94,77 @@ class Lightline(base.Target):
         except exceptions.InvalidConfigKeyError:
             return False
 
+    @staticmethod
     def compatible_os():
         return [targets.OS.DARWIN, targets.OS.LINUX]
 
+    @staticmethod
     def export(palette, image_path):
         """
         This function extract the targeted colors of the palette and defines
         the color's variables used in the theme's template defined in the
         configuration file.
         """
+
+        theme = Lightline.add_header(image_path)
+        theme += Lightline.add_body()
+        theme = Lightline.add_colors(theme, palette)
+
         colorscheme = Lightline.load_config()[Lightline.colorscheme_key]
-        assert (pathlib.Path(colorscheme).is_file()), "{} is not a file".format(colorscheme)
-        with open(colorscheme, 'w') as f:
-            f.write(Lightline.header(image_path))
+        with open(colorscheme, 'w') as colorscheme_file:
+            colorscheme_file.write(theme)
 
-            # Defines input palette's variables
-            colors = Lightline.get_colors(palette)
-            f.write(Lightline.replace_line("foreground", palette.foreground))
-            f.write("\n")
-            f.write(Lightline.replace_line("background", palette.background))
-            f.write("\n")
+    @staticmethod
+    def add_body():
+        theme_path = Lightline.load_config()[Lightline.theme_key]
+        body = []
+        with open(theme_path, "r") as theme_file:
+            body = theme_file.read()
+        return body
 
-            for label in colors:
-                f.write(Lightline.replace_line(label, colors[label]) + "\n")
-            f.write("\n")
+    @staticmethod
+    def add_colors(theme, palette):
+        theme = '\n'.join(theme)
+        colors = Lightline.classify(palette.colors)
 
-            body_path = Lightline.load_config()[Lightline.theme_key]
-            with open(body_path, "r") as body_file:
-                f.write(body_file.read())
-            f.write("\n")
+        # Sort by hue and rearrange in the following order:
+        # NORMAL, INSERT, REPLACE, VISUAL, FOREGROUND, BACKGROUND
+        hsl_colors = [helpers.rgb_to_hsl(c) for c in colors]
+        hsl_colors.sort(key=lambda c: c[0])
+        hsl_colors = [hsl_colors[1], hsl_colors[0], hsl_colors[3], hsl_colors[2]]
+        colors = [helpers.hsl_to_rgb(c) for c in hsl_colors]
+        colors.extend([palette.foreground, palette.background])
 
-            f.write(Lightline.footer())
+        modes = ["$NORMAL", "$INSERT", "$REPLACE", "$VISUAL", "$FG", "$BG"]
+        for mode, color in zip(modes, colors):
+            new_value = "'{}', {}".format(helpers.rgb_to_hex(color),
+                                          eight_bit_colors.rgb_to_short(color))
+            theme = theme.replace(mode, new_value)
+        return theme.split('\n')
 
-    def footer():
-        return "let g:lightline#colorscheme#hapycolor#palette \
-            = lightline#colorscheme#flatten(s:p)"
+    @staticmethod
+    def classify(colors):
+        def distance(c1, c2):
+            """ Evaluates the hue's distance """
+            return abs(c1[0] - c2[0])
 
-    def header(image_path):
+        k = 4 # There are four modes: Insert, Visual, Normal and Replace
+        colors = pam.PAM(colors, k, distance)()
+
+        # Only the medoids of each cluster will used
+        return [m for m in colors]
+
+    @staticmethod
+    def add_header(image_path):
         now = datetime.datetime.now()
-        date = "%s/%s/%s %s:%s:%s." % (now.day, now.month, now.year, now.hour,
-                                       now.minute, now.second)
+        date = "{}/{}/{} {}:{}:{}.".format(now.day, now.month, now.year,
+                                           now.hour, now.minute, now.second)
         return """
 " =============================================================================
 " Filename: autoload/lightline/colorscheme/hapycolor.vim
 " Author: hapycolor
 " License: MIT License
-" Last Change: %s
-" Source image: %s
+" Last Change: {}
+" Source image: {}
 " =============================================================================
-""" % (date, image_path)
-
-    def get_colors(palette):
-        """
-        For each label defined in the color enumeration, affects a color of
-        the palette.
-        """
-        lcm = ColorManager(palette.colors)
-        colors = {}
-        for e in ColorEnum:
-            colors[e.name.lower()] = lcm.get(e)
-        return colors
-
-    def replace_line(label, color):
-        return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', "\
-            + str(eight_bit_colors.rgb2short(color)) + "]"
-
-
-class ColorEnum(enum.Enum):
-    __order__ = 'RED ORANGE YELLOW GREEN BLUE MAGENTA'
-    RED     = [345, 15]
-    ORANGE  = [16, 32]
-    YELLOW  = [33, 74]
-    GREEN   = [75, 166]
-    BLUE    = [167, 255]
-    MAGENTA = [256, 344]
-
-    def get_label(hue):
-        for e in ColorEnum:
-            if e.value[0] <= hue and hue <= e.value[1]:
-                return e
-        return ColorEnum.RED
-
-    def get_next(label):
-        enums = [l for l in ColorEnum]
-        i = enums.index(label)
-        return enums[(i+1) % len(enums)]
-
-
-class ColorManager:
-    """
-    For each variable needed by the theme, defines a dictionary which binds
-    a the enumerate to a value of the palette's colors.
-
-    .. todo:: Apply another reduction filter? Since we need only a few colors,
-        it makes sense.
-    """
-    def __init__(self, colors):
-        if not all([helpers.can_be_rgb(c) for c in colors]):
-            raise exceptions.ColorFormatError("Must be a list of rgb colors")
-
-        # Classify the colors according to their hue
-        sorted_colors = {}
-        for c in [helpers.rgb_to_hsl(col) for col in colors]:
-            label = ColorEnum.get_label(c[0])
-            if label in sorted_colors:
-                sorted_colors[label].append(c)
-            else:
-                sorted_colors[label] = [c]
-
-        self.labels = {}
-        for label in ColorEnum:
-            original_label = label
-            while sorted_colors.get(label) is None:
-                label = ColorEnum.get_next(label)
-            # Get color whose saturation is max
-            colors = sorted_colors[label]
-            # If there is only one color in this label and another label uses
-            # this list of colors, it will fail.
-            # color = colors.pop(colors.index(max(colors, key=lambda c: c[1])))
-            color = max(colors, key=lambda c: c[1])
-            self.labels[original_label] = color
-
-    def get(self, label):
-        return helpers.hsl_to_rgb(self.labels[label])
+""".format(date, image_path)

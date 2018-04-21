@@ -1,8 +1,5 @@
 from hapycolor import exceptions
 import numpy as np
-from colormath.color_conversions import convert_color
-from colormath.color_diff import delta_e_cie2000
-from colormath.color_objects import LabColor, sRGBColor
 
 
 class PAM:
@@ -36,26 +33,17 @@ class PAM:
         swap of :math:`i` and :math:`h`. Note that we have either
         :math:`d(j, i) > D_j` or :math:`d(j, i) = D_j`.
     """
-    def __init__(self, rgb_colors, K):
-        if K > len(rgb_colors):
+    def __init__(self, colors, K, distance):
+        if K > len(colors):
             msg = "Impossible to classify the provided palette into {} \
-classes, since it only has {} colors.".format(K, len(rgb_colors))
+classes, since it only has {} colors.".format(K, len(colors))
             raise exceptions.PAMException(msg)
 
-        self.colors = [PAM.rgb_to_lab(c) for c in rgb_colors]
+        self.colors = colors
         self.K = K
         self.selected = []
         self.unselected = self.colors[:]
-
-    @staticmethod
-    def rgb_to_lab(c):
-        rgb = sRGBColor(c[0], c[1], c[2])
-        return convert_color(rgb, LabColor)
-
-    @staticmethod
-    def lab_to_rgb(lab_c):
-        c = convert_color(lab_c, sRGBColor)
-        return (round(c.rgb_r), round(c.rgb_g), round(c.rgb_b))
+        self.distance = distance
 
     def __call__(self):
         """
@@ -70,13 +58,13 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
         for c in self.colors:
             distance_c = []
             for s in self.selected:
-                distance_c.append(PAM.distance(c, s))
+                distance_c.append(self.distance(c, s))
             medoid_index = distance_c.index(min(distance_c))
-            medoid = PAM.lab_to_rgb(self.selected[medoid_index])
+            medoid = self.selected[medoid_index]
             if medoid in clusters:
-                clusters[medoid].append(PAM.lab_to_rgb(c))
+                clusters[medoid].append(c)
             else:
-                clusters[medoid] = [PAM.lab_to_rgb(c)]
+                clusters[medoid] = [c]
         return clusters
 
     def _build(self):
@@ -87,7 +75,7 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
         for c_1 in self.colors:
             distances[c_1] = []
             for c_2 in self.colors:
-                distances[c_1].append(PAM.distance(c_1, c_2))
+                distances[c_1].append(self.distance(c_1, c_2))
 
         mean_distances = [np.array(distances[key]).mean()
                           for key in distances]
@@ -106,7 +94,7 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
                 for j in self.unselected:
                     if i != j:
                         D_j = self._d_p(j)
-                        d_j_i = PAM.distance(i, j)
+                        d_j_i = self.distance(i, j)
                         g_i += max(D_j - d_j_i, 0)
                 g.append((i, g_i))
             # Choose that object i that maximizes g_i
@@ -134,9 +122,9 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
         T_i_h = 0
         for j in self.unselected:
             if h != j:
-                d_j_i = PAM.distance(j, i)
+                d_j_i = self.distance(j, i)
                 D_j = self._d_p(j)
-                d_j_h = PAM.distance(j, h)
+                d_j_h = self.distance(j, h)
                 if d_j_i > D_j:
                     K_j_i_h = min(d_j_h - D_j, 0)
                 elif d_j_i == D_j:
@@ -149,7 +137,7 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
         """
         The dissimilarity between `p` and the closest object in `self.selected`
         """
-        dist = map(lambda c: PAM.distance(p, c), self.selected)
+        dist = map(lambda c: self.distance(p, c), self.selected)
         return min(list(dist))
 
     def _e_p(self, p):
@@ -157,19 +145,10 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
         the dissimilarity between `p` and the second closest object in
         `self.selected`.
         """
-        dist = list(map(lambda c: PAM.distance(c, p), self.selected))
+        dist = list(map(lambda c: self.distance(c, p), self.selected))
         dist.sort()
         if len(dist) > 1:
             return dist[1]
         else:
             return dist[0]
 
-    def distance(c1, c2):
-        """
-        Returns the CIEDE2000 distance of the two provided colors.
-
-        :arg c1: a tuple representing a Lab color
-        :arg c2: a tuple representing a Lab color
-        :see: `<https://en.wikipedia.org/wiki/Color_difference/>`_
-        """
-        return delta_e_cie2000(c1, c2)

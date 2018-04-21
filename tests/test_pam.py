@@ -1,93 +1,87 @@
 import contextlib
 import unittest
 from unittest import mock
+from colormath.color_diff import delta_e_cie2000
 
-
-from hapycolor.targets.vim.pam import PAM
+from hapycolor import helpers
+from hapycolor.targets.pam import PAM
 
 class TestPAM(unittest.TestCase):
-    def mock_distance(c_1, c_2):
+    def distance(c_1, c_2):
         return abs(c_2 - c_1)
 
-    def mock_conversion(c):
-        return c
-
-    @contextlib.contextmanager
-    def pamcontext():
-        prefix = "hapycolor.targets.vim.pam.PAM"
-        with mock.patch(prefix + ".distance", TestPAM.mock_distance), \
-                mock.patch(prefix + ".lab_to_rgb", TestPAM.mock_conversion), \
-                mock.patch(prefix + ".rgb_to_lab", TestPAM.mock_conversion):
-            yield
-
-
-    @pamcontext()
     def test_1_clusters(self):
         colors = [1]
         k = 1
         expected = {1: [1]}
 
-        res = PAM(colors, k)()
+        res = PAM(colors, k, TestPAM.distance)()
         self.assertDictEqual(res, expected)
 
-    @pamcontext()
     def test_2_clusters_2_colors(self):
         colors = [1, 2]
         k = 2
         expected = {1: [1], 2: [2]}
 
-        res = PAM(colors, k)()
+        res = PAM(colors, k, TestPAM.distance)()
         self.assertDictEqual(res, expected)
 
-    @pamcontext()
     def test_2_clusters_10_colors(self):
         colors = [1, 2, 3, 4, 5, 10, 11, 12, 13, 14]
         k = 2
         expected = {3: [1, 2, 3, 4, 5], 12: [10, 11, 12, 13, 14]}
 
-        res = PAM(colors, k)()
+        res = PAM(colors, k, TestPAM.distance)()
         self.assertDictEqual(res, expected)
 
-    @pamcontext()
     def test_3_clusters(self):
         colors = [1, 2, 3, 7, 8, 9, 20, 21, 22]
         k = 3
         expected = {2: [1, 2, 3], 8: [7, 8, 9], 21: [20, 21, 22]}
 
-        res = PAM(colors, k)()
+        res = PAM(colors, k, TestPAM.distance)()
         self.assertDictEqual(res, expected)
 
-    @pamcontext()
     def test_4_clusters_4_colors(self):
         colors = [1, 2, 3, 7]
         k = 4
         expected = {1: [1], 2: [2], 3: [3], 7: [7]}
 
-        res = PAM(colors, k)()
+        res = PAM(colors, k, TestPAM.distance)()
         self.assertDictEqual(res, expected)
 
     @unittest.skip("fixed in the next pull request")
     def test_3_clusters_3_colors_rgb(self):
         colors = [(0, 0, 0), (100, 100, 100), (255, 255, 255)]
+        lab_colors = [helpers.rgb_to_lab(c) for c in colors]
+        expected = lab_colors[:]
         k = 3
-        expected = colors[:]
 
-        res = PAM(colors, k)()
-        for i, c in enumerate(res):
-            self.assertEqual(res[c][0], expected[i])
+        def distance(c1, c2):
+            return delta_e_cie2000(c1, c2)
+
+        res = PAM(lab_colors, k, distance)()
+        for i, medoid in enumerate(res):
+            self.assertEqual(medoid, expected[i])
+            self.assertEqual(res[medoid][0], expected[i])
 
     def test_2_clusters_4_colors_rgb(self):
         colors = [(150, 20, 20), (180, 10, 10), (10, 10, 150), (20, 20, 180)]
+        lab_colors = [helpers.rgb_to_lab(c) for c in colors]
+
         k = 2
         expected = [
                     [(150, 20, 20), (180, 10, 10)],
                     [(10, 10, 150), (20, 20, 180)],
                    ]
 
-        res = PAM(colors, k)()
+        def distance(c1, c2):
+            return delta_e_cie2000(c1, c2)
+
+        res = PAM(lab_colors, k, distance)()
         for i, medoid in enumerate(res):
-            for j, c in enumerate(res[medoid]):
-                self.assertEqual(c, expected[i][j])
+            cluster = [helpers.lab_to_rgb(c) for c in res[medoid]]
+            self.assertEqual(cluster, expected[i])
 
     @unittest.skip("Too slow, but working")
     def test_multiple_colors(self):
@@ -102,5 +96,8 @@ class TestPAM(unittest.TestCase):
                   (84, 163, 209), (42, 238, 211), (35, 217, 224), (41, 253, 250),
                   (49, 245, 242), (86, 236, 231), (250, 142, 135), (233, 160, 161),
                   (147, 236, 151), (253, 209, 138), (244, 233, 168), (158, 241, 217)]
+        lab_colors = [helpers.rgb_to_lab(c) for c in colors]
+        def distance(c1, c2):
+            return delta_e_cie2000(c1, c2)
         k = 5
         PAM(colors, k)()

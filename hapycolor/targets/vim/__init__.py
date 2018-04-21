@@ -1,4 +1,5 @@
 import json
+from colormath.color_diff import delta_e_cie2000
 
 from hapycolor import targets
 from hapycolor import helpers
@@ -7,7 +8,7 @@ from hapycolor import palette as pltte
 from hapycolor.targets import eight_bit_colors
 from hapycolor.targets import base
 from hapycolor.targets.vim.environment import VimEnvironments
-import hapycolor.targets.vim.pam
+from hapycolor.targets import pam
 import hapycolor.targets.vim.qap
 
 
@@ -115,11 +116,11 @@ let g:colors_name = "Hapycolor"'''
     def __write_entry(f, category, fg, bg=None):
         entry = ["hi " + category,
                  "guifg=" + helpers.rgb_to_hex(fg),
-                 "ctermfg=" + str(eight_bit_colors.rgb2short(fg))]
+                 "ctermfg=" + str(eight_bit_colors.rgb_to_short(fg))]
 
         if bg is not None:
             entry.extend(["guibg=" + helpers.rgb_to_hex(bg),
-                          "ctermbg=" + str(eight_bit_colors.rgb2short(bg))])
+                          "ctermbg=" + str(eight_bit_colors.rgb_to_short(bg))])
 
         elements = 3 if bg is None else 5
         f.write(("{: <20} " * elements + "\n").format(*entry))
@@ -187,11 +188,20 @@ class ColorManager:
             msg = "The colors must be defined in the rgb base"
             raise exceptions.ColorFormatError(msg)
 
-        colors = pam.PAM(rgb_colors, len(Vim.groups))()
-        self.groups_colors = ColorManager._pair_group_to_color(colors)
+        def distance(c1, c2):
+            return delta_e_cie2000(c1, c2)
+
+        lab_colors = [helpers.rgb_to_lab(c) for c in rgb_colors]
+        lab_classified = pam.PAM(lab_colors, len(Vim.groups), distance)()
+        rgb_classified = {}
+        for m in lab_classified:
+            cluster = [helpers.lab_to_rgb(c) for c in lab_classified[m]]
+            rgb_classified[helpers.lab_to_rgb(m)] = cluster
+
+        self.groups_colors = ColorManager._pair_group_to_color(rgb_classified)
 
     def _pair_group_to_color(colors):
-        medoids = [medoid for medoid in colors]
+        medoids = [m for m in colors]
         groups_frequencies = ColorManager.load_frequencies()
         frequencies_groups = {v: k for k, v in groups_frequencies.items()}
         freq_values = [groups_frequencies[g]
