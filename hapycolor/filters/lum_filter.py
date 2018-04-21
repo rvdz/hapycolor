@@ -41,9 +41,10 @@ class LumFilter(base.Filter):
         Generates a data structures that represent the interpolated
         luminosity hyperplan (dark or bright).
 
-        .. todo:: This should be replaced by a function that only load a json
-        file where that contains the interpolated points instead of
-        regenating them each time
+        .. todo::
+            This should be replaced by a function that only load a json
+            file where that contains the interpolated points instead of
+            regenating them each time
         """
         # Load the provided points
         data = helpers.load_json(json_file)
@@ -117,8 +118,9 @@ class LumFilter(base.Filter):
     @staticmethod
     def polar_to_cartesian(polar_point):
         """
-        .. warning: The variable's ordering follows the 'hsl' format and not
-        the classic (radius, angle, z).
+        .. warning::
+            The variable's ordering follows the 'hsl' format and not
+            the classic (radius, angle, z).
         """
         theta, r, z = polar_point
         # if r < 0 or r > 1 or theta < 0 or theta >= 360 or z < 0 or z > 1:

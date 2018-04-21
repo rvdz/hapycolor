@@ -33,7 +33,7 @@ class VimEnvironments:
                               .expanduser() \
                               .as_posix()
 
-        vimscript = pathlib.Path("./hapycolor/targets/vim/active_plugins.vim") \
+        vimscript = pathlib.Path("./hapycolor/targets/vim/active_plugins.vim")\
                            .expanduser() \
                            .as_posix()
 

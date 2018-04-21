@@ -1,6 +1,16 @@
 hapycolor\.targets package
 ==========================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    hapycolor.targets.vim
+
+Submodules
+----------
+
 hapycolor\.targets module
 -------------------------
 
@@ -26,13 +36,17 @@ hapycolor\.targets\.lightline module
 
 .. automodule:: hapycolor.targets.lightline
 
-hapycolor\.targets\.vim module
-------------------------------
-
-.. automodule:: hapycolor.targets.vim
-
 hapycolor\.targets\.wallpaper module
 ------------------------------------
 
 .. automodule:: hapycolor.targets.wallpaper
 
+hapycolor\.targets\.i3 module
+-----------------------------
+
+.. automodule:: hapycolor.targets.i3
+
+hapycolor\.targets\.yabar module
+--------------------------------
+
+.. automodule:: hapycolor.targets.yabar

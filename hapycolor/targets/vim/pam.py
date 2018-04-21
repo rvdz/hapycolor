@@ -4,38 +4,37 @@ from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 from colormath.color_objects import LabColor, sRGBColor
 
+
 class PAM:
     """
     Partition Around Medoids
-    ========================
-    The goal of the algorithm is to minimize the average dissimilarity of
-    objects to their closest selected object.
-    A k-medoid algorithm was chosen instead of a regular k-means, since it is
-    often useful to have a color representing a cluster of colors that is also
-    contained in the picture.
 
-    The algorithm is divided in two steps: the build phase, and the swap
-    phase.
+        The goal of the algorithm is to minimize the average dissimilarity of
+        objects to their closest selected object.
+        A k-medoid algorithm was chosen instead of a regular k-means, since it
+        is often useful to have a color representing a cluster of colors that
+        is also contained in the picture. The algorithm is divided in two
+        steps: the build phase, and the swap phase.
 
     Build
-    -----
-    A collection of k objects are selected for an initial set S
+
+        A collection of k objects are selected for an initial set S
 
     Swap
-    ----
-    The second phase, SWAP, attempts to improve the the set of selected
-    object :math:`selected` and, therefore, to improve the quality of the
-    clustering. This is done by considering all pairs :math:`(i, h)` where
-    :math:`i` in :math:`selected` and :math:`h` in :math:`unselected` and
-    consists of computing the effect :math:`T_{i_h}` on the sum of
-    dissimilarities between objects and the closest selected object caused by
-    swapping :math:`i` and :math:`h`, that is, by transferring :math:`i` from
-    :math:`selected` to :math:`unselected` and transferring :math:`h` from
-    :math:`unselected` to :math:`selected`. The computation of :math:`T_{i_h}`
-    involves the computation of the contribution :math:`K_{j_i_h}` of each
-    object :math:`j \in unselected − {h}` to the swap of :math:`i`and
-    :math:`h`. Note that we have either :math:`d(j, i) > D_{j}` or
-    :math:`d(j, i) = D_{j}`.
+
+        The second phase, SWAP, attempts to improve the the set of selected
+        object :math:`selected` and, therefore, to improve the quality of the
+        clustering. This is done by considering all pairs :math:`(i, h)` where
+        :math:`i` in :math:`selected` and :math:`h` in :math:`unselected` and
+        consists of computing the effect :math:`T_{ih}` on the sum of
+        dissimilarities between objects and the closest selected object caused
+        by swapping :math:`i` and :math:`h`, that is, by transferring :math:`i`
+        from :math:`selected` to :math:`unselected` and transferring :math:`h`
+        from :math:`unselected` to :math:`selected`. The computation of
+        :math:`T_{ih}` involves the computation of the contribution
+        :math:`K_{jih}` of each object :math:`j \in unselected − {h}` to the
+        swap of :math:`i` and :math:`h`. Note that we have either
+        :math:`d(j, i) > D_j` or :math:`d(j, i) = D_j`.
     """
     def __init__(self, rgb_colors, K):
         if K > len(rgb_colors):
@@ -145,7 +144,6 @@ classes, since it only has {} colors.".format(K, len(rgb_colors))
                     K_j_i_h = min(d_j_h, E_j) - D_j
                 T_i_h += K_j_i_h
         return T_i_h
-
 
     def _d_p(self, p):
         """
