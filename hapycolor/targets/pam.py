@@ -2,6 +2,7 @@ from hapycolor import exceptions
 import numpy as np
 
 
+
 class PAM:
     """
     Partition Around Medoids
