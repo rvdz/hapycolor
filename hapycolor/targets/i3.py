@@ -16,7 +16,7 @@ class I3(base.Target):
     This class aims at altering i3's configuration file.
     Currently, it changes the color of the borders and sets the new
     wallpaper in addition of executing yabar with the custom configuration
-    file
+    file.
     """
     configuration_key = "config"
 

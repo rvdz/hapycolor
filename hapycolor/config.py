@@ -15,7 +15,7 @@ LOCAL_CONFIG = CONFIG
 def create_config():
     """
     Creates a local configuration from the default one, in the user's base
-    directory
+    directory.
     """
     dst = get_config()
     if not pathlib.Path(dst).is_file():

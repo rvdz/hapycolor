@@ -28,14 +28,16 @@ class Vim(base.Target):
     # {Minor group title: [Minor group names]}
     groups = {
               "Comment": ["Comment"],
-              "Constant": ["Constant", "String", "Character", "Number", "Boolean", "Float"],
+              "Constant": ["Constant", "String", "Character", "Number",
+                           "Boolean", "Float"],
               "Identifier": ["Identifier", "Function"],
-              "Statement": ["Statement", "Conditional", "Repeat", "Label", "Operator",
-               "Keyword", "Exception"],
-              "PreProc": ["PreProc", "Include", "Define", "Macro", "PreCondit"],
+              "Statement": ["Statement", "Conditional", "Repeat", "Label",
+                            "Operator", "Keyword", "Exception"],
+              "PreProc": ["PreProc", "Include", "Define", "Macro",
+                          "PreCondit"],
               "Type": ["Type", "StorageClass", "Structure", "Typedef"],
-              "Special": ["Special", "SpecialChar", "Tag", "Delimiter", "SpecialComment",
-               "Debug"],
+              "Special": ["Special", "SpecialChar", "Tag", "Delimiter",
+                          "SpecialComment", "Debug"],
               # ["Underlined"],
               # ["Ignore"], ["Error"], ["Todo"],
              }
@@ -139,36 +141,33 @@ let g:colors_name = "Hapycolor"'''
 
 class ColorManager:
     """
-    ColorManager
-    ============
     Manages vim's color's distribution
 
     Step 1
-    ------
-    Runs a clustering algorithm on the palette's colors and classifies
-    them according to the number of major syntactic groups, i.e.:
-    "Comment", "Constant", "Identifier", "Statement", "PreProc", "Type",
-    "Special".
+
+        Runs a clustering algorithm on the palette's colors and classifies
+        them according to the number of major syntactic groups, i.e.:
+        "Comment", "Constant", "Identifier", "Statement", "PreProc", "Type",
+        "Special".
 
     Step 2
-    ------
-    The problem of casting the colors to the syntactic groups is a
-    quadratic assignment problem. So, a QAP algorithm is ran with
-    the medoids of the clusters previously found as the input colors,alongside
-    the occurrence frequencies, of each main syntactic group. The former
-    elements represent the weights between two groups, for instance, the weight
-    between the group "Comment" and the group "Statement" is the product of
-    both their frequencies.
 
-    Then, once the algorithms finishes, each syntactic group is assigned to
-    a cluster, which will be retrieved by calling the method
-    :func:`ColorManager.cast(group_name)`.
+        The problem of casting the colors to the syntactic groups is a
+        quadratic assignment problem. So, a QAP algorithm is ran with
+        the medoids of the clusters previously found as the input colors,
+        longside the occurrence frequencies, of each main syntactic group. The
+        former elements represent the weights between two groups, for
+        instance, the weight between the group "Comment" and the group
+        "Statement" is the product of both their frequencies.
+        Then, once the algorithms finishes, each syntactic group is assigned to
+        a cluster, which will be retrieved by calling the method
+        :func:`ColorManager.cast(group_name)`.
 
     .. note::
         The occurrence frequencies are previously calculated and are located in
         `hapycolor/targets/vim/frequencies.json`
 
-    .. see::
+    .. note::
         If you are interested in correctly alter the occurrence frequencies
         of the syntactic groups, the vimscript
         `hapycolor/targets/vim/syntax_groups.vim` might be useful. It uses
