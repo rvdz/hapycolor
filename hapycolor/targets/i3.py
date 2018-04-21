@@ -20,20 +20,10 @@ class I3(base.Target, config.ConfigurationEditor):
     wallpaper in addition of executing yabar with the custom configuration
     file
     """
+    configuration_key = "config"
 
     border_variable = "$border_color"
     split_variable = "$split_color"
-    configuration_key = "config"
-
-    def get_config_file():
-        """
-        ConfigurationEditor requires to specify the location of the
-        configuration file. Since all the classes are static, the configuration
-        file cannot directly be stored as an argument of the class, since its
-        super function method :func:`Target.load_config()` cannot be called in
-        the body of :class:`I3` outside a function.
-        """
-        return I3.load_config()[I3.configuration_key]
 
     def is_config_initialized():
         try:
@@ -77,8 +67,10 @@ class I3(base.Target, config.ConfigurationEditor):
         """
         border_color = palette.colors[0]
         split_color = palette.colors[1]
+
         I3.assign_border_colors()
-        I3.declare_border_colors(border_color, split_color)
+        I3.declare_color(I3.border_variable, border_color)
+        I3.declare_color(I3.split_variable, split_color)
 
         try:
             if targets.wallpaper.Wallpaper.is_enabled():
@@ -92,30 +84,27 @@ class I3(base.Target, config.ConfigurationEditor):
         except exceptions.InvalidConfigKeyError:
             pass
 
-    def declare_border_colors(border_color, split_color):
+    def declare_color(variable, color):
         """
-        Associates the color variables to the colors themselves.
-        The result of this function should be:
-
-            set $focused_border_color = <hex_color>
-            set $focused_split_color = <hex_color>
+        Associates a color to a variable
+            set $variable_name <hex_color>
         """
-        for c in [border_color, split_color]:
-            if not helpers.can_be_rgb(c):
-                msg = "Color should be formatted as an RGB color. "
-                msg += "Instead, {} was provided".format(c)
-                raise exceptions.ColorFormatError(msg)
+        if not helpers.can_be_rgb(color):
+            msg = "Color should be formatted as an RGB color. "
+            msg += "Instead, {} was provided".format(color)
+            raise exceptions.ColorFormatError(msg)
 
-        bc = helpers.rgb_to_hex(border_color)
-        sc = helpers.rgb_to_hex(split_color)
+        hex_color = helpers.rgb_to_hex(color)
 
-        pattern_border = "set *{}.*".format(re.escape(I3.border_variable))
-        I3.replace_line(pattern_border, lambda m: "set {}    {}"
-                                            .format(I3.border_variable, bc))
+        config_file = I3.load_config()[I3.configuration_key]
 
-        pattern_split = "set *{}.*".format(re.escape(I3.split_variable))
-        I3.replace_line(pattern_split, lambda m: "set {}    {}"
-                                            .format(I3.split_variable, sc))
+        pattern_border = "set *{}.*".format(re.escape(variable))
+        declaration = "set {}    {}".format(variable, hex_color)
+        found = I3.replace_line(config_file, pattern_border,
+                                lambda _: declaration)
+        if not found:
+            with open(config_file, 'r+') as f:
+                f.write(declaration)
 
     def assign_border_colors():
         """
@@ -138,23 +127,35 @@ class I3(base.Target, config.ConfigurationEditor):
             .format(I3.border_variable, I3.border_variable,
                     "{}", I3.split_variable)
 
-        def new_line(match=None):
-            if match is not None:
-                text_color = [e for e in match.group(1).split(' ') if e != '']
-            c = text_color[2] if match else "#000000"
-            return base.format(c)
+        def new_line(match):
+            text_color = [e for e in match.group(1).split(' ') if e != '']
+            return base.format(text_color[2])
 
-        I3.replace_line(pattern, new_line)
+        config_file = I3.load_config()[I3.configuration_key]
+        found = I3.replace_line(config_file, pattern, new_line)
+
+        if not found:
+            with open(config_file, 'r+') as f:
+                f.write(base.format('#000000'))
 
     def set_wallpaper(image_path):
         pattern = r".*exec .*feh.*"
+        config_file = I3.load_config()[I3.configuration_key]
         command = "exec --no-startup-id feh --bg-fill --no-xinerama {}" \
             .format(image_path)
-        I3.replace_line(pattern, lambda m: command)
+        found = I3.replace_line(config_file, pattern, lambda _: command)
+
+        if not found:
+            with open(config_file, 'r+') as f:
+                f.write(command)
 
     def set_yabar():
-        pattern = r".* status_command *yabar.*"
+        pattern = r".*status_command *yabar.*"
         config_key = yabar.Yabar.configuration_key
         config_file = pathlib.Path(yabar.Yabar.load_config()[config_key]).parent / "hapy.conf"
         command = "status_command yabar -c {}".format(config_file.as_posix())
-        I3.replace_line(pattern, lambda m: command)
+
+        found = I3.replace_line(config_file, pattern, lambda _: command)
+        if not found:
+            with open(config_file, 'r+') as f:
+                f.write(command)
