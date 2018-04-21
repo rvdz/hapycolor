@@ -15,25 +15,18 @@ class TestConfiguration(unittest.TestCase):
         expected_sections = ["hyperplan", "Iterm", "Wallpaper", "Gnome"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))
 
+
     @contextlib.contextmanager
-    def test_context(lines=None):
-        test_file = "./tests/test_configuration_editor.txt"
-        text = """first line
-second line
-third line
-fourth line
-"""
-        with open(test_file, 'w') as f:
-            f.write(text)
-            if lines:
-                f.write(lines)
+    def test_context(output):
+        @contextlib.contextmanager
+        def mock_edit_config(file):
+            text = ["first line", "second line", "third line", "fourth line"]
+            yield text, output
 
-        with mock.patch("hapycolor.config.ConfigurationEditor.get_config_file",
-                return_value=test_file):
+        with mock.patch("hapycolor.config.ConfigurationEditor.edit_config",
+                        mock_edit_config):
             yield
-        os.remove(test_file)
 
-    @test_context()
     def test_replace_line_with_match(self):
         """
         This test aims at testing if the return of the match is correctly
@@ -41,16 +34,16 @@ fourth line
         capture the string 'line' in the second line, and replace the begging
         of the line by 'middle'.
         """
+        result = []
         pattern = r"^second (.*)$"
-        config.ConfigurationEditor.replace_line(pattern,
-                lambda m: "middle " + m.group(1))
+        with TestConfiguration.test_context(result):
+            match = config.ConfigurationEditor.replace_line("", pattern,
+                    lambda m: "middle " + m.group(1))
 
-        expected = "middle line\n"
-        match = False
-        with open(config.ConfigurationEditor.get_config_file(), 'r') as f:
-            self.assertEqual(expected, f.readlines()[1])
+        expected = "middle line"
+        self.assertTrue(match)
+        self.assertEqual(expected, result[1])
 
-    @test_context()
     def test_replace_line_with_argument(self):
         """
         This test aims at checking if the substitution arguments are passed
@@ -69,11 +62,11 @@ fourth line
             args[1] = (args[1] + 1) % len(args[0])
             return res
 
-        config.ConfigurationEditor.replace_line(pattern, substitution,
-                [[1, 2, 3, 4], 0])
+        result = []
+        with TestConfiguration.test_context(result):
+            config.ConfigurationEditor.replace_line("", pattern, substitution,
+                    [[1, 2, 3, 4], 0])
 
-        expected = ["Color 1\n", "Color 2\n", "Color 3\n", "Color 4\n"]
+        expected = ["Color 1", "Color 2", "Color 3", "Color 4"]
         match = False
-        with open(config.ConfigurationEditor.get_config_file(), 'r') as f:
-            for i, l in enumerate(f.readlines()):
-                self.assertEqual(expected[i], l)
+        self.assertEqual(expected, result)

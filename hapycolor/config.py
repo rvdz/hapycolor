@@ -89,96 +89,70 @@ class ConfigurationManager:
 
 class ConfigurationEditor:
     """
-    This abstract class is meant to be inherited by an object that needs to
-    alters a file, for instance, a target that edits its configuration file
-    such as i3 or yabar.
+    This abstract class is meant to be a tool useful when a target needs to
+    alter a file, for instance, i3 or yabar need to update their configuration
+    file.
 
-    In order to do so, it loads the associated file into a buffer and
-    allocates an empty buffer which will store the new version of the file.
-    Both are provided through a context manager and once the context closed,
-    the new buffer will be saved in the target file.
-
-    In between, each line of the file is matched to a provided regular
-    expression, and, if a match is found, the matched line is replaced. This
-    operation is performed by running the provided substitution function with
-    the result of the match (:class:`re.match`).
-
-    The reader might wonder why a function is required instead of a string
-    when replacing a line. The answer comes from the fact that in some cases,
-    parts of the former line are needed to create the new one. To do so, the
-    user can provide a regular expression capturing the needed parts in
-    addition of defining the targeted pattern and the result of the match
-    will be used to generate the new line through the provided function.
+    .. see:: :func:`replace_line()`
 
     .. todo::
         We should change the name of this class, since it can be
         confused with :class:`ConfigurationManager`
     """
-    def get_config_file():
-        raise NotImplemented
-
     @contextlib.contextmanager
-    def edit_config(cls):
+    def edit_config(file):
         """
-        This context manager first, loads the lines of the configuration file
+        This context manager first, loads the lines of the provided file
         into a buffer and allocates an empty buffer. Then, both lists are
-        passed to the created context, which should analyze the old buffer and
+        passed to the new context, which should read the old buffer and
         fill the new one. Finally, once the context has been closed, the new
-        buffer is written into the configuration file.
+        buffer is written into the file.
         """
         old_lines = []
         new_lines = []
-        with open(cls.get_config_file(), 'r') as old_f:
+        with open(file, 'r') as old_f:
             old_lines = old_f.readlines()
 
         yield (old_lines, new_lines)
 
-        with open(cls.get_config_file(), 'w') as new_f:
+        with open(file, 'w') as new_f:
             new_f.write(''.join(new_lines))
 
-    @classmethod
-    def replace_line(cls, pattern, substitution, *args):
+    def replace_line(file, pattern, substitution, *args):
         """
-        Parses the configuration file, applying the provided pattern to each
+        Parses the provided file, applying the provided pattern to each
         line. If a match is found, the :class:`re.match` object created is
         passed to the substitution function, which generates the new line
         that will replace the matched line.
 
         It might happen that the substitution function will need other
-        arguments, such as a list of colors and an index, in the case of
-        multiple substitutions with different colors. So, in order to
-        generalize this tool, the substitution function can be prototyped
-        as:
+        arguments. For instance: a list of colors and an index, where the index
+        is incremented after each call, which allows the substitution function
+        to replace the same matched pattern with different colors.
+        So, in order to generalize this tool, the substitution function
+        can be prototyped as:
 
-        ```
-        def substitution(match, *args)
-        ```
+        After running this function, the boolean `True` is returned
+        if a match has been found, otherwise, `False`.
 
-        When executing the substitution, the arguments will be the result
-        of the match and :arg *args:
+        .. code:: python
+
+            def substitution(match, *args)
+
+        Note, that the argument: `*args` is optional.
 
         .. note::
             For more details and examples, please check the tests in
-            :func:`tests.test_configuration.TestConfiguration`
-
-        .. warning::
-            If any line matches the pattern,
-            :func:`ContextEditor.replace_line()` it will call the substitution
-            function providing 'None' as argument and add the result at the
-            end of the file. This implies that the substitution function should
-            manage the case where 'None' is provided instead of a
-            :class:`re.match` object.
+            :class:`tests.test_configuration.TestConfiguration`
         """
         p = re.compile(pattern)
         match = False
-        with ConfigurationEditor.edit_config(cls) as (config, new_config):
+        with ConfigurationEditor.edit_config(file) as (config, new_config):
             for line in config:
                 if p.match(line):
-                    new_line = substitution(p.match(line), *args) + '\n'
+                    new_line = substitution(p.match(line), *args)
                     new_config.append(new_line)
                     match = True
                 else:
                     new_config.append(line)
-
-            if not match:
-                new_config.append(substitution(None, *args) + '\n')
+        return match
