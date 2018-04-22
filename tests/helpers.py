@@ -46,5 +46,5 @@ def generate_palette(size):
     pltte = palette.Palette()
     pltte.foreground = (0, 0, 0)
     pltte.background = (0, 0, 0)
-    pltte.colors = [(c, c, c) for c in range(size)]
+    pltte.colors = [tuple([c * 15 % 256] * 3) for c in range(size)]
     return pltte

@@ -12,7 +12,7 @@ from .. import exceptions
 from .. import helpers
 from .. import palette as pltte
 from .. import targets
-from . import terminal_color_manager
+from . import terminal
 from . import base
 
 
@@ -135,7 +135,7 @@ class Iterm(base.Target):
         :arg image_path: a string which will be used to name the newly created
              profile
         """
-        if palette.__class__ != pltte.Palette or not palette.is_initialized:
+        if palette.__class__ != pltte.Palette or not palette.is_initialized():
             msg = "The palette has not been correctly initialized"
             raise exceptions.PaletteFormatError(msg)
 
@@ -143,7 +143,7 @@ class Iterm(base.Target):
 
         root = template_tree.getroot()
 
-        Iterm._set_colors(palette.colors, template_root)
+        Iterm._set_colors(palette.colors, root)
 
         name = image_path.split("/")[-1].split(".")[0]
         name_element = ET.Element(Iterm.Tag.STRING)
@@ -161,7 +161,7 @@ class Iterm(base.Target):
                            Iterm.rgb_to_xml(palette.foreground), root)
 
         Iterm._set_element(Iterm.Key.CURSOR_TEXT_COLOR,
-                           Iterm.rgb_to_xml(palette.foreground, root)
+                           Iterm.rgb_to_xml(palette.foreground), root)
 
         element = ET.Element(Iterm.Tag.REAL)
         element.text = str(0.2)
@@ -169,9 +169,9 @@ class Iterm(base.Target):
 
         with Iterm.open_preferences("r") as f:
             preferences_tree = ET.parse(Iterm.load_config()[Iterm.preferences_key])
-        preferences_root = config_tree.getroot().find(Iterm.Tag.DICT)
+        preferences_root = preferences_tree.getroot().find(Iterm.Tag.DICT)
 
-        guid = Iterm._set_guid(template_root, preferences_root)
+        guid = Iterm._set_guid(root, preferences_root)
 
         if Iterm.load_config()[Iterm.default_key] == str(True):
             Iterm._set_default(guid, preferences_root)
@@ -180,11 +180,11 @@ class Iterm(base.Target):
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
                 root[i+1].text = "\n\t\t"
-                root[i+1].append(template_root)
+                root[i+1].append(root)
 
         # Save changes
         with Iterm.open_preferences("wb") as f:
-            f.write(ET.tostring(config_tree.getroot()))
+            f.write(ET.tostring(preferences_tree.getroot()))
 
     def rgb_to_xml(color):
         """
@@ -198,9 +198,10 @@ class Iterm(base.Target):
 
         components = ["Red Component", "Green Component", "Blue Component"]
         color_keys = [ET.Element(Iterm.Tag.KEY)] * 3
-        color_keys = [element.text = components[i]
-                      for i, element in enumerate(color_keys)]
-        color_keys = [element.tail = "\n\t\t" for element in color_keys]
+        for i, element in enumerate(color_keys):
+            element.text = components[i]
+        for element in color_keys:
+            element.tail = "\n\t\t"
 
         element = ET.Element(Iterm.Tag.DICT)
         element.text = "\n\t\t"
@@ -217,7 +218,7 @@ class Iterm(base.Target):
         return element
 
     def _set_colors(colors, root):
-        tc = terminal_color_manager.TerminalColorManager(colors)
+        tc = terminal.Terminal(colors)
         p = re.compile(r"Ansi [0-9]* Color")
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and p.match(n.text):

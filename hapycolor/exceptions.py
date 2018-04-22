@@ -56,6 +56,11 @@ class EmptyPaletteException(HapycolorError):
         super(EmptyPaletteException, self).__init__(msg)
         self.msg = msg
 
+class InvalidPaletteException(HapycolorError):
+    def __init__(self, msg):
+        super(InvalidPaletteException, self).__init__(msg)
+        self.msg = msg
+
 
 class InvalidImageError(HapycolorError):
     def __init__(self, msg, wrapped_exc=None):
