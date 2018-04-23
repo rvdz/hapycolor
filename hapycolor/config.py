@@ -1,10 +1,7 @@
-from . import exceptions
-
 import configparser
-import contextlib
 import pathlib
-import re
 import shutil
+from . import exceptions
 
 
 ROOT_DIR = pathlib.Path(__file__).parent
@@ -85,74 +82,3 @@ class ConfigurationManager:
 
         with open(get_config(), "w") as f:
             config.write(f)
-
-
-class ConfigurationEditor:
-    """
-    This abstract class is meant to be a tool useful when a target needs to
-    alter a file, for instance, i3 or yabar need to update their configuration
-    file.
-
-    .. see:: :func:`replace_line()`
-
-    .. todo::
-        We should change the name of this class, since it can be
-        confused with :class:`ConfigurationManager`
-    """
-    @contextlib.contextmanager
-    def edit_config(file):
-        """
-        This context manager first, loads the lines of the provided file
-        into a buffer and allocates an empty buffer. Then, both lists are
-        passed to the new context, which should read the old buffer and
-        fill the new one. Finally, once the context has been closed, the new
-        buffer is written into the file.
-        """
-        old_lines = []
-        new_lines = []
-        with open(file, 'r') as old_f:
-            old_lines = old_f.readlines()
-
-        yield (old_lines, new_lines)
-
-        with open(file, 'w') as new_f:
-            new_f.write(''.join(new_lines))
-
-    def replace_line(file, pattern, substitution, *args):
-        """
-        Parses the provided file, applying the provided pattern to each
-        line. If a match is found, the :class:`re.match` object created is
-        passed to the substitution function, which generates the new line
-        that will replace the matched line.
-
-        It might happen that the substitution function will need other
-        arguments. For instance: a list of colors and an index, where the index
-        is incremented after each call, which allows the substitution function
-        to replace the same matched pattern with different colors.
-        So, in order to generalize this tool, the substitution function
-        can be prototyped as:
-
-        After running this function, the boolean `True` is returned
-        if a match has been found, otherwise, `False`.
-
-        .. code:: python
-
-            def substitution(match, *args)
-
-        Note, that the argument: `*args` is optional.
-
-        .. note::
-            For more details and examples, please check the tests in
-            :class:`tests.test_configuration.TestConfiguration`
-        """
-        p = re.compile(pattern)
-        match = False
-        with ConfigurationEditor.edit_config(file) as (config, new_config):
-            for line in config:
-                if p.match(line):
-                    new_line = substitution(p.match(line), *args)
-                    new_config.append(new_line)
-                    match = True
-                else:
-                    new_config.append(line)
-        return match
