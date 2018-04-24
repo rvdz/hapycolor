@@ -43,6 +43,7 @@ class ConfigurationManager:
         confused with :class:`ConfigurationManager`
     """
 
+    @staticmethod
     def load(section):
         """
         Loads the content of a given section of hapycolor's configuration file
@@ -58,6 +59,7 @@ class ConfigurationManager:
             msg = "Configuration entry not found"
             raise exceptions.InvalidConfigKeyError(msg, e)
 
+    @staticmethod
     def save(section, target_config):
         """
         Save a new entry in the config file.

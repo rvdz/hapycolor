@@ -23,12 +23,12 @@ name.
     in the module and retrieving the one that implements :class:`base.Target`.
 """
 
-from . import vim, iterm, wallpaper, lightline, gnome, yabar, i3, rofi
-from . import base
 import platform
 import enum
 from hapycolor import config
 from hapycolor import exceptions
+from . import vim, iterm, wallpaper, lightline, gnome, yabar, i3, rofi
+from . import base
 
 
 def initialize():
@@ -36,21 +36,18 @@ def initialize():
     print("Targets found: " + ", ".join([t.__name__ for t in get()]))
     targets = get_compatible()
     uninit_targets = []
-    for t in targets:
-        try:
-            if not t.is_enabled():
-                continue
-            if not t.is_config_initialized():
-                uninit_targets.append(t)
-        except (KeyError, exceptions.InvalidConfigKeyError):
-            uninit_targets.append(t)
 
-    for t in uninit_targets:
-        res = input("Enable " + t.__name__ + "? (y/n) :")
+    for target in targets:
+        if not target.is_defined() \
+                or (target.is_enabled() and not target.is_config_initialized()):
+            uninit_targets.append(target)
+
+    for target in uninit_targets:
+        res = input("Enable " + target.__name__ + "? (y/n) :")
         if res.capitalize() == "Y":
-            initialize_target(t)
+            initialize_target(target)
         else:
-            t.disable()
+            target.disable()
 
 
 def initialize_target(target):

@@ -46,6 +46,19 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
     def reconfigure(cls):
         cls.initialize_config()
 
+    @classmethod
+    def is_defined(cls):
+        """
+        Checks if there target has already been enabled/disabled once.
+        This is useful, since at first, any target is set to be
+        enabled/disabled so to initialize them when first running
+        Hapycolor.
+        """
+        try:
+            return "enabled" in cls.load(cls.__name__)
+        except exceptions.InvalidConfigKeyError:
+            return False
+
     @staticmethod
     def is_config_initialized():
         return True
@@ -72,4 +85,7 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
 
     @classmethod
     def is_enabled(cls):
-        return cls.load_config()["enabled"] == str(True)
+        try:
+            return cls.load_config()["enabled"] == str(True)
+        except exceptions.InvalidConfigKeyError:
+            return False
