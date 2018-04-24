@@ -81,7 +81,7 @@ class I3(base.Target):
         config_path = I3.load_config()[I3.configuration_key]
         configuration = []
         with open(config_path, 'r') as config_file:
-            configuration = config_file.readlines()
+            configuration = config_file.read().splitlines()
 
         configuration = I3.assign_border_colors(configuration)
         configuration = I3.declare_color(configuration, I3.border_variable,
@@ -104,7 +104,7 @@ class I3(base.Target):
             pass
 
         with open(config_path, 'w') as config_file:
-            config_file.write(configuration)
+            config_file.write('\n'.join(configuration))
 
     @staticmethod
     def declare_color(config, variable, color):

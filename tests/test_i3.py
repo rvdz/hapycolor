@@ -1,6 +1,7 @@
 """
 i3 Test Module
 """
+import os
 import unittest
 from unittest import mock
 import contextlib
@@ -127,8 +128,8 @@ class TestI3(unittest.TestCase):
 
         result = []
         mock_file = mock.Mock()
-        mock_file.write = lambda string: result.extend(string)
-        mock_file.readlines = lambda: config
+        mock_file.write = lambda string: result.extend(string.split('\n'))
+        mock_file.read().splitlines = lambda: config
 
         @contextlib.contextmanager
         def mock_open(file, mode):
@@ -145,7 +146,37 @@ class TestI3(unittest.TestCase):
                 mock.patch("hapycolor.targets.yabar.Yabar.is_enabled", \
                         return_value=True), \
                 mock.patch("hapycolor.targets.yabar.Yabar.load_config",
-                        return_value=mock_yabar):
+                           return_value=mock_yabar):
             I3.export(palette, "/path/to/image.png")
 
         self.assertEqual(result, expected)
+
+    def test_export_with_file(self):
+        config_path = "./tests/test_i3.txt"
+        config = ["line 1", "line 3", "set $border_color    #bbbbbb",
+                  "set $var_color    #aaaaaa", "Last line"]
+
+        with open(config_path, 'w') as config_file:
+            config_file.write('\n'.join(config))
+
+        mock_palette = mock.Mock()
+        mock_palette.colors = [(4, 6, 7), (1, 3, 6), (3, 6, 8)]
+        mock_config = {I3.configuration_key: config_path}
+        with mock.patch("hapycolor.targets.i3.I3.load_config",
+                        return_value=mock_config), \
+                mock.patch("hapycolor.targets.yabar.Yabar.is_enabled",
+                           return_value=False), \
+                mock.patch("hapycolor.targets.wallpaper.Wallpaper.is_enabled",
+                           return_value=False):
+            I3.export(mock_palette, "path/to/image.png")
+
+        with open(config_path, 'r') as config_file:
+            result = config_file.read().splitlines()
+
+        expected = ["set $split_color    #010306",
+                    "client.focused    $border_color   "
+                    + " $border_color    #000000    $split_color",
+                    "line 1", "line 3", "set $border_color    #040607",
+                    "set $var_color    #aaaaaa", "Last line"]
+        self.assertEqual(result, expected)
+        os.remove(config_path)
