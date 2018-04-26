@@ -7,7 +7,6 @@ from unittest import mock
 import contextlib
 from hapycolor import exceptions
 from hapycolor import targets
-from hapycolor.targets import yabar
 from hapycolor.targets.i3 import I3
 
 class TestI3(unittest.TestCase):
@@ -52,25 +51,6 @@ class TestI3(unittest.TestCase):
                         I3.split_variable)
         self.assertEqual(result[4], expected)
 
-    @mock.patch("hapycolor.targets.yabar.Yabar.load_config",
-                return_value={yabar.Yabar.configuration_key: "/path/to/yabar.conf"})
-    def test_set_yabar_not_set(self, mock_config):
-        config = ["first line", "second line", "third line", "fourth line"]
-        result = I3.set_yabar(config)
-
-        expected = "status_command yabar -c /path/to/hapy.conf"
-        self.assertEqual(result[0], expected)
-
-    @mock.patch("hapycolor.targets.yabar.Yabar.load_config",
-                return_value={yabar.Yabar.configuration_key: "/path/to/yabar.conf"})
-    def test_set_yabar_set(self, mock_config):
-        config = ["first line", "second line", "third line", "fourth line",
-                  "status_command yabar"]
-        result = I3.set_yabar(config)
-
-        expected = "status_command yabar -c /path/to/hapy.conf"
-        self.assertEqual(result[4], expected)
-
     def test_is_config_initialized_default(self):
         self.assertFalse(I3.is_config_initialized())
 
@@ -111,7 +91,6 @@ class TestI3(unittest.TestCase):
                   "line 3",
                   "set $border_color    #bbbbbb",
                   "set $var_color    #aaaaaa",
-                  "status_command yabar -c /path/to/nothapy.conf",
                   "set $split_color    #cccccc",
                   "exec --no-startup-id feh --bg-fill --no-xinerama "
                   + "/path/to/otherimage.png", "last line"]
@@ -121,7 +100,6 @@ class TestI3(unittest.TestCase):
                     "line 3",
                     "set $border_color    #646464",
                     "set $var_color    #aaaaaa",
-                    "status_command yabar -c /path/to/hapy.conf",
                     "set $split_color    #c8c8c8",
                     "exec --no-startup-id feh --bg-fill --no-xinerama "
                     + "/path/to/image.png", "last line"]
@@ -138,15 +116,10 @@ class TestI3(unittest.TestCase):
         palette = mock.Mock()
         palette.colors = [(100, 100, 100), (200, 200, 200)]
 
-        mock_yabar = {yabar.Yabar.configuration_key: "/path/to/yabar.conf"}
         with mock.patch("builtins.open", mock_open), \
                 mock.patch("hapycolor.targets.i3.I3.load_config"), \
                 mock.patch("hapycolor.targets.wallpaper.Wallpaper.is_enabled", \
-                        return_value=True), \
-                mock.patch("hapycolor.targets.yabar.Yabar.is_enabled", \
-                        return_value=True), \
-                mock.patch("hapycolor.targets.yabar.Yabar.load_config",
-                           return_value=mock_yabar):
+                        return_value=True):
             I3.export(palette, "/path/to/image.png")
 
         self.assertEqual(result, expected)
@@ -164,8 +137,6 @@ class TestI3(unittest.TestCase):
         mock_config = {I3.configuration_key: config_path}
         with mock.patch("hapycolor.targets.i3.I3.load_config",
                         return_value=mock_config), \
-                mock.patch("hapycolor.targets.yabar.Yabar.is_enabled",
-                           return_value=False), \
                 mock.patch("hapycolor.targets.wallpaper.Wallpaper.is_enabled",
                            return_value=False):
             I3.export(mock_palette, "path/to/image.png")
