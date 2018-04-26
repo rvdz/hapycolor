@@ -6,7 +6,6 @@ import re
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import targets
-from hapycolor.targets import yabar
 from hapycolor.targets import wallpaper
 from . import base
 
@@ -97,12 +96,6 @@ class I3(base.Target):
         except exceptions.InvalidConfigKeyError:
             pass
 
-        try:
-            if yabar.Yabar.is_enabled():
-                configuration = I3.set_yabar(configuration)
-        except exceptions.InvalidConfigKeyError:
-            pass
-
         with open(config_path, 'w') as config_file:
             config_file.write('\n'.join(configuration))
 
@@ -168,20 +161,6 @@ class I3(base.Target):
         pattern = r".*exec .+feh"
         command = "exec --no-startup-id feh --bg-fill --no-xinerama {}" \
             .format(image_path)
-        return I3.replace_or_add(config, pattern, command)
-
-    @staticmethod
-    def set_yabar(config):
-        # TODO(romain|yann): Naming? hapy.conf / hapycolor.conf / hapycolor.config?
-        """
-        If the target "yabar" is enables, this method will insert/replace
-        yabar's command with the generated configuration file: `hapy.conf`
-        """
-        pattern = r".*status_command +yabar"
-        config_key = yabar.Yabar.configuration_key
-        config_file = pathlib.Path(yabar.Yabar.load_config()[config_key]).parent / "hapy.conf"
-        command = "status_command yabar -c {}".format(config_file.as_posix())
-
         return I3.replace_or_add(config, pattern, command)
 
     @staticmethod
