@@ -6,7 +6,7 @@ import os
 from hapycolor import exceptions
 
 
-class VimHelpers:
+class VimEnvironments:
     def is_vim_installed():
         try:
             subprocess.run(["vim", "--version"], stdout=subprocess.DEVNULL)
@@ -15,22 +15,21 @@ class VimHelpers:
             return False
 
     def bundle_plugins_path():
-        common_paths = [pathlib.Path(p) for p in ["~/.vim/bundle",
-                                                  "~/.vim/pack/bundle/start",
-                                                  "~/.vim_runtime/sources_non_forked"]]
+        common_paths = ["~/.vim/bundle", "~/.vim/pack/bundle/start",
+                        "~/.vim_runtime/sources_non_forked"]
+        common_paths = [pathlib.Path(p) for p in common_paths]
         for p in common_paths:
             if p.expanduser().exists():
                 return p.expanduser()
         raise exceptions.NoCommonPathFound("Common bundle's path do not exist")
 
-    @contextlib.contextmanager
-    def export_plugin_paths():
+    def plugin_paths():
         """
         Generates a file containing all the plugins' paths, and removes
         afterward.
         """
 
-        plugin_paths = pathlib.Path("./hapycolor/targets/plugin_paths.txt") \
+        plugin_paths = pathlib.Path("./plugin_paths.txt") \
                               .expanduser() \
                               .as_posix()
 
@@ -38,27 +37,28 @@ class VimHelpers:
                            .expanduser() \
                            .as_posix()
 
-        subprocess.run(["vim", "-s", vimscript, plugin_paths],
+        subprocess.run(["vim", "-s", vimscript],
                        stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL)
-        yield plugin_paths
+
+        with open(plugin_paths, 'r') as pp:
+            plugins = pp.readlines()
         os.remove(plugin_paths)
+
+        plugins = plugins[0].split('=')[1].split(',')
+        return plugins
 
     def find_plugin(plugin):
         """
         Retrives the full path to a vim plugin.
 
         :param plugin: a string representing the name of the plugin
-        :return: a string containing the full path of the plugin
+        :return: None if the plugin is not found, otherwise the path of the
+            provided plugin
         """
-        with VimHelpers.export_plugin_paths() as path:
-            with open(path) as f:
-                plugins = f.readlines()
-        p = re.compile("[0-9]+: (.*" + plugin + "/)")
-        matches = [m for m in [p.search(l) for l in plugins] if m is not None]
-        try:
-            path = pathlib.Path(matches[0].group(1))
-            return path
-        except IndexError as e:
-            msg = "No active plugin found named: " + plugin + " - " + str(e)
-            raise exceptions.PluginError(msg)
+        plugins = VimEnvironments.plugin_paths()
+        pattern = re.compile(r".*/{}$".format(plugin))
+        for p in plugins:
+            if pattern.match(p):
+                return p
+        return None

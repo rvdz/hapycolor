@@ -32,3 +32,12 @@ class TestLightline(unittest.TestCase):
     def test_theme_exist(self):
         for t in Lightline.ThemeEnum:
             self.assertTrue(pathlib.Path(t.value).exists())
+
+    @unittest.skipUnless(pathlib.Path("~/.vim/pack/bundle/start/lightline.vim")
+        .expanduser().is_dir(), "This test requires vim's plugins to be "
+        + "located in this folder: '~/vim/pack/bundle/start")
+    def test_select_colorscheme_path(self):
+        path = Lightline.select_colorscheme_path()
+        expected = "~/.vim/pack/bundle/start/lightline.vim/autoload/lightline" \
+                    + "/colorscheme/hapycolor.vim"
+        self.assertEqual(path, expected)

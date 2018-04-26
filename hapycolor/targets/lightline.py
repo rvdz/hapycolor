@@ -2,8 +2,8 @@ import enum
 import datetime
 from . import base
 from . import eight_bit_colors
-from . import vim_helpers
-from hapycolor import config
+from . import vim_environment
+from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor import helpers
 
@@ -71,12 +71,13 @@ class Lightline(base.Target):
             Lightline.save_config({Lightline.theme_key: str(theme.value)})
         elif entry == 2:
             colorscheme_path = Lightline.select_colorscheme_path()
-            Lightline.save_config({Lightline.colorscheme_key: colorscheme_path})
+            entry = {Lightline.colorscheme_key: colorscheme_path}
+            Lightline.save_config(entry)
 
     def select_colorscheme_path():
-        p = vim_helpers.VimHelpers.find_plugin(Lightline.plugin_name)
-        file_path = (p / "autoload/lightline/colorscheme/hapycolor.vim")
-        return file_path.expanduser().as_posix()
+        p = vim_environment.VimEnvironments.find_plugin(Lightline.plugin_name)
+        file_path = p + "/autoload/lightline/colorscheme/hapycolor.vim"
+        return file_path
 
     def select_theme():
         try:
@@ -101,7 +102,7 @@ class Lightline(base.Target):
             return False
 
     def compatible_os():
-        return [config.OS.DARWIN, config.OS.LINUX]
+        return [targets.OS.DARWIN, targets.OS.LINUX]
 
     def export(palette, image_path):
         """
@@ -115,13 +116,13 @@ class Lightline(base.Target):
 
             # Defines input palette's variables
             colors = Lightline.get_colors(palette)
-            f.write(Lightline.set_variable("foreground", palette.foreground))
+            f.write(Lightline.replace_line("foreground", palette.foreground))
             f.write("\n")
-            f.write(Lightline.set_variable("background", palette.background))
+            f.write(Lightline.replace_line("background", palette.background))
             f.write("\n")
 
             for label in colors:
-                f.write(Lightline.set_variable(label, colors[label]) + "\n")
+                f.write(Lightline.replace_line(label, colors[label]) + "\n")
             f.write("\n")
 
             body_path = Lightline.load_config()[Lightline.theme_key]
@@ -160,7 +161,7 @@ class Lightline(base.Target):
             colors[e.name.lower()] = lcm.get(e)
         return colors
 
-    def set_variable(label, color):
+    def replace_line(label, color):
         return "let s:" + label + " = [ '" + helpers.rgb_to_hex(color) + "', "\
             + str(eight_bit_colors.rgb2short(color)) + "]"
 

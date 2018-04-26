@@ -1,14 +1,15 @@
-from hapycolor import config
 from hapycolor import helpers
 from hapycolor import exceptions
+from hapycolor import targets
 from hapycolor import palette as pltte
 from . import eight_bit_colors
 from . import base
-import random, os, re
+import random
+import os
+import re
 
 
 class Yabar(base.Target):
-
 
     """
         Replace tokens by their defined color in yabar conf file
@@ -42,7 +43,6 @@ class Yabar(base.Target):
     configuration_key = "yabar_conf"
     configuration_hue_key = "yabar_default_hue"
 
-
     def is_config_initialized():
 
         try:
@@ -52,28 +52,28 @@ class Yabar(base.Target):
 
     def initialize_config():
 
-        p = config.input_path("Path to yabar's custom config file: ")
+        p = helpers.input_path("Path to yabar's custom config file: ")
 
         if not p.is_file():
             raise exceptions.WrongInputError("Must be a file")
         if not p.is_absolute():
             p = p.resolve()
 
-        Yabar.save_config({Yabar.configuration_key : p.as_posix()})
+        Yabar.save_config({Yabar.configuration_key: p.as_posix()})
 
         p = input("Default hue for defined colors: ")
 
         try:
             if not 0 <= int(p) <= 360:
                 raise exceptions.WrongInputError("Must be between 0 and 360")
-        except:
+        except Exception:
             raise exceptions.WrongInputError("Must be an int")
 
         Yabar.save_config({Yabar.configuration_hue_key: p})
 
     def compatible_os():
 
-        return [config.OS.LINUX]
+        return [targets.OS.LINUX]
 
     def export(palette, image_path):
 
@@ -91,7 +91,7 @@ class Yabar(base.Target):
         hsl_colors = list(map(lambda x: helpers.rgb_to_hsl(x),
                               palette._colors))
 
-        with open(ya_conf, 'r') as f, open(hapyconf, 'a') as hapy:
+        with open(ya_conf, 'r') as f, open(hapyconf, 'w') as hapy:
             body = f.read()
 
             # TOKEN BACKGROUND

@@ -1,13 +1,14 @@
-from hapycolor import config
+from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor.targets.wallpaper import Wallpaper
 from tests import helpers
 from unittest.mock import patch
+import pathlib
 import unittest
 
 
 class TestWallpaper(unittest.TestCase):
-    @unittest.skipUnless(config.os() == config.OS.DARWIN,
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
                          "targetted platform: Darwin")
     @patch('hapycolor.targets.wallpaper.Wallpaper.load_config',
            return_value={Wallpaper.configuration_darwin: '~'})
@@ -17,7 +18,7 @@ class TestWallpaper(unittest.TestCase):
             Wallpaper.export({}, "name")
 
     @helpers.configurationtesting()
-    @unittest.skipUnless(config.os() == config.OS.DARWIN,
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
                          "targetted platform: Darwin")
     @patch('subprocess.call', lambda x: x)
     def test_configuration_file_exist(self):
@@ -25,3 +26,11 @@ class TestWallpaper(unittest.TestCase):
             Wallpaper.export({}, "name")
         except Exception as err:
             self.fail(str(err))
+
+    @helpers.configurationtesting()
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, "Tests Darwin's"
+                         + " environment")
+    def test_configuration_wallpaper(self):
+        raw_path = Wallpaper.load_config()[Wallpaper.configuration_darwin]
+        wallpaper_path = pathlib.Path(raw_path).expanduser()
+        self.assertTrue(wallpaper_path.exists())

@@ -28,20 +28,7 @@ from hapycolor import config
 
 
 def get():
-    """
-    Returns all the filters enabled sorted by their complexity.
-    """
-    fltrs_config = config.load("Filters")
-    fltrs = [f for f in config.load("Filters")]
-    # Sort the filters according to their complexity
-    fltrs.sort(key=lambda f: int(fltrs_config[f]))
-
-    fltr_classes = []
-    for f in fltrs:
-        # Convert to PascalCase
-        clazz = "".join(x.title() for x in f.split('_'))
-        fltr_classes.append(eval(f + "." + clazz))
-    return fltr_classes
+    return [lum_filter.LumFilter, reducer.Reducer]
 
 
 def apply(palette):

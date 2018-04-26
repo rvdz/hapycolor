@@ -1,7 +1,7 @@
 import subprocess
 import pathlib
 import platform
-from hapycolor import config
+from hapycolor import targets
 from hapycolor import exceptions
 from . import base
 
@@ -15,7 +15,7 @@ class Wallpaper(base.Target):
         return True
 
     def compatible_os():
-        return [config.OS.DARWIN, config.OS.LINUX]
+        return [targets.OS.DARWIN, targets.OS.LINUX]
 
     configuration_darwin = "wallpaper_macos"
 
@@ -24,24 +24,25 @@ class Wallpaper(base.Target):
 
         :arg img: the image's path
         """
-        os = config.os()
-        if os == config.OS.DARWIN:
+        os = targets.os()
+        if os == targets.OS.DARWIN:
             Wallpaper.__export_darwin(image_path)
-        elif os == config.OS.LINUX:
+        elif os == targets.OS.LINUX:
             Wallpaper.__export_linux(image_path)
 
     def __export_linux(image_path):
         try:
             subprocess.call(['feh', '--bg-scale', image_path])
             return
-        except:
+        except Exception:
             pass
         try:
-            subprocess.call(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', "file:///" + image_path])
-        except:
+            subprocess.call(['gsettings', 'set',
+                             'org.gnome.desktop.background', 'picture-uri',
+                             "file:///" + image_path])
+        except Exception:
             msg = '\nUnable to set the wallpaper\n'
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
-
 
     def __export_darwin(image_path):
         value = Wallpaper.load_config()[Wallpaper.configuration_darwin]
@@ -51,5 +52,6 @@ class Wallpaper(base.Target):
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
         full_path = pathlib.Path(image_path).resolve().as_posix()
-        subprocess.call(["sqlite3", db_file, "update data set value = '%s'" % full_path])
+        subprocess.call(["sqlite3", db_file, "update data set value = '{}'"
+                         .format(full_path)])
         subprocess.call(["killall", "Dock"])

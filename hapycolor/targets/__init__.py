@@ -25,6 +25,8 @@ name.
 
 from . import vim, iterm, wallpaper, lightline, gnome, yabar
 from . import base
+import platform
+import enum
 from hapycolor import config
 from hapycolor import exceptions
 
@@ -115,13 +117,28 @@ def retry():
     return res
 
 
+class OS(enum.Enum):
+    LINUX = 0
+    DARWIN = 1
+
+
+def os():
+    platform_os = platform.system()
+    if platform_os == "Darwin":
+        return OS.DARWIN
+    elif platform_os == "Linux":
+        return OS.LINUX
+    else:
+        raise exceptions.PlatformNotSupportedError()
+
+
 def get_compatible():
     """
     Get all compatible targets
     """
     all_targets = base.Target.__subclasses__()
     # Filters out the incompatible or disabled targets
-    return list(filter(lambda t: config.os() in t.compatible_os(),
+    return list(filter(lambda t: os() in t.compatible_os(),
                        all_targets))
 
 

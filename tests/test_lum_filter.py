@@ -1,5 +1,6 @@
 from hapycolor import exceptions, helpers, config
 import warnings
+import pathlib
 from tests.helpers import configurationtesting
 from hapycolor.filters import lum_filter as lf
 from scipy import interpolate
@@ -10,6 +11,20 @@ from unittest.mock import patch
 
 
 class TestLumFilter(unittest.TestCase):
+    @configurationtesting()
+    def test_hypeplans_files_exist(self):
+        """ Checks if manual hyperplan point's file exists """
+        for filter_type in lf.Filter:
+            hyperplan_file = pathlib.Path(lf.hyperplan_file(filter_type))
+            self.assertTrue(hyperplan_file.is_file())
+
+    @configurationtesting()
+    def test_hyperplan_files(self):
+        with self.assertRaises(exceptions.UnknownLuminosityFilterTypeError):
+            lf.hyperplan_file("hue")
+        for f in lf.Filter:
+            self.assertTrue(pathlib.Path(lf.hyperplan_file(f)).exists())
+
     def test_polar_to_cartesian(self):
         polar = [(359, 1, 0), (0, 0, 0), (250.0, 1.0, 1.0)]
         cartesian = [[0.9998, -0.017, 0], [0, 0, 0], [-0.342, -0.940, 1.0]]
@@ -146,7 +161,7 @@ class TestLumFilter(unittest.TestCase):
     @configurationtesting()
     def test_limit_cases_bright(self):
         lf.LumFilter.bright_interp = lf.LumFilter.interpolate_hyperplans(
-                config.hyperplan_file(config.Filter.BRIGHT), "bright")
+                lf.hyperplan_file(lf.Filter.BRIGHT), "bright")
         bright = [(0, 0, 1), (12, 1, 0.9), (240, 1, 0.95), (0, 0.5, 0.9)]
         for c in [helpers.hsl_to_rgb(c) for c in bright]:
             self.assertTrue(lf.LumFilter.analyze(c, "brightness"))
@@ -193,7 +208,7 @@ class TestLumFilter(unittest.TestCase):
     @configurationtesting()
     def test_limit_cases_dark(self):
         lf.LumFilter.dark_interp = lf.LumFilter.interpolate_hyperplans(
-                config.hyperplan_file(config.Filter.DARK), "dark")
+                lf.hyperplan_file(lf.Filter.DARK), "dark")
 
         dark = [(0, 0, 0), (240, 1, 0.1), (81, 1, 0.1), (300, 1, 0.1), (0, 1, 0),
                 (300, 0.5, 0.1), (150, 0.38, 0.03), (358, 0.86, 0.12)]

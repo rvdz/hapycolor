@@ -1,5 +1,5 @@
 let s:grey1  = [ '#5c6370', 59 ]
-let s:grey2  = [ '#2c323d', 23 ]
+let s:grey2  = [ '#2c323d', 237 ]
 let s:grey3  = [ '#3e4452', 59 ]
 
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}

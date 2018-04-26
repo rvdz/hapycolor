@@ -1,8 +1,10 @@
 from hapycolor import exceptions, config, helpers, palette
+from hapycolor import targets
 from hapycolor.targets.iterm import Iterm, TermColorManager, TermColorEnum
 from tests.helpers import generate_palette, configurationtesting, disableprints
 from unittest import mock
 from unittest.mock import patch
+import pathlib
 import contextlib
 import os
 import shutil
@@ -223,3 +225,11 @@ class TestTermColor(unittest.TestCase):
         colors_dict = TermColorManager.analyze_colors(input_colors)
         for tc in TermColorEnum:
             self.assertEqual(colors_dict[tc], expected_dict[tc])
+
+    @configurationtesting()
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, "Tests Darwin's"
+                         + " environment")
+    def test_configuration_iterm_template(self):
+        raw_path = Iterm.load_config()[Iterm.template_key]
+        iterm_template_path = pathlib.Path(raw_path).resolve()
+        self.assertTrue(iterm_template_path.exists())

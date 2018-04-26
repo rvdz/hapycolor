@@ -1,9 +1,31 @@
 from . import base
 import warnings
+import enum
 from hapycolor import config, exceptions, helpers
 from scipy import interpolate
 import math
 import numpy as np
+
+
+class Filter(enum.Enum):
+    BRIGHT = 1
+    DARK = 2
+    SATURATION = 3
+
+
+def hyperplan_file(filter_type):
+    configuration = config.ConfigurationManager.load("hyperplan")
+    path = config.ROOT_DIR
+    if filter_type == Filter.DARK:
+        path /= configuration["dark"]
+    elif filter_type == Filter.BRIGHT:
+        path /= configuration["bright"]
+    elif filter_type == Filter.SATURATION:
+        path /= configuration["saturation"]
+    else:
+        msg = "Unknown filter type"
+        raise exceptions.UnknownLuminosityFilterTypeError(msg)
+    return path.as_posix()
 
 
 class LumFilter(base.Filter):
@@ -55,7 +77,8 @@ class LumFilter(base.Filter):
             hsl_points.append((h, 0, inner_lum))
 
         # Convert points to catesian
-        points = np.asarray([LumFilter.polar_to_cartesian(e) for e in hsl_points])
+        points = np.asarray([LumFilter.polar_to_cartesian(e)
+                            for e in hsl_points])
         x = [e[0] for e in points]
         y = [e[1] for e in points]
         z = [e[2] for e in points]
@@ -108,7 +131,6 @@ class LumFilter(base.Filter):
         Initializes the interpolation functions and the max/min values of
         the dark/bright surfaces
         """
-        from hapycolor.config import Filter, hyperplan_file
         LumFilter.dark_interp = LumFilter.interpolate_hyperplans(
                 hyperplan_file(Filter.DARK), "dark")
 
@@ -117,7 +139,6 @@ class LumFilter(base.Filter):
 
         LumFilter.saturation_interp = LumFilter.gen_sat_interpolation(
                 hyperplan_file(Filter.SATURATION))
-
 
     @staticmethod
     def apply(palette):
@@ -158,7 +179,8 @@ class LumFilter(base.Filter):
         x, y, z = LumFilter.polar_to_cartesian(hsl_color)
 
         if kind == "brightness":
-            return z > LumFilter.bright_min or z > LumFilter.bright_interp(x, y)
+            return z > LumFilter.bright_min \
+                   or z > LumFilter.bright_interp(x, y)
         elif kind == "darkness":
             return z < LumFilter.dark_max or z < LumFilter.dark_interp(x, y)
         elif kind == "saturation":

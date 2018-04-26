@@ -1,8 +1,15 @@
 import json
+import re
+import readline
 from hapycolor import exceptions
 import os
+import pathlib
 
 """ Utilitary methods to convert color types  """
+
+
+def is_hex(color):
+    return re.match(r"0[xX][0-9a-fA-F]{6}", color) is not None
 
 
 def can_be_hsl(color):
@@ -129,3 +136,16 @@ def update_json(data_file, data_object):
 
     with open(data_file, 'w') as f:
         json.dump(data, f, indent=2)
+
+
+def input_path(prompt_str):
+    """
+    Prompts the user with a string and returns a :class:`pathlib.Path` from the
+    user's input:
+
+    :arg prompt_str: the string to display before the user's entry
+    """
+    readline.set_completer_delims(' \t\n;')
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(readline.get_completer())
+    return pathlib.Path(input(prompt_str)).expanduser()
