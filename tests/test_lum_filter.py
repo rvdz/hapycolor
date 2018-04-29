@@ -172,6 +172,7 @@ class TestLumFilter(unittest.TestCase):
         for c in [helpers.hsl_to_rgb(c) for c in not_bright]:
             self.assertFalse(lf.LumFilter.analyze(c, kind="brightness"))
 
+    @configurationtesting()
     def test_interpolated_dark(self):
         """
         Asserts that the interpolation function for the dark colors, is valid
@@ -182,6 +183,7 @@ class TestLumFilter(unittest.TestCase):
                 lf.LumFilter.dark_interp, lambda l: l > 0.5)
         self.assertLess(errors, total // 5)
 
+    @configurationtesting()
     def test_interpolated_bright(self):
         """
         Asserts that the interpolation function for the bright colors, is valid
