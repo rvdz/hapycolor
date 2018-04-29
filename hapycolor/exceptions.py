@@ -175,3 +175,21 @@ class InvalidFileError(HapycolorError):
     def __init__(self, msg):
         super(InvalidFileError, self).__init__(msg)
         self.msg = msg
+
+
+class PAMException(HapycolorError):
+    def __init__(self, msg):
+        super(PAMException, self).__init__(msg)
+        self.msg = msg
+
+
+class InvalidMacroException(HapycolorError):
+    def __init__(self, msg):
+        super(InvalidMacroException, self).__init__(msg)
+        self.msg = msg
+
+
+class ColorFormatNotFound(HapycolorError):
+    def __init__(self, msg):
+        super(ColorFormatNotFound, self).__init__(msg)
+        self.msg = msg
