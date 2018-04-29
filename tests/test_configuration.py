@@ -1,8 +1,5 @@
-from hapycolor import config
-import os
-import contextlib
 import unittest
-from unittest import mock
+from hapycolor import config
 
 
 class TestConfiguration(unittest.TestCase):

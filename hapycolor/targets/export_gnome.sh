@@ -32,7 +32,7 @@ set_theme() {
         dset bold-color "'${BOLD_COLOR}'"
         dset bold-color-same-as-fg "false"
     else
-        dset bold-color "'${COLOR_08}'"
+        dset bold-color "'${BACKGROUND_COLOR}'"
         dset bold-color-same-as-fg "true"
     fi
     dset use-theme-colors "false"
@@ -63,20 +63,13 @@ fi
 # first argument is profile name
 PROFILE_NAME=$1; shift
 # second argument is tmp file with colors
-TMP_FILE=$1; shift
+FOREGROUND_COLOR=$1; shift
+BACKGROUND_COLOR=$1; shift
+
+COLORS=$1; shift
+
 # third argument is theme location
 BASE_KEY_NEW=$1
-
-i=0
-while IFS='' read -r line || [[ -n "$line" ]]; do
-	declare "COLOR_$i=$(gnome_color \"$line\")"
-	((i++))
-done < "$TMP_FILE"
-rm -f $TMP_FILE
-# first is background
-BACKGROUND_COLOR=$COLOR_0
-# second is foreground
-FOREGROUND_COLOR=$COLOR_1
 
 [[ -z "$BASE_KEY_NEW" ]] && BASE_KEY_NEW=/org/gnome/terminal/legacy/profiles:
 
@@ -116,8 +109,7 @@ if which "$DCONF" > /dev/null 2>&1; then
 
 		# update profile values with theme options
 		set_theme
-		dset palette "['${COLOR_2}', '${COLOR_3}', '${COLOR_4}', '${COLOR_5}', '${COLOR_6}', '${COLOR_7}', '${COLOR_8}', '${COLOR_9}', '${COLOR_10}', '${COLOR_11}', '${COLOR_12}', '${COLOR_13}', '${COLOR_14}', '${COLOR_15}', '${COLOR_16}', '${COLOR_17}']"
-
+		dset palette "[ $COLORS ]"
         unset PROFILE_NAME
 		unset PROFILE_SLUG
         unset PROFILE_KEY

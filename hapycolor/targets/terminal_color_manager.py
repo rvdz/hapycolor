@@ -1,19 +1,20 @@
 """
-Terminal module
+TerminalColorManager module
 """
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor.targets import pam
 
 
-class Terminal:
+class TerminalColorManager:
     SIMPLE_SORT = True
     """
     For more details about standard and high-intensity terminal colors, see:
     `Standard and Hight-intensity colors
     <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
 
-    Initializes a :class:`Terminal`'s instance with a list of colors.
+    Initializes a :class:`TerminalColorManager`'s instance with a list of
+    colors.
 
     :arg colors: a `list` of rgb colors
     """
@@ -28,7 +29,7 @@ class Terminal:
             msg = "a minimum of six colors is required"
             raise exceptions.InvalidPaletteException(msg)
 
-        colors = Terminal._classify_hue(colors)
+        colors = TerminalColorManager._classify_hue(colors)
         assert len(colors) == 6
         colors = Terminal._classify_luminosity(colors)
         assert len(colors) == 6
@@ -38,6 +39,9 @@ class Terminal:
         else:
             self.colors = Terminal._sort(colors)
         assert len(self.colors) == 16
+
+    def __call__(self):
+        return [self.cast(i) for i in range(16)]
 
     def cast(self, i):
         assert 0 <= i < 16, "i: {}".format(i)

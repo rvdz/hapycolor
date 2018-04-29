@@ -195,3 +195,8 @@ class ColorFormatNotFound(HapycolorError):
     def __init__(self, msg):
         super(ColorFormatNotFound, self).__init__(msg)
         self.msg = msg
+
+class DconfInvalidCommand(HapycolorError):
+    def __init__(self, msg):
+        super(DconfInvalidCommand, self).__init__(msg)
+        self.msg = msg
