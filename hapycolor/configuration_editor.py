@@ -9,9 +9,10 @@ class ConfigurationEditor:
     def __init__(self, configuration):
         self.configuration = configuration
         self.attributes = self.parser()
-        first_line = [line for line, attr in zip(configuration, self.attributes)
-                      if attr is not None][0]
-        self.pattern, self.converter = self.get_format(first_line)
+        if list(filter(lambda a: a, self.attributes)):
+            first_line = [line for line, attr in zip(configuration, self.attributes)
+                          if attr is not None][0]
+            self.pattern, self.converter = self.get_format(first_line)
 
     def parser(self):
         attributes = [None]

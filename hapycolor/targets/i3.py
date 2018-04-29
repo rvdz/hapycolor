@@ -6,6 +6,7 @@ import re
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import targets
+from hapycolor.configuration_editor import ConfigurationEditor
 from hapycolor.targets import wallpaper
 from . import base
 
@@ -74,19 +75,10 @@ class I3(base.Target):
         .. todo::
             Add rofi support
         """
-        border_color = palette.colors[0]
-        split_color = palette.colors[1]
-
         config_path = I3.load_config()[I3.configuration_key]
         configuration = []
         with open(config_path, 'r') as config_file:
             configuration = config_file.read().splitlines()
-
-        configuration = I3.assign_border_colors(configuration)
-        configuration = I3.declare_color(configuration, I3.border_variable,
-                                         border_color)
-        configuration = I3.declare_color(configuration, I3.split_variable,
-                                         split_color)
 
         # TODO(yann) is_enabled() should return False if not initialized,
         # when this will be changed, remove the try/catch
@@ -96,61 +88,10 @@ class I3(base.Target):
         except exceptions.InvalidConfigKeyError:
             pass
 
+        configuration = ConfigurationEditor(configuration).replace(palette)
+
         with open(config_path, 'w') as config_file:
             config_file.write('\n'.join(configuration))
-
-    @staticmethod
-    def declare_color(config, variable, color):
-        """
-        Associates a color to a variable
-            set $variable_name <hex_color>
-        """
-        if not helpers.can_be_rgb(color):
-            msg = "Color should be formatted as an RGB color. "
-            msg += "Instead, {} was provided".format(color)
-            raise exceptions.ColorFormatError(msg)
-
-        hex_color = helpers.rgb_to_hex(color)
-
-        pattern = r"set +{}".format(re.escape(variable))
-        replace = "set {}    {}".format(variable, hex_color)
-
-        return I3.replace_or_add(config, pattern, replace)
-
-    @staticmethod
-    def assign_border_colors(config):
-        """
-        Assings the variables associated to the colors of the border to i3's
-        variable: `client.focused`, which takes four colors:
-            - border color
-            - background color
-            - text color
-            - split color
-
-        The first two colors will be matched with the `$focused_border_color`,
-        whereas the split color will be associated to `$focused_split_color`.
-
-        .. note::
-            If `client.focused` wasn't already defined the text color will be
-            set to black (#000000), otherwise, the former color will be used.
-        """
-        pattern = r"client.focused +(\S+) +(\S+) +(\S+) +(\S+)"
-        replace = "client.focused    {}    {}    {}    {}" \
-            .format(I3.border_variable, I3.border_variable,
-                    "{}", I3.split_variable)
-        match = False
-        new_config = []
-        for line in config:
-            if re.match(pattern, line):
-                match = re.match(pattern, line)
-                new_config.append(replace.format(match.group(3)))
-                match = True
-            else:
-                new_config.append(line)
-
-        if not match:
-            new_config = [replace.format("#000000")] + config
-        return new_config
 
     @staticmethod
     def set_wallpaper(config, image_path):
@@ -159,32 +100,13 @@ class I3(base.Target):
         command in order to update the current wallpaper.
         """
         pattern = r".*exec .+feh"
-        command = "exec --no-startup-id feh --bg-fill --no-xinerama {}" \
-            .format(image_path)
-        return I3.replace_or_add(config, pattern, command)
+        command = "exec --no-startup-id feh --bg-fill {}".format(image_path)
 
-    @staticmethod
-    def replace_or_add(config, pattern, replace):
-        """
-        Handy method that loops through a list of strings and if a line
-        matches the provided pattern, it will replace it with the provided
-        string. If no match is found, the `replace` argument will be added
-        at the begining of the list.
-
-        :arg config: The current configuration file loaded as a list of
-            strings.
-        :arg pattern: A raw string defining a regular expression.
-        :arg replace: The new string which will be used to replace the matched
-            string.
-
-        :see: `https://stackoverflow.com/questions/2081640/what-exactly-do-u-\
-                and-r-string-flags-do-and-what-are-raw-string-literals`
-        """
         new_config = []
         match = False
         for line in config:
             if re.match(pattern, line):
-                new_config.append(replace)
+                new_config.append(command)
                 match = True
             else:
                 new_config.append(line)

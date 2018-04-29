@@ -18,16 +18,6 @@ class TestWallpaper(unittest.TestCase):
             Wallpaper.export({}, "name")
 
     @helpers.configurationtesting()
-    @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
-                         "targetted platform: Darwin")
-    @patch('subprocess.call', lambda x: x)
-    def test_configuration_file_exist(self):
-        try:
-            Wallpaper.export({}, "name")
-        except Exception as err:
-            self.fail(str(err))
-
-    @helpers.configurationtesting()
     @unittest.skipUnless(targets.os() == targets.OS.DARWIN, "Tests Darwin's"
                          + " environment")
     def test_configuration_wallpaper(self):
