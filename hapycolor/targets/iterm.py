@@ -12,7 +12,7 @@ from .. import exceptions
 from .. import helpers
 from .. import palette as pltte
 from .. import targets
-from . import terminal
+from . import terminal_color_manager as tcm
 from . import base
 
 
@@ -218,12 +218,12 @@ class Iterm(base.Target):
         return element
 
     def _set_colors(colors, root):
-        tc = terminal.Terminal(colors)
+        color_manager = tcm.TerminalColorManager(colors)
         p = re.compile(r"Ansi [0-9]* Color")
         for i, n in enumerate(root):
             if n.tag == Iterm.Tag.KEY and p.match(n.text):
                 ansi_number = int(n.text.split()[1])
-                color = tc.cast(ansi_number)
+                color = color_manager.cast(ansi_number)
                 root.insert(i+1, Iterm.rgb_to_xml(color))
 
     def _set_guid(template, root):

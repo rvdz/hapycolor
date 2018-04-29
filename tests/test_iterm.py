@@ -7,7 +7,7 @@ import shutil
 from hapycolor import exceptions, config, helpers, palette
 from hapycolor import targets
 from hapycolor.targets.iterm import Iterm
-from hapycolor.targets.terminal import Terminal
+from hapycolor.targets.terminal_color_manager import TerminalColorManager as TCM
 from tests.helpers import generate_palette, configurationtesting, disableprints
 
 
@@ -145,16 +145,16 @@ class TestIterm(unittest.TestCase):
 class TestTermColor(unittest.TestCase):
     def test_color_format(self):
         with self.assertRaises(exceptions.ColorFormatError):
-            Terminal([(240, 240, 0.3), (0, 0, 1)])
+            TCM([(240, 240, 0.3), (0, 0, 1)])
 
     def test_invalid_argument(self):
         with self.assertRaises(exceptions.WrongInputError):
-            Terminal((12, 14, 16))
+            TCM((12, 14, 16))
 
     def test_not_enough_arguments(self):
         colors = [(100, 100, 100), (200, 200, 200), (150, 100, 50)]
         with self.assertRaises(exceptions.InvalidPaletteException):
-            Terminal(colors)
+            TCM(colors)
 
     def test_classify_hue(self):
         colors = [(0, 0.5, 0.5), (10, 0.5, 0.5),
@@ -164,7 +164,7 @@ class TestTermColor(unittest.TestCase):
                   (250, 0.5, 0.5), (260, 0.5, 0.5),
                   (300, 0.5, 0.5), (310, 0.5, 0.5)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified = Terminal._classify_hue(colors)
+        classified = TCM._classify_hue(colors)
         self.assertEqual(len(classified), 6)
 
     def test_classify_hue_1_color_cluster(self):
@@ -172,7 +172,7 @@ class TestTermColor(unittest.TestCase):
                   (100, 0.5, 0.5), (170, 0.5, 0.5),
                   (250, 0.5, 0.5), (300, 0.5, 0.5)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified = Terminal._classify_hue(colors)
+        classified = TCM._classify_hue(colors)
         self.assertEqual(len(classified), 6)
 
     def test_classify_luminosity(self):
@@ -183,8 +183,8 @@ class TestTermColor(unittest.TestCase):
                   (250, 0.5, 0.5), (260, 0.5, 0.7),
                   (300, 0.5, 0.5), (310, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified_hue = Terminal._classify_hue(colors)
-        classified_lum = Terminal._classify_luminosity(classified_hue)
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
         self.assertEqual(len(classified_lum), 6)
         for (c1, c2) in classified_lum:
             self.assertNotEqual(c1, c2)
@@ -195,8 +195,8 @@ class TestTermColor(unittest.TestCase):
                   (100, 0.5, 0.5), (170, 0.5, 0.5),
                   (250, 0.5, 0.5), (300, 0.5, 0.5)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified_hue = Terminal._classify_hue(colors)
-        classified_lum = Terminal._classify_luminosity(classified_hue)
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
         self.assertEqual(len(colors), 6)
         for (c1, c2) in classified_lum:
             self.assertEqual(c1, c2)
@@ -209,9 +209,9 @@ class TestTermColor(unittest.TestCase):
                   (250, 0.5, 0.5), (260, 0.5, 0.7),
                   (300, 0.5, 0.5), (310, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified_hue = Terminal._classify_hue(colors)
-        classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort(classified_lum)
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
@@ -226,9 +226,9 @@ class TestTermColor(unittest.TestCase):
                   (300, 0.5, 0.5), (310, 0.5, 0.7),
                   (340, 0.5, 0.5), (350, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified_hue = Terminal._classify_hue(colors)
-        classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort(classified_lum)
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
@@ -247,9 +247,9 @@ class TestTermColor(unittest.TestCase):
                   (250, 0.5, 0.5), (260, 0.5, 0.7),
                   (300, 0.5, 0.5), (310, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        classified_hue = Terminal._classify_hue(colors)
-        classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort(classified_lum)
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
@@ -265,7 +265,7 @@ class TestTermColor(unittest.TestCase):
                   (100, 0.5, 0.5), (170, 0.5, 0.5),
                   (250, 0.5, 0.5), (300, 0.5, 0.5)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        cm = Terminal(colors)
+        cm = TCM(colors)
         self.assertEqual(len(cm.colors), 16)
         self.assertEqual(len(set(cm.colors)), 10)
 
@@ -277,7 +277,7 @@ class TestTermColor(unittest.TestCase):
                   (250, 0.5, 0.5), (260, 0.5, 0.7),
                   (300, 0.5, 0.5), (310, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
-        cm = Terminal(colors)
+        cm = TCM(colors)
         self.assertEqual(len(cm.colors), 16)
         self.assertEqual(len(set(cm.colors)), 16)
         for c in cm.colors:

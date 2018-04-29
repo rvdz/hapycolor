@@ -27,7 +27,7 @@ import platform
 import enum
 from hapycolor import config
 from hapycolor import exceptions
-from . import vim, iterm, wallpaper, lightline, gnome, yabar, i3, rofi
+from . import vim, iterm, wallpaper, lightline, gnome_terminal, yabar, i3, rofi
 from . import base
 
 

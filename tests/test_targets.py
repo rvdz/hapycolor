@@ -1,7 +1,8 @@
 from hapycolor import config
 from hapycolor import targets
 from hapycolor import exceptions
-from hapycolor.targets import base, vim, lightline, iterm, wallpaper, gnome
+from hapycolor.targets import base, vim, lightline, iterm, wallpaper
+from hapycolor.targets import gnome_terminal
 from tests import helpers
 from unittest.mock import patch
 import unittest
@@ -57,7 +58,8 @@ class TestTarget(unittest.TestCase):
             `targets.__all__`, defined in this test.
         """
         import inspect
-        targets.__all__ = ['vim', 'lightline', 'iterm', 'wallpaper', 'gnome']
+        targets.__all__ = ['vim', 'lightline', 'iterm', 'wallpaper',
+                           'gnome_terminal']
         target_modules = inspect.getmembers(targets)[1][1]
         for m in target_modules:
             try:
