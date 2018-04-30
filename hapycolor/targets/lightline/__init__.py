@@ -143,11 +143,12 @@ class Lightline(base.Target):
 
     @staticmethod
     def classify(colors):
-        def distance(c1, c2):
+        def distance(c_1, c_2):
             """ Evaluates the hue's distance """
-            return abs(c1[0] - c2[0])
+            return abs(c_1[0] - c_2[0])
 
-        k = 4 # There are four modes: Insert, Visual, Normal and Replace
+        # There are four modes: Insert, Visual, Normal and Replace
+        k = 4
         colors = pam.PAM(colors, k, distance)()
 
         # Only the medoids of each cluster will used

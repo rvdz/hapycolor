@@ -1,8 +1,7 @@
 """
 Hapycolor's exceptions
 """
-
-from hapycolor import config
+from hapycolor import targets
 
 
 class HapycolorError(Exception):
@@ -39,7 +38,7 @@ class ExportTargetFailure(HapycolorError):
 
 class PlatformNotSupportedError(HapycolorError):
     def __str__(self):
-        supported_os = ",".join([o.name for o in config.OS])
+        supported_os = ",".join([o.name for o in targets.OS])
         err_msg = "Platform not supported\n" \
                   + "Currently supporting: %s" % supported_os
         super(PlatformNotSupportedError, self).__init__(err_msg)
@@ -47,7 +46,7 @@ class PlatformNotSupportedError(HapycolorError):
 
 class InvalidValueError(HapycolorError):
     def __init__(self, msg):
-        super(HapycolorError, self).__init__(msg)
+        super(InvalidValueError, self).__init__(msg)
         self.msg = msg
 
 
@@ -55,6 +54,7 @@ class EmptyPaletteException(HapycolorError):
     def __init__(self, msg):
         super(EmptyPaletteException, self).__init__(msg)
         self.msg = msg
+
 
 class InvalidPaletteException(HapycolorError):
     def __init__(self, msg):

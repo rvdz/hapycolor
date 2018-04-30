@@ -1,13 +1,12 @@
 """
 Terminal module
 """
-
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor.targets import pam
 
 
-class Terminal():
+class Terminal:
     SIMPLE_SORT = True
     """
     For more details about standard and high-intensity terminal colors, see:
@@ -39,7 +38,6 @@ class Terminal():
         else:
             self.colors = Terminal._sort(medoids)
         assert len(self.colors) == 16
-
 
     def cast(self, i):
         assert 0 <= i < 16, "i: {}".format(i)

@@ -2,7 +2,6 @@ from hapycolor import exceptions
 import numpy as np
 
 
-
 class PAM:
     """
     Partition Around Medoids
@@ -152,4 +151,3 @@ classes, since it only has {} colors.".format(K, len(colors))
             return dist[1]
         else:
             return dist[0]
-

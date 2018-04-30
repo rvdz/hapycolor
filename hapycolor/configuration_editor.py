@@ -2,6 +2,7 @@ import re
 from hapycolor import helpers
 from hapycolor import exceptions
 
+
 class ConfigurationEditor:
     """
     Many targets are usually defined by a configuration file which
@@ -84,8 +85,9 @@ class ConfigurationEditor:
             if re.match(".*" + pattern + ".*", color_line):
                 return pattern, converter
 
-        msg = "Color format at line '{}' not found, feel ".format(color_line)
-        msg += " free to raise an issue: https://github.com/rvdz/hapycolor/issues"
+        msg = "Color format at line '{}' not found, ".format(color_line)
+        msg += "feel free to raise an issue: "
+        msg += "https://github.com/rvdz/hapycolor/issues"
         raise exceptions.ColorFormatNotFound(msg)
 
     def replace(self, palette):

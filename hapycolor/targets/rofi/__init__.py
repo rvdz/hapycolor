@@ -1,6 +1,3 @@
-"""
-Rofi module
-"""
 import pathlib
 import enum
 from os import listdir
@@ -10,6 +7,7 @@ from hapycolor import exceptions
 from hapycolor.targets import base
 from hapycolor import targets
 from hapycolor.configuration_editor import ConfigurationEditor
+
 
 class Rofi(base.Target):
     """
@@ -41,7 +39,6 @@ class Rofi(base.Target):
             return Rofi.configuration_key in Rofi.load_config()
         except exceptions.InvalidConfigKeyError:
             return False
-
 
     @staticmethod
     def compatible_os():
