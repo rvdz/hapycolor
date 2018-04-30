@@ -54,25 +54,25 @@ class TestPAM(unittest.TestCase):
     def test_3_clusters_3_colors_rgb(self):
         colors = [(0, 0, 0), (100, 100, 100), (255, 255, 255)]
         lab_colors = [helpers.rgb_to_lab(c) for c in colors]
-        expected = lab_colors[:]
+        expected = colors[:]
         k = 3
 
         def distance(c1, c2):
             return delta_e_cie2000(c1, c2)
 
         res = PAM(lab_colors, k, distance)()
-        for i, medoid in enumerate(res):
-            self.assertEqual(medoid, expected[i])
-            self.assertEqual(res[medoid][0], expected[i])
+        for medoid in res:
+            self.assertIn(helpers.lab_to_rgb(medoid), expected)
+            self.assertIn(helpers.lab_to_rgb(res[medoid][0]), expected)
 
     def test_2_clusters_4_colors_rgb(self):
-        colors = [(150, 20, 20), (180, 10, 10), (10, 10, 150), (20, 20, 180)]
+        colors = [(150, 20, 20), (180, 10, 10), (10, 10, 160), (20, 20, 190)]
         lab_colors = [helpers.rgb_to_lab(c) for c in colors]
 
         k = 2
         expected = [
                     [(150, 20, 20), (180, 10, 10)],
-                    [(10, 10, 150), (20, 20, 180)],
+                    [(10, 10, 160), (20, 20, 190)],
                    ]
 
         def distance(c1, c2):
@@ -81,7 +81,7 @@ class TestPAM(unittest.TestCase):
         res = PAM(lab_colors, k, distance)()
         for i, medoid in enumerate(res):
             cluster = [helpers.lab_to_rgb(c) for c in res[medoid]]
-            self.assertEqual(cluster, expected[i])
+            self.assertIn(cluster, expected)
 
     @unittest.skip("Too slow, but working")
     def test_multiple_colors(self):
