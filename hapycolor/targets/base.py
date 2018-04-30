@@ -1,9 +1,9 @@
 import abc
-from hapycolor import config
+from hapycolor.config import ConfigurationManager
 from hapycolor import exceptions
 
 
-class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
+class Target(ConfigurationManager, metaclass=abc.ABCMeta):
     """
     Abstract class introducting the basic methods needed to initialize the
     target and export the palette or the image to the environment. The
@@ -34,7 +34,7 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
 
     @abc.abstractstaticmethod
     def compatible_os():
-        """ Returns a list of enum of class :class:`hapycolor.config.OS` """
+        """ Returns a list of enum of class :class:`hapycolor.targets.OS` """
         raise exceptions.CallingAbstractMethodError("Your are a wizard!")
 
     # --- Configuration Methods ---

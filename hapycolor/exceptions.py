@@ -1,7 +1,6 @@
 """
 Hapycolor's exceptions
 """
-from hapycolor import targets
 
 
 class HapycolorError(Exception):
@@ -38,9 +37,7 @@ class ExportTargetFailure(HapycolorError):
 
 class PlatformNotSupportedError(HapycolorError):
     def __str__(self):
-        supported_os = ",".join([o.name for o in targets.OS])
-        err_msg = "Platform not supported\n" \
-                  + "Currently supporting: %s" % supported_os
+        err_msg = "Platform not supported"
         super(PlatformNotSupportedError, self).__init__(err_msg)
 
 

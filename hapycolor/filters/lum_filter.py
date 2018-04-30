@@ -1,10 +1,10 @@
-from . import base
 import warnings
 import enum
-from hapycolor import config, exceptions, helpers
-from scipy import interpolate
 import math
+from scipy import interpolate
 import numpy as np
+from hapycolor import config, exceptions, helpers
+from . import base
 
 
 class Filter(enum.Enum):
