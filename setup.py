@@ -16,25 +16,24 @@ AUTHOR = 'Robin Vincent-Deleuze, Romain Pierson, Yann Colina'
 
 # Packages required for this module to be executed
 REQUIRED = [
-    'Pillow',
-    'networkx==1.11',
-    'scipy',
-    'colormath',
-    'numpy',
-    'matplotlib',
-    'imgur_downloader-0.1.6'
+    'Pillow==5.1.0',
+    'networkx==2.1',
+    'scipy==1.0.1',
+    'colormath==3.0.0',
+    'numpy==1.14.3',
+    'imgur-downloader==0.1.7',
 ]
 
-here = os.path.abspath(os.path.dirname(__file__))
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = '\n' + f.read()
+with io.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
-about = {}
-with open(os.path.join(here, NAME, '__version__.py')) as f:
-    exec(f.read(), about)
+ABOUT = {}
+with open(os.path.join(HERE, NAME, '__version__.py')) as f:
+    exec(f.read(), ABOUT)
 
 
 class UploadCommand(Command):
@@ -44,9 +43,9 @@ class UploadCommand(Command):
     user_options = []
 
     @staticmethod
-    def status(s):
+    def status(string):
         """Prints things in bold."""
-        print('\033[1m{0}\033[0m'.format(s))
+        print('\033[1m{0}\033[0m'.format(string))
 
     def initialize_options(self):
         pass
@@ -57,7 +56,7 @@ class UploadCommand(Command):
     def run(self):
         try:
             self.status('Removing previous builds…')
-            rmtree(os.path.join(here, 'dist'))
+            rmtree(os.path.join(HERE, 'dist'))
         except OSError:
             pass
 
@@ -73,9 +72,9 @@ class UploadCommand(Command):
 # Where the magic happens:
 setup(
     name=NAME,
-    version=about['__version__'],
+    version=ABOUT['__version__'],
     description=DESCRIPTION,
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
