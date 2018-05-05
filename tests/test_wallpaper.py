@@ -8,13 +8,9 @@ import unittest
 
 
 class TestWallpaper(unittest.TestCase):
-    @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
-                         "targetted platform: Darwin")
-    @patch('hapycolor.targets.wallpaper.Wallpaper.load_config',
-           return_value={Wallpaper.configuration_darwin: '~'})
     @helpers.configurationtesting()
-    def test_incorrect_configuration_file(self, get_config):
-        with self.assertRaises(exceptions.ExportTargetFailure):
+    def test_invalid_image_path(self):
+        with self.assertRaises(exceptions.WrongInputError):
             Wallpaper.export({}, "name")
 
     @helpers.configurationtesting()
@@ -24,3 +20,12 @@ class TestWallpaper(unittest.TestCase):
         raw_path = Wallpaper.load_config()[Wallpaper.configuration_darwin]
         wallpaper_path = pathlib.Path(raw_path).expanduser()
         self.assertTrue(wallpaper_path.exists())
+
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
+                         "targetted platform: Darwin")
+    @patch('subprocess.run')
+    def test_export(self, mock_subprocess):
+        try:
+            Wallpaper.export({}, "images/firewatch.jpg")
+        except Exception as err:
+            self.fail(str(err))

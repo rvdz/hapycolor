@@ -24,34 +24,41 @@ class Wallpaper(base.Target):
 
         :arg img: the image's path
         """
+        path = None
+        try:
+            path = pathlib.Path(image_path).resolve().as_posix()
+        except FileNotFoundError:
+            msg = "Image not found: {}".format(image_path)
+            raise exceptions.WrongInputError(msg)
+
         os = targets.os()
         if os == targets.OS.DARWIN:
-            Wallpaper.__export_darwin(image_path)
+            Wallpaper._export_darwin(path)
         elif os == targets.OS.LINUX:
-            Wallpaper.__export_linux(image_path)
+            Wallpaper._export_linux(path)
 
-    def __export_linux(image_path):
+    def _export_linux(image_path):
         try:
-            subprocess.call(['feh', '--bg-scale', image_path])
+            subprocess.run(['feh', '--bg-scale', image_path])
             return
         except Exception:
             pass
         try:
-            subprocess.call(['gsettings', 'set',
+            subprocess.run(['gsettings', 'set',
                              'org.gnome.desktop.background', 'picture-uri',
                              "file:///" + image_path])
         except Exception:
             msg = '\nUnable to set the wallpaper\n'
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
-    def __export_darwin(image_path):
+    def _export_darwin(image_path):
         value = Wallpaper.load_config()[Wallpaper.configuration_darwin]
         db_file = pathlib.Path(value).expanduser()
         if not db_file.is_file():
             msg = "\nUnable to set the wallpaper, sorry\n"
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
-        full_path = pathlib.Path(image_path).resolve().as_posix()
-        subprocess.call(["sqlite3", db_file, "update data set value = '{}'"
-                         .format(full_path)])
-        subprocess.call(["killall", "Dock"])
+        subprocess.run(["sqlite3",
+                        db_file,
+                        "update data set value = '{}'".format(image_path)])
+        subprocess.run(["killall", "Dock"])
