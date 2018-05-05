@@ -20,26 +20,24 @@ The full official documentation can be found [here](https://rvdz.github.io/hapyc
 - Debian or macOS.
 
 ### Dependencies
-- linux or macOS (iTerm2)
-- python 3.5+
+- linux or macOS
+- python >=3.5
 - imagemagick
-- scipy
-- matplotlib (TODO: is it true?)
 
 __Debian__:
 ```sh
-sudo apt-get update && sudo apt-get install python3 python3-pip python3-scipy python3-matplotlib imagemagick -y
+sudo apt-get update && sudo apt-get install python3 python3-pip imagemagick -y
 ```
 
 __macOS__:
 
 With [homebrew](https://brew.sh/):
 ```sh
-brew install python3 python3-pip python3-scipy python3-matplotlib imagemagick
+brew install python3 python3-pip imagemagick
 ```
 
 ## Installation
-Hapycolor can be installed with `pip`, or by cloning this repository.
+Hapycolor can be installed with `pip`, `pipenv`, or by cloning this repository.
 
 ### Pip install
 TODO: Still not enabled
@@ -81,8 +79,13 @@ gnome-terminal:
 
 ## Tests
 
-To check if all the test pass on a Debian Stretch, you can build and run the provided dockerfile:
+To run the tests on Debian Stretch, you can build and run the provided dockerfile:
 ```sh
-docker build -t hapycolor .
-docker run -t hapycolor
+make build
+make run
+```
+
+To stop the container, run:
+```sh
+make stop
 ```
