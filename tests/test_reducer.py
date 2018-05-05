@@ -1,12 +1,14 @@
 import unittest
-from unittest.mock import patch
-from hapycolor.filters.reducer import Reducer, Node
+from  unittest import mock
+from hapycolor.filters.reducer import Reducer
 import subprocess as sp
+import networkx as nx
+from networkx import convert_node_labels_to_integers as cnlti
+from hapycolor import palette as pltte
 
 
 class TestReducer(unittest.TestCase):
-    @unittest.skip("Will be updated in the next pull request")
-    @patch("hapycolor.filters.reducer.Reducer.threshold", 20)
+    @mock.patch("hapycolor.filters.reducer.Reducer.threshold", 20)
     def test_reducer_taipei(self):
         """
         When debuging the reduction filter, it is highly advised to uncomment
@@ -17,7 +19,7 @@ class TestReducer(unittest.TestCase):
         the effects of the reduction algorithm and when setting a threshold
         for the algorithm.
         """
-        # from hapycolor import visual
+        from hapycolor import visual
         colors = [(83, 7, 53), (13, 25, 84), (18, 22, 81), (19, 28, 91),
                   (24, 26, 88), (56, 7, 70), (46, 19, 76), (40, 25, 87),
                   (56, 27, 88), (11, 46, 81), (22, 39, 89), (46, 38, 88),
@@ -40,40 +42,95 @@ class TestReducer(unittest.TestCase):
                   (49, 245, 242), (86, 236, 231), (250, 142, 135), (233, 160, 161),
                   (147, 236, 151), (253, 209, 138), (244, 233, 168), (158, 241, 217)]
 
-        nodes = Reducer.generate_nodes(colors)
-        self.assertEqual(len(colors), len(nodes))
-        graphs = Reducer.find_subgraphs(nodes)
+        graph = None
+        with mock.patch("hapycolor.filters.reducer.Reducer.threshold", 20):
+            graph = Reducer.generate_graph(colors)
+        self.assertEqual(len(colors), len(graph))
+        graphs = Reducer.find_subgraphs(graph)
+        self.assertEqual(len(graphs), 12)
+
         reduced_graphs = []
         # print()
-        for g in graphs:
-            reduced_graphs.append(Reducer.get_maximum_clique(g, 20))
-            # visual.print_palette([n.color for n in g])
+        for graph in graphs:
+            inverted_graph = nx.Graph()
+            inverted_graph.add_edges_from(nx.non_edges(graph))
+            reduced_graphs.append(Reducer.get_maximum_clique(inverted_graph))
+            # visual.print_palette(list(graph.nodes))
             # visual.print_palette(reduced_graphs[-1])
             # print()
-        self.assertEqual(len(graphs), 12)
-        self.assertEqual(sum([len(l) for l in reduced_graphs]), 26)
+        self.assertEqual(sum([len(l) for l in reduced_graphs]), 24)
 
-    @unittest.skip("Will be updated in the next pull request")
-    def test_reducer_valid_entry(self):
+    @mock.patch("hapycolor.filters.reducer.Reducer.threshold", 30)
+    def test_generate_graph(self):
+        colors = [(100, 0, 0), (90, 0, 0), (110, 0, 0),
+                  (0, 100, 0), (0, 110, 0), (0, 90, 0),
+                  (0, 0, 100), (0, 0, 90), (0, 0, 110)]
+
+        expected = {(0, 0, 110): {(0, 0, 90): {}, (0, 0, 100): {}},
+                    (0, 0, 100): {(0, 0, 110): {}, (0, 0, 90): {}},
+                    (0, 0, 90): {(0, 0, 110): {}, (0, 0, 100): {}},
+                    (0, 110, 0): {(0, 90, 0): {}, (0, 100, 0): {}},
+                    (0, 100, 0): {(0, 90, 0): {}, (0, 110, 0): {}},
+                    (0, 90, 0): {(0, 110, 0): {}, (0, 100, 0): {}},
+                    (90, 0, 0): {(110, 0, 0): {}, (100, 0, 0): {}},
+                    (100, 0, 0): {(110, 0, 0): {}, (90, 0, 0): {}},
+                    (110, 0, 0): {(90, 0, 0): {}, (100, 0, 0): {}}}
+
+        graph = Reducer.generate_graph(colors)
+        self.assertDictEqual(dict(graph.adj), expected)
+
+    def test_get_maximum_clique_0_colors(self):
+        graph = nx.Graph()
+        result = Reducer.get_maximum_clique(graph)
+        self.assertEqual(result, [])
+
+    def test_get_maximum_clique_2_colors(self):
+        graph = nx.Graph()
+        graph.add_edge((100, 0, 0), (101, 0, 0))
+        result = Reducer.get_maximum_clique(graph)
+        expected = {(100, 0, 0), (101, 0, 0)}
+        self.assertSetEqual(set(result), expected)
+
+    def test_apply_14_colors(self):
         colors = [(239, 106, 135), (42, 240, 236), (53, 217, 115),
                   (89, 240, 119), (92, 234, 150), (167, 220, 106),
                   (216, 79, 104), (43, 227, 146), (217, 54, 100),
                   (246, 81, 111), (71, 203, 214), (166, 73, 99),
                   (195, 64, 175), (49, 49, 159)]
 
-        expected_output = [(166, 73, 99), (239, 106, 135), (216, 79, 104),
-                           (42, 240, 236), (89, 240, 119), (43, 227, 146),
-                           (167, 220, 106), (71, 203, 214), (195, 64, 175),
-                           (49, 49, 159)]
+        expected = {(166, 73, 99), (239, 106, 135), (217, 54, 100),
+                    (42, 240, 236), (89, 240, 119), (43, 227, 146),
+                    (167, 220, 106), (71, 203, 214), (195, 64, 175),
+                    (49, 49, 159)}
 
-        nodes = Reducer.generate_nodes(colors)
-        graphs = Reducer.find_subgraphs(nodes)
-        reduced_colors = []
-        threshold = 10
+        palette = pltte.Palette()
+        palette.colors = colors
+        with mock.patch("hapycolor.filters.reducer.Reducer.threshold", 10):
+            result = Reducer.apply(palette)
+        self.assertSetEqual(set(result.colors), expected)
 
-        for g in graphs:
-            reduced_colors.extend(Reducer.get_maximum_clique(g, threshold))
-        self.assertEqual(set(expected_output), set(reduced_colors))
+    def test_threshold_0(self):
+        values = [(12, 13, 14), (24, 25, 26), (100, 101, 102)]
+        expected = {(12, 13, 14), (24, 25, 26), (100, 101, 102)}
+        with mock.patch("hapycolor.filters.reducer.Reducer.threshold", 0):
+            result = Reducer.reduce(values)
+        self.assertSetEqual(set(result), expected)
+
+
+    def test_reduce_15_integers(self):
+        values = [1, 2, 3, 6, 7, 8, 11, 12, 13, 16, 17, 18, 21, 22, 23]
+        expected = {1, 8, 11, 16, 21}
+
+        with mock.patch("hapycolor.filters.reducer.Reducer.threshold", 3), \
+                mock.patch("hapycolor.filters.reducer.Reducer.distance",
+                           TestReducer.mock_distance):
+            result = Reducer.reduce(values)
+        result.sort()
+        self.assertIn(result[0], [1, 2, 3])
+        self.assertIn(result[1], [6, 7, 8])
+        self.assertIn(result[2], [11, 12, 13])
+        self.assertIn(result[3], [16, 17, 18])
+        self.assertIn(result[4], [21, 22, 23])
 
     def test_find_subgraphs(self):
         """
@@ -90,48 +147,27 @@ class TestReducer(unittest.TestCase):
            |
            n5
         """
-        n0 = Node(0)
-        n1 = Node(1)
-        n2 = Node(2)
-        n0.add_neighbour(n1)
-        n1.add_neighbour(n0)
-        n0.add_neighbour(n2)
-        n2.add_neighbour(n0)
-        n3 = Node(3)
-        n1.add_neighbour(n3)
-        n3.add_neighbour(n1)
-        n4 = Node(4)
-        n2.add_neighbour(n4)
-        n4.add_neighbour(n2)
-        n5 = Node(5)
-        n4.add_neighbour(n5)
-        n5.add_neighbour(n4)
-        n6 = Node(6)
-        n7 = Node(7)
-        n6.add_neighbour(n7)
-        n7.add_neighbour(n6)
+        graph = nx.Graph()
+        graph.add_edges_from([(0, 1), (1, 3), (0, 2), (2, 4), (4, 5), (6, 7)])
+        expected = [nx.Graph([(0, 1), (1, 3), (0, 2), (2, 4), (4, 5)]),
+                    nx.Graph([(6, 7)])]
 
-        nodes = {n0.color: n0, n1.color: n1, n2.color: n2, n3.color: n3,
-                 n4.color: n4, n5.color: n5, n6.color: n6, n7.color: n7}
+        with mock.patch("hapycolor.filters.reducer.Reducer.distance",
+                        TestReducer.mock_distance):
+            graphs = Reducer.find_subgraphs(graph)
 
-        graphs = Reducer.find_subgraphs(nodes)
-        graphs_id = []
-        for g in graphs:
-            graphs_id.append([n.color for n in g])
-        graphs_set = [tuple(sorted(lst)) for lst in graphs_id]
-        expected_graphs = [tuple(range(6)), (6, 7)]
+        for graph, exp in zip(graphs, expected):
+            self.assertEqual(graph.nodes, exp.nodes)
 
-        self.assertEqual(set(graphs_set), set(expected_graphs))
+    @staticmethod
+    def mock_distance(value_1, value_2):
+        return abs(value_1 - value_2)
 
-    def mock_distance(v1, v2):
-        return abs(v1 - v2)
-
-    @patch("hapycolor.filters.reducer.Reducer.distance", mock_distance)
-    @patch("hapycolor.filters.reducer.Reducer.threshold", 3)
+    @mock.patch("hapycolor.filters.reducer.Reducer.distance", mock_distance)
+    @mock.patch("hapycolor.filters.reducer.Reducer.threshold", 3)
     def test_graph_reduction(self):
         colors = [0, 1, 2, 3, 6, 7, 8, 11, 12, 13, 14, 16]
-        expected_graphs = [[0, 1, 2, 3], [6, 7, 8], [11, 12, 13, 14, 16]]
-        graphs = Reducer.find_subgraphs(Reducer.generate_nodes(colors))
-        for i, g in enumerate(graphs):
-            self.assertEqual(set(expected_graphs[i]),
-                             set([n.color for n in g]))
+        expected = [{0, 1, 2, 3}, {6, 7, 8}, {11, 12, 13, 14, 16}]
+        graphs = Reducer.find_subgraphs(Reducer.generate_graph(colors))
+        for exp, graph in zip(expected, graphs):
+            self.assertSetEqual(exp, set(graph.nodes))
