@@ -1,11 +1,42 @@
-"""
-Configuration Editor module
-"""
 import re
 from hapycolor import helpers
 from hapycolor import exceptions
 
 class ConfigurationEditor:
+    """
+    Many targets are usually defined by a configuration file which
+    maps colors to the elements of the target.
+    In order to create a generic tool able to deal with these kind
+    of targets, hapycolor defines a "macro" indicating hapycolor
+    that the next color will have to be replaced, i.e., if the
+    user wants a color to be replaced by hapycolor, he or she will
+    have to precede the target line by a comment line similar to:
+    '# @hapycolor(args)'.
+
+    The provided arguments specify which color has to be replaced
+    by which color. For instance, if there is only one color which
+    has to be replaced by the foreground (resp. background),
+    then the argument will only be: "foreground" (resp. "background").
+    If the user wants to use another color from the palette, then use:
+    "random".
+
+    In some cases, there might be multiple colors on the same line,
+    but only a few of them have to be replaced, for instance:
+
+        set colors #010203 #020304 #040506
+
+    Here, the first color should be replaced by the foreground, and
+    the last, should be replaced by a color of the palette. In this
+    case, the macro should look like:
+
+        # @hapycolor("foreground", None, "random")
+        set colors #010203 #020304 #040506
+
+    To use this class, first initialize it with a list storing the
+    lines of the configuration file, then, call the function
+    :func:`replace(palette)` providing the generated palette which
+    will return the new configuration file.
+    """
     def __init__(self, configuration):
         self.configuration = configuration
         self.attributes = self.parser()
