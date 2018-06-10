@@ -21,6 +21,7 @@ class TestWallpaper(unittest.TestCase):
         wallpaper_path = pathlib.Path(raw_path).expanduser()
         self.assertTrue(wallpaper_path.exists())
 
+    @helpers.configurationtesting()
     @unittest.skipUnless(targets.os() == targets.OS.DARWIN,
                          "targetted platform: Darwin")
     @patch('subprocess.run')
