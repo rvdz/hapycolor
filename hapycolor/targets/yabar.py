@@ -17,17 +17,16 @@ class Yabar(base.Target):
         RGB colors must be written as 0x$TOKEN
         ARGB colors must be written as 0xA$TOKEN
         where:
-            - A is the hex alpha value (00 - FF)
-            - TOKEN is defined below (TGB, TFG, etc.)
+        - A is the hex alpha value (00 - FF)
+        - TOKEN is defined below (TGB, TFG, etc.)
 
         Methods for defined color:
-            - 'closest': finds the closest color in hue
-                         => full token must be '$DCT45' for a target
-                         hue of 45
-            - 'range': finds a color in the hue range, if none,
-                       uses the default hue
-                       => full token must look like '$DC30T60'
-                       for hue from 30 to 60
+        - 'closest': finds the closest color in hue
+        => full token must be '$DCT45' for a target hue of 45
+        - 'range': finds a color in the hue range, if none,
+        uses the default hue => full token must look like '$DC30T60'
+        for hue from 30 to 60
+
         !!! THE TOKEN DEFINES THE METHOD !!!
     """
 

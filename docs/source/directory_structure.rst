@@ -11,8 +11,6 @@ Directory Structure
 | /hapycolor/targets   | Submodule which define how to export the final palette |
 |                      | to the targets.                                        |
 +----------------------+--------------------------------------------------------+
-| /hapycolor/hyperplan | Submodule with.                                        |
-+----------------------+--------------------------------------------------------+
 | /build               | All built code from the compile scripts goes here.     |
 +----------------------+--------------------------------------------------------+
 | /dist                | Distributable Python wheels go here after the build    |
@@ -31,5 +29,3 @@ Directory Structure
 +----------------------+--------------------------------------------------------+
 | /images              | Some example images                                    |
 +----------------------+--------------------------------------------------------+
-
-.. todo:: Complete hapycolor/hyperplan

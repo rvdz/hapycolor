@@ -85,7 +85,7 @@ def is_target_subclass(target_str):
 
 def reconfigure(target_str):
     """
-    Calls the :func:reconfigure method of the appropriate class
+    Calls the :func:`reconfigure` method of the appropriate class
     contained in the target module provided in the arguments.
     This method allows to interact with the user and change the
     target settings.

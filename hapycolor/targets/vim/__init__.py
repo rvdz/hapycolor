@@ -162,7 +162,7 @@ class ColorManager:
         "Statement" is the product of both their frequencies.
         Then, once the algorithms finishes, each syntactic group is assigned to
         a cluster, which will be retrieved by calling the method
-        :func:`ColorManager.cast(group_name)`.
+        :func:`ColorManager.cast`.
 
     .. note::
         The occurrence frequencies are previously calculated and are located in

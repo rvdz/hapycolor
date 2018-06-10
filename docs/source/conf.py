@@ -37,7 +37,7 @@ extensions = ['sphinx.ext.autodoc',
               # 'sphinx.ext.imgmath',
               'sphinx.ext.mathjax',
               'sphinx.ext.coverage',
-              'sphinxcontrib.plantuml',
+              # 'sphinxcontrib.plantuml',
               'sphinx.ext.githubpages']
 
 

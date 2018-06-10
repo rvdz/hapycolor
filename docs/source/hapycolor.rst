@@ -1,5 +1,5 @@
-hapycolor package
-=================
+.. Hapycolor API Docs
+.. ==================
 
 Subpackages
 -----------
@@ -16,6 +16,11 @@ hapycolor\.config module
 ------------------------
 
 .. automodule:: hapycolor.config
+
+hapycolor\.configuration_editor module
+--------------------------------------
+
+.. automodule:: hapycolor.configuration_editor
 
 hapycolor\.imgur module
 ------------------------

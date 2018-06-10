@@ -7,9 +7,6 @@ How to contribute without coding
 --------------------------------
 
 - **Suggest improvements**: Post bugs and enhancement requests at the `Github Issue List`_.
-- **Create your own filters**: to be completed
-
-.. todo:: complete **Create your own filters**
 
 .. _`Github Issue List`: https://github.com/rvdz/hapycolor/issues
 
@@ -17,26 +14,76 @@ How to contribute code
 ----------------------
 
 Filters
-```````
+^^^^^^^
+See: :ref:`add filters`.
 
 Targets
-```````
+^^^^^^^
+See: :ref:`add targets`.
 
-.. uml::
+Useful Tools when contributing with code
+----------------------------------------
 
-    @startuml
+There are a few useful classes implemented in this project when building
+new targets:
 
-    start
+Partitioning Around Medoids
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    :Image;
+:class:`hapycolor.targets.pam.PAM` - The k-medoids algorithm is a clustering
+algorithm related to the k-means algorithm and the medoidshift algorithm. Both
+the k-means and k-medoids algorithms are partitional (breaking the dataset up
+into groups) and both attempt to minimize the distance between colors labeled
+to be in a cluster and a color designated as the center of that cluster. In
+contrast to the k-means algorithm, k-medoids chooses datapoints as centers
+(medoids).
 
-    :Raw Palette;
+Many targets require a subset of colors from the palette, and usually, a
+clever way to get them is to split the colors into clusters and retrieve the
+center of each cluster with the constraint that this center must be a real
+color of the palette. That way, at the end of the algorithm, we end up with
+a defined number of centers that are sufficiently far appart.
 
-    note right
-        A large number of colors
-        are extracted by Imagemagick,
-        from the image
-    end note
+.. note::
+    The most common realisation of k-medoid clustering is the
+    Partitioning Around Medoids (PAM) algorithm.
 
-    @enduml
+.. _`contribution editor`:
 
+Configuration Editor
+^^^^^^^^^^^^^^^^^^^^
+
+:class:`hapycolor.configuration_editor.ConfigurationEditor` - Some targets like
+i3 or yabar, rely on a configuration file which maps colors to the elements of
+the target. In order to create a generic tool able to deal with these
+kind of targets, hapycolor defines a "macro" indicating
+that the next color will have to be replaced, i.e., if the
+user wants a color to be replaced by hapycolor, he or she will
+have to precede the target line by a comment line similar to:
+
+.. code-block:: shell
+
+    # @hapycolor(args)
+
+The provided arguments specify which color has to be replaced
+by which color. For instance, if there is only one color which
+has to be replaced by the foreground (resp. background),
+then the argument will only be: "foreground" (resp. "background").
+If the user wants to use another color from the palette, then use:
+"random".
+
+In some cases, there might be multiple colors on the same line,
+but only a few of them have to be replaced, for instance:
+
+.. code-block:: shell
+
+    set colors #010203 #020304 #040506
+
+Here, the first color should be replaced by the foreground, and
+the last, should be replaced by a color of the palette. In this
+case, the macro should look like:
+
+.. code-block:: shell
+
+    # @hapycolor("foreground", None, "random")
+    set colors #010203 #020304 #040506

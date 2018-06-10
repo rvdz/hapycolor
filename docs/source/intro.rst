@@ -72,13 +72,8 @@ Moreover, Hapycolor has been designed to be a collaborative project where it is 
 or new targets. This means that it provides new tools upon which ricers can walk the Trail, and share easily
 their knowledge and work.
 
-So?
----
-Hapycolor is an infrastructure that helps ricers to efficiently configure their system according to their desire, in
-addition of benefiting from other's people work. In particular through the choice of color filters and how to
-use the palette on the targets, and on which target.
-
-.. todo::
-    Options to add (a TODO list)
-    Customization (eg moving hyperplans)
-    People sharing dotfiles?
+tl;dr?
+------
+Hapycolor is an tool that helps ricers to efficiently configure their system from a selected image, according
+to their will, in addition of benefiting from other people's work. In particular through the choice of
+color filters and targets.

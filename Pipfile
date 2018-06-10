@@ -4,8 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+colormath = "*"
+numpy = "*"
+scipy = "*"
+networkx = "*"
+pillow = "*"
+imgur-downloader = "*"
 
 [dev-packages]
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [requires]
 python_version = "3.5"

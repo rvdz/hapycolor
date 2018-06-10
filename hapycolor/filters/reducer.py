@@ -116,7 +116,7 @@ class Reducer(base.Filter):
             In order to optimize the algorithm, only connected graphs should be
             provided.
         :arg threshold: The minimal LAB distance between two colors.
-        :see: :func:`Reducer.distance()`
+        :see: :func:`Reducer.distance`
         :see: `<https://en.wikipedia.org/wiki/Color_difference/>`_
         """
         # if len(graph) <= 1:

@@ -70,7 +70,7 @@ class I3(base.Target):
         This class implements two main features:
         - it replaces the wallpaper in the configuration file
         - replaces the colors preceded by the macro replace line, for more info,
-            please check out :class:`hapycolor.configuration_editor.ConfigurationEditor`:
+        please check out :class:`hapycolor.configuration_editor.ConfigurationEditor`:
         """
         config_path = I3.load_config()[I3.configuration_key]
         configuration = []

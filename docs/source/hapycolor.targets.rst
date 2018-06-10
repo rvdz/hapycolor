@@ -31,6 +31,12 @@ hapycolor\.targets\.iterm module
 
 .. automodule:: hapycolor.targets.iterm
 
+hapycolor\.targets\.pam module
+-----------------------------------
+
+.. automodule:: hapycolor.targets.pam
+
+
 hapycolor\.targets\.lightline module
 ------------------------------------
 

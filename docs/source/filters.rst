@@ -37,6 +37,8 @@ the `CIEL*a*b color space <https://en.wikipedia.org/wiki/CIELUV>`_. The commissi
 operate in this space, among others the: `CIEDE2000 <https://en.wikipedia.org/wiki/Color_difference#CIEDE2000>`_, that have
 been used by Hapycolor to define the maximal clique problem.
 
+.. _`add filters`:
+
 How to add a color filter?
 --------------------------
 In order to add a custom filter, a class inheriting from :class:`hapycolor.filters.base.Filter` should be implemented in the filters module.

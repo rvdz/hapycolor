@@ -14,8 +14,8 @@ Welcome to Hapycolor's documentation!
    contribution
    filters
    targets
-   modules
    directory_structure
+   modules
 
 
 
