@@ -106,7 +106,7 @@ class GnomeTerminal(base.Target):
         fg = rgb_to_hex(palette.foreground)
         bg = rgb_to_hex(palette.background)
 
-        colors = tcm.TerminalColorManager(palette.colors)()
+        colors = tcm.TerminalColorManager(palette.colors).cast_all()
 
         hex_colors = list(map(rgb_to_hex, colors))
         hex_colors = '", "'.join(hex_colors)

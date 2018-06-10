@@ -9,14 +9,19 @@ from hapycolor.targets import pam
 class TerminalColorManager:
     SIMPLE_SORT = True
     """
+    When implementing a class adding the support to a terminal emulator,
+    the generated profile will usually look the same: sixteen base colors,
+    among which eight hues and for each hue, a bright and a darker color.
+    This class requires the list of at least fourteen colors and provides two
+    main methods:
+
     For more details about standard and high-intensity terminal colors, see:
     `Standard and Hight-intensity colors
     <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
 
-    Initializes a :class:`TerminalColorManager`'s instance with a list of
-    colors.
+    .. note:: The white and black colors are set with default values.
 
-    :arg colors: a `list` of rgb colors
+    :arg colors: a `list` of rgb colors of at least fourteen colors
     """
     def __init__(self, colors):
         if colors.__class__ != list:
@@ -40,10 +45,17 @@ class TerminalColorManager:
             self.colors = TerminalColorManager._sort(medoids)
         assert len(self.colors) == 16
 
-    def __call__(self):
+    def cast_all(self):
+        """
+        Returns a list of colors (the second eight colors
+        are the brighter version of each first eight colors).
+        """
         return [self.cast(i) for i in range(16)]
 
     def cast(self, i):
+        """
+        Returns the ith color of the generated list.
+        """
         assert 0 <= i < 16, "i: {}".format(i)
         return self.colors[i]
 

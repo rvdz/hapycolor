@@ -87,3 +87,24 @@ case, the macro should look like:
 
     # @hapycolor("foreground", None, "random")
     set colors #010203 #020304 #040506
+
+Terminal Color Manager
+^^^^^^^^^^^^^^^^^^^^^^
+
+:class:`hapycolor.targets.terminal_color_manager.TerminalColorManager` -
+when implementing a class adding the support to a terminal emulator,
+the generated profile will usually look the same: sixteen base colors,
+among which 8 hues and for each hue, a bright and a darker color.
+This class requires the list of at least fourteen colors and provides two
+main methods:
+
+- :func:`hapycolor.targets.terminal_color_manager.TerminalColorManager.cast_all`,
+    which returns a list of colors (the second eight colors
+    are the brighter version of each first eight colors).
+- :func:`hapycolor.targets.terminal_color_manager.TerminalColorManager.cast`,
+    which returns the ith color a the previously described list.
+
+.. note::
+   This class is already being used in the modules
+   :class:`hapycolor.targets.gnome_terminal.GnomeTerminal` and
+   :class:`hapycolor.targets.iterm.Iterm`

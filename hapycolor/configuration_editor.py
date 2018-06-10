@@ -82,10 +82,17 @@ class ConfigurationEditor:
                     # (r, g, b, alpha)
                     r"\( *[0-9]+ *, *[0-9]+ *, *[0-9]+ *,",
                     # #rrggbb
-                    r"#[0-9a-f-A-F]{6}"]
+                    r"#[0-9a-f-A-F]{6}",
+                    # 0xrrggbb
+                    r"0x[0-9a-f-A-F]{6}",
+                    # 0Xrrggbb
+                    r"0X[0-9a-f-A-F]{6}"]
 
-        converters = [lambda c: "({}, {}, {})".format(c[0], c[1], c[2]),
-                      lambda c: "({}, {}, {},".format(c[0], c[1], c[2]),
+        converters = [lambda c: "({}, {}, {})".format(*c),
+                      lambda c: "({}, {}, {},".format(*c),
+                      lambda c: "#{:02X}{:02X}{:02X}".format(*c),
+                      lambda c: "0x{:02X}{:02X}{:02X}".format(*c),
+                      lambda c: "0X{:02X}{:02X}{:02X}".format(*c),
                       helpers.rgb_to_hex]
 
         for pattern, converter in zip(patterns, converters):

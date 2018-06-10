@@ -31,8 +31,18 @@ hapycolor\.targets\.iterm module
 
 .. automodule:: hapycolor.targets.iterm
 
+hapycolor\.targets\.gnome_terminal module
+-----------------------------------------
+
+.. automodule:: hapycolor.targets.gnome_terminal
+
+hapycolor\.targets\.terminal_color_manager module
+-------------------------------------------------
+
+.. automodule:: hapycolor.targets.terminal_color_manager
+
 hapycolor\.targets\.pam module
------------------------------------
+------------------------------
 
 .. automodule:: hapycolor.targets.pam
 

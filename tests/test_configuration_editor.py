@@ -86,7 +86,7 @@ class TestConfigurationEditor(unittest.TestCase):
                     "line 4",
                     "line 5 #aabbcc",
                     "# @hapycolor(\"random\")", "asdf #040506 sfdg",
-                    "# @hapycolor(\"foreground\")", "new line #ffffff",
+                    "# @hapycolor(\"foreground\")", "new line #FFFFFF",
                     "# @hapycolor(\"random\", None, \"background\")",
                     "#070809, #FFAACC, #000000",
                     "# @hapycolor(\"random\")", "Last line: #010203"]
