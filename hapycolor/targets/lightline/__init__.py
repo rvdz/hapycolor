@@ -112,7 +112,7 @@ class Lightline(base.Target):
 
         colorscheme = Lightline.load_config()[Lightline.colorscheme_key]
         with open(colorscheme, 'w') as colorscheme_file:
-            colorscheme_file.write(theme)
+            colorscheme_file.write('\n'.join(theme))
 
     @staticmethod
     def add_body():
@@ -124,7 +124,6 @@ class Lightline(base.Target):
 
     @staticmethod
     def add_colors(theme, palette):
-        theme = '\n'.join(theme)
         colors = Lightline.classify(palette.colors)
 
         # Sort by hue and rearrange in the following order:
