@@ -87,4 +87,4 @@ class Rofi(base.Target):
 
         config_path = Rofi.load_config()[Rofi.configuration_key]
         with open(config_path, 'w') as config_file:
-            config_file.write(filled_template)
+            config_file.write('\n'.join(filled_template))
