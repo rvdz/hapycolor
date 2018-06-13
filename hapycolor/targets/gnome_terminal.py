@@ -35,15 +35,12 @@ class GnomeTerminal(base.Target):
         if str(p) == '.':
             new_config = {GnomeTerminal.configuration_key: default_path}
             GnomeTerminal.save_config(new_config)
-            return
-
-        if str(p)[-1] != ':':
+        elif str(p)[-1] != ':':
             raise exceptions.WrongInputError("Must end with ':'")
 
         is_default = GnomeTerminal.set_default()
 
-        GnomeTerminal.save_config({GnomeTerminal.configuration_key: str(p),
-                                   GnomeTerminal.default_key: str(is_default)})
+        GnomeTerminal.save_config({GnomeTerminal.default_key: str(is_default)})
 
     def set_default():
         answ = input("Set generated profile as default? (y/n): ").upper()
@@ -141,11 +138,11 @@ class GnomeTerminal(base.Target):
         """
         set_profile_command = ["dconf", "write",
                                "/org/gnome/terminal/legacy/profiles:/default",
-                               profile]
+                               "\"" + profile + "\""]
         process = sp.run(set_profile_command, stderr=sp.PIPE)
         if process.returncode:
             msg = "Hapycolor encountered an error when running dconf: " \
-                    + process.stderr
+                    + process.stderr.decode("utf-8")
             raise exceptions.DconfInvalidCommand(msg)
 
     @staticmethod
