@@ -2,24 +2,38 @@
 Rofi module
 """
 import pathlib
+import enum
+from os import listdir
 from hapycolor import helpers
 from hapycolor import targets
 from hapycolor import exceptions
 from hapycolor.targets import base
+from hapycolor import targets
 from hapycolor.configuration_editor import ConfigurationEditor
 
 class Rofi(base.Target):
     """
-    ROFI
+    To run `rofi` with the generated profile, execute
+    `rofi -run --config ~/.config/hapycolor.rasi`.
+
+    When configuring this target, the user will be prompted about which
+    configuration template to use. This version of hapycolor prefers using
+    templates instead of letting the user directly provide a configuration
+    file with hapycolor's macros since some effort is required in order to
+    understand how the configuration interacts with the end result. So, it
+    seemed more interesting using templates that already contain color
+    macros. If a user wants to add his own templates, this can be done just
+    by adding the file into `./hapycolor/targets/rofi/`.
     """
+
+    configuration_path = "~/.config/hapycolor.rasi"
+    configuration_key = "configuration"
     template_key = "template"
-    configuration_key = "config"
 
-
-    @staticmethod
-    def get_config_file():
-        return Rofi.load_config()[Rofi.configuration_key]
-
+    ThemeEnum = enum.Enum("ThemeEnum",
+                          [(t.split('.')[0].upper(),
+                            "hapycolor/targets/rofi/" + t)
+                           for t in listdir("./hapycolor/targets/rofi") if ".rasi" in t])
 
     @staticmethod
     def is_config_initialized():
@@ -30,49 +44,37 @@ class Rofi(base.Target):
 
 
     @staticmethod
+    def compatible_os():
+        return [targets.OS.LINUX]
+
+    @staticmethod
     def initialize_config():
         """
-        Searches through the common paths where is stored Rofi's configuration.
-        If it isn't found, this function will prompt the user about its
-        location, and save the result in hapycolor's configuration file.
-
-        Then, prompts the user about a configuration file to be used as a
-        template. Its format is described here.
-
-        .. todo::
-            Create a section in the documentation detailing how to create a
-            rofi or yabar template file.
+        Currently, Rofi will write a configuration file in:
+        `~/.config/hapycolor.rasi`. In addition, when configuring thistarget,
+        the user will be prompted about which configuration template to use.
         """
-        config_path = None
-        common_paths = [pathlib.Path(p) for p in ["~/.config/rofi"]]
+        Rofi.save_config({Rofi.configuration_key: Rofi.configuration_path})
 
-        for path in common_paths:
-            if path.is_dir():
-                config_path = path
+        theme = select_theme()
 
-        if not config_path:
-            config_path = helpers.input_path("Path to rofi configuration directory: ")
-            if not config_path.is_dir():
-                raise exceptions.WrongInputError("Must be a directory")
-            # Seems not needed
-            # if not p.is_absolute():
-            #     p = p.resolve()
+        Rofi.save_config({Rofi.template_key: theme.value})
 
-        Rofi.save_config({Rofi.configuration_key: config_path.as_posix()})
-
-        config_path = helpers.input_path("Path to rofi template (for more "
-                                         + "information about template files, "
-                                         + "please check out here: ")
-
-        if not config_path.exists():
-            raise exceptions.WrongInputError("{} not found"
-                                             .format(config_path.as_posix()))
-        if not config_path.is_file():
-            raise exceptions.WrongInputError("{} is not a file"
-                                             .format(config_path.as_posix()))
-
-        Rofi.save_config({Rofi.template_key: config_path.as_posix()})
-
+    @staticmethod
+    def select_theme():
+        try:
+            print("\nSelect a theme:")
+            for i, t in enumerate(Rofi.ThemeEnum):
+                print("{}: ({})".format(t.name, i))
+            theme_i = int(input("Theme: "))
+            if 0 <= theme_i < len(Rofi.ThemeEnum):
+                return list(Rofi.ThemeEnum)[theme_i]
+            else:
+                raise ValueError
+        except ValueError:
+            print("Value must be an integer between 0 and {}" \
+                  .format(len(Rofi.ThemeEnum)))
+            return Rofi.select_theme()
 
     @staticmethod
     def compatible_os():
