@@ -48,7 +48,7 @@ a defined number of centers that are sufficiently far appart.
     The most common realisation of k-medoid clustering is the
     Partitioning Around Medoids (PAM) algorithm.
 
-.. _`contribution editor`:
+.. _`configuration editor`:
 
 Configuration Editor
 ^^^^^^^^^^^^^^^^^^^^

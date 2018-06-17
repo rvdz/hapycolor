@@ -24,7 +24,6 @@ use of a shell script executing `dconf`_ commands.
 
 .. _`dconf`: https://en.wikipedia.org/wiki/Dconf
 
-
 iTerm2
 ^^^^^^
 
@@ -47,7 +46,7 @@ file named after the provided image's name.
     the `Theme:`'s menu, select `Dark`.
 
 .. note::
-    By default, iTerm2 uses the configuration file located in: :code:``~/Library/Preferences/com.googlecode.iterm2.plist``,
+    By default, iTerm2 uses the configuration file located in: ``~/Library/Preferences/com.googlecode.iterm2.plist``,
     which is automatically encoded as an `Apple binary property list`_. It is possible to use a custom file by enabling
     ``Load preferences from a custom folder or URL:`` in ``Preferences > General > Preferences``, and selecting a target folder.
     Then, when configuring hapycolor, you will be prompted to provide the path to the generated custom preferences file
@@ -59,7 +58,7 @@ file named after the provided image's name.
 How it is done?
 ^^^^^^^^^^^^^^^
 
-A terminal profile, usually requires sixteen base colors: 
+A terminal profile, usually requires sixteen base colors:
 
 .. image:: ./ascii_colors_normal.png
 
@@ -72,7 +71,7 @@ In order for hapycolor to create a profile matching the conventional description
 the palette into six clusters according to their hues, and then, splits each one
 by their luminosity.  That way, by taking the medoids of each clusters, we end up with twelve colors,
 a bright and a darker one for six different group of hues. The last four colors
-are a dark/normal version of the foreground and the backgroud colors.
+are default values for the blacks and whites.
 
 In addition, hapycolor allows the user to choose whether or not the generated
 profile should be set as the default profile.
@@ -162,6 +161,27 @@ provided image.
 
 .. _`feh`: https://wiki.archlinux.org/index.php/Feh
 
+Rofi
+----
+Rofi_ is a window switcher, application launcher and dmenu replacement much
+appreciated by i3's community.
+
+This version of hapycolor prefers using templates instead of letting the
+user directly provide a rofi's configuration file with hapycolor's macros since
+some effort is required in order to understand how the configuration
+interacts with the end result. So, it seemed more interesting using
+templates that already contain color macros. If a user wants to add his
+own templates, this can be done by just adding the file with a '.rasi'
+extension into `./hapycolor/targets/rofi/`.
+
+Currently supported themes:
+
+- Monokai
+- lb
+- arc-red-dark
+
+.. _Rofi: https://github.com/DaveDavenport/rofi
+
 Lightline
 ---------
 
@@ -182,8 +202,8 @@ It currently supports various themes inspired from lightline's repository:
 Add new themes
 ^^^^^^^^^^^^^^
 In order to add new themes, a template should be added in ``hapycolor/targets/lightline_themes/``, written in
-a flattened [1]_ format, as the other themes, and can use the following undefined variables: "$FG", "$BG",
-"$NORMAL", "$INSERT", "$REPLACE" and "$VISUAL". An easy way could be to define at the beginning of the template
+a flattened [1]_ format, as the other themes, and can use the following undefined variables: ``$FG``, ``$BG``,
+``$NORMAL``, ``$INSERT``, ``$REPLACE`` and ``$VISUAL``. An easy way could be to define at the beginning of the template
 the following variable declarations:
 
 .. code-block:: vim
@@ -227,11 +247,12 @@ i3
 --
 The class :class:`hapycolor.targets.i3.I3` implements two features:
 
-- Inserts `feh`'s command in order to set the wallpaper, if this target was
-    enabled
-- Supports hapycolor's macro to replace colors. For more info about this,
-    please check out :class:`hapycolor.configuration_editor.ConfigurationEditor`,
-    or the :ref:`contribution editor`. That way, a user can, for instance,
+- Inserts `feh`'s command in order to set the new wallpaper
+    This will be done only if this feature was enabled.
+- Supports hapycolor's macro to replace colors.
+    For more info about this, please check out
+    :class:`hapycolor.configuration_editor.ConfigurationEditor`,
+    or the :ref:`configuration editor`. That way, a user can, for instance,
     use a generated color as the border color of i3's windows:
 
 .. code:: vim
@@ -268,12 +289,13 @@ function :func:`hapycolor.targets.base.Target.export`, takes
 in a palette of colors and the path to the image. Other methods that should be implemented
 are:
 
-- :func:`hapycolor.targets.base.Target.compatible_os`, which defines a list of compatible OS.
-- :func:`hapycolor.targets.base.Target.initialize_config`, which interacts with the
-    user and stores in its respective section of the configuration file, persistent
+- :func:`hapycolor.targets.base.Target.compatible_os`
+    which defines a list of compatible OS.
+- :func:`hapycolor.targets.base.Target.initialize_config`
+    which interacts with the user and stores in its respective section of the configuration file, persistent
     data needed to export a palette. For instance, the path of vim's hapycolor colorscheme.
-- :func:`hapycolor.targets.base.Target.reconfigure`. This method can be triggered by
-    hapycolor's `--reconfigure` and the name of the target. This function should allow
+- :func:`hapycolor.targets.base.Target.reconfigure`
+    this method can be triggered by hapycolor's `--reconfigure` and the name of the target. This function should allow
     the user to change the persistent data defined when first initializing the target.
     For instance, a user might want to stop setting the generated terminal profile as
     the default profile.

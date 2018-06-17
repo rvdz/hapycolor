@@ -15,13 +15,22 @@ class Rofi(base.Target):
     `rofi -run --config ~/.config/hapycolor.rasi`.
 
     When configuring this target, the user will be prompted about which
-    configuration template to use. This version of hapycolor prefers using
-    templates instead of letting the user directly provide a configuration
-    file with hapycolor's macros since some effort is required in order to
-    understand how the configuration interacts with the end result. So, it
-    seemed more interesting using templates that already contain color
-    macros. If a user wants to add his own templates, this can be done just
-    by adding the file into `./hapycolor/targets/rofi/`.
+    configuration template to use.
+
+    This version of hapycolor prefers using templates instead of letting the
+    user directly provide a configuration file with hapycolor's macros since
+    some effort is required in order to understand how the configuration
+    interacts with the end result. So, it seemed more interesting using
+    templates that already contain color macros. If a user wants to add his
+    own templates, this can be done just by adding the file with a '.rasi'
+    extension into `./hapycolor/targets/rofi/`.
+
+    Currently supported themes:
+
+    - Monokai
+    - lb
+    - arc-red-dark
+
     """
 
     configuration_path = "~/.config/hapycolor.rasi"
