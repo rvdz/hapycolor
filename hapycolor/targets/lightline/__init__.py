@@ -106,8 +106,8 @@ class Lightline(base.Target):
         configuration file.
         """
 
-        theme = Lightline.add_header(image_path)
-        theme += Lightline.add_body()
+        theme = [Lightline.add_header(image_path)]
+        theme.extend(Lightline.add_body())
         theme = Lightline.add_colors(theme, palette)
 
         colorscheme = Lightline.load_config()[Lightline.colorscheme_key]
@@ -119,7 +119,7 @@ class Lightline(base.Target):
         theme_path = Lightline.load_config()[Lightline.theme_key]
         body = []
         with open(theme_path, "r") as theme_file:
-            body = theme_file.read()
+            body = theme_file.read().splitlines()
         return body
 
     @staticmethod
@@ -138,8 +138,8 @@ class Lightline(base.Target):
         for mode, color in zip(modes, colors):
             new_value = "'{}', {}".format(helpers.rgb_to_hex(color),
                                           eight_bit_colors.rgb_to_short(color))
-            theme = theme.replace(mode, new_value)
-        return theme.split('\n')
+            theme = [line.replace(mode, new_value) for line in theme]
+        return theme
 
     @staticmethod
     def classify(colors):

@@ -211,7 +211,7 @@ class TestTermColor(unittest.TestCase):
         colors = [helpers.hsl_to_rgb(c) for c in colors]
         classified_hue = Terminal._classify_hue(colors)
         classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort_medoids(classified_lum)
+        sorted_colors = Terminal._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
@@ -228,7 +228,7 @@ class TestTermColor(unittest.TestCase):
         colors = [helpers.hsl_to_rgb(c) for c in colors]
         classified_hue = Terminal._classify_hue(colors)
         classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort_medoids(classified_lum)
+        sorted_colors = Terminal._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
@@ -249,7 +249,7 @@ class TestTermColor(unittest.TestCase):
         colors = [helpers.hsl_to_rgb(c) for c in colors]
         classified_hue = Terminal._classify_hue(colors)
         classified_lum = Terminal._classify_luminosity(classified_hue)
-        sorted_colors = Terminal._sort_medoids(classified_lum)
+        sorted_colors = Terminal._sort(classified_lum)
         self.assertEqual(len(sorted_colors), 16)
 
         hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
