@@ -41,3 +41,7 @@ class TestLightline(unittest.TestCase):
         expected = "~/.vim/pack/bundle/start/lightline.vim/autoload/lightline" \
                     + "/colorscheme/hapycolor.vim"
         self.assertEqual(path, pathlib.Path(expected).expanduser().as_posix())
+
+    def test_themes_finder(self):
+        self.assertIn("hapycolor/targets/lightline/landscape.vim",
+                      [t.value for t in Lightline.ThemeEnum])
