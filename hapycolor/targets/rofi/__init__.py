@@ -60,9 +60,10 @@ class Rofi(base.Target):
         `~/.config/hapycolor.rasi`. In addition, when configuring thistarget,
         the user will be prompted about which configuration template to use.
         """
-        Rofi.save_config({Rofi.configuration_key: Rofi.configuration_path})
+        Rofi.save_config({Rofi.configuration_key:
+                          pathlib.Path(Rofi.configuration_path).expanduser()})
 
-        theme = select_theme()
+        theme = Rofi.select_theme()
 
         Rofi.save_config({Rofi.template_key: theme.value})
 
