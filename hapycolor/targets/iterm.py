@@ -177,10 +177,10 @@ class Iterm(base.Target):
             Iterm._set_default(guid, preferences_root)
 
         # Append profile to profile list
-        for i, n in enumerate(root):
+        for i, n in enumerate(preferences_root):
             if n.tag == Iterm.Tag.KEY and n.text == Iterm.Key.NEW_BOOKMARKS:
-                root[i+1].text = "\n\t\t"
-                root[i+1].append(root)
+                preferences_root[i+1].text = "\n\t\t"
+                preferences_root[i+1].append(root)
 
         # Save changes
         with Iterm.open_preferences("wb") as f:
@@ -197,7 +197,7 @@ class Iterm(base.Target):
             raise exceptions.ColorFormatError(msg)
 
         components = ["Red Component", "Green Component", "Blue Component"]
-        color_keys = [ET.Element(Iterm.Tag.KEY)] * 3
+        color_keys = [ET.Element(Iterm.Tag.KEY), ET.Element(Iterm.Tag.KEY), ET.Element(Iterm.Tag.KEY)]
         for i, element in enumerate(color_keys):
             element.text = components[i]
         for element in color_keys:
