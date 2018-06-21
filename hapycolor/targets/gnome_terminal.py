@@ -20,26 +20,15 @@ class GnomeTerminal(base.Target):
         Otherwise appends a new one to the list
     """
 
-    configuration_key = "gnome_terminal_profiles"
     default_key = "default"
 
     @staticmethod
     def initialize_config():
         """
-            Set the path for themes
+        Checks if the user wants the generated profile to be set as the default
+        profile.
         """
-        default_path = '/org/gnome/terminal/legacy/profiles:'
-        p = helpers.input_path("Path to gnome-terminal's dconf profiles\n\
-                               (Keep empty to use default path '{}'): "
-                               .format(default_path))
-        if str(p) == '.':
-            new_config = {GnomeTerminal.configuration_key: default_path}
-            GnomeTerminal.save_config(new_config)
-        elif str(p)[-1] != ':':
-            raise exceptions.WrongInputError("Must end with ':'")
-
         is_default = GnomeTerminal.set_default()
-
         GnomeTerminal.save_config({GnomeTerminal.default_key: str(is_default)})
 
     def set_default():
@@ -56,8 +45,7 @@ class GnomeTerminal(base.Target):
     def is_config_initialized():
         try:
             config = GnomeTerminal.load_config()
-            is_init = GnomeTerminal.configuration_key in config \
-                    and GnomeTerminal.default_key in config
+            is_init = GnomeTerminal.default_key in config
         except exceptions.InvalidConfigKeyError:
             return False
         return is_init
@@ -102,7 +90,6 @@ class GnomeTerminal(base.Target):
             raise exceptions.PaletteFormatError(msg)
 
         config = GnomeTerminal.load_config()
-        saved_profiles_path = config[GnomeTerminal.configuration_key]
         fg = rgb_to_hex(palette.foreground)
         bg = rgb_to_hex(palette.background)
 
@@ -113,7 +100,8 @@ class GnomeTerminal(base.Target):
         hex_colors = '"' + hex_colors + '"'
         process = sp.Popen(['bash', './hapycolor/targets/export_gnome.sh',
                             name, fg, bg, hex_colors,
-                            saved_profiles_path], stdout=sp.PIPE, bufsize=1)
+                            '/org/gnome/terminal/legacy/profiles:'],
+                           stdout=sp.PIPE, bufsize=1)
         with process.stdout:
             for line in iter(process.stdout.readline, b''):
                 print(line, )

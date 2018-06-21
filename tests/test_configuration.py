@@ -9,5 +9,5 @@ class TestConfiguration(unittest.TestCase):
 
         configuration = configparser.ConfigParser()
         configuration.read(config.get_default_config())
-        expected_sections = ["hyperplan", "Iterm", "Wallpaper", "GnomeTerminal"]
+        expected_sections = ["hyperplan", "Iterm", "Wallpaper"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))
