@@ -122,8 +122,8 @@ class Reducer(base.Filter):
         # if len(graph) <= 1:
         #     return [n.color for n in graph]
 
-        # if len(graph) > 60:
-        #     graph = graph[:60]
+        if len(graph) > 60:
+            graph = graph.subgraph(list(graph.nodes)[:60])
 
         cliques = list(nx.find_cliques(graph))
         if not cliques:
