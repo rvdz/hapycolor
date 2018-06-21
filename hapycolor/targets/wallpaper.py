@@ -59,6 +59,6 @@ class Wallpaper(base.Target):
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
         subprocess.run(["sqlite3",
-                        db_file,
+                        db_file.as_posix(),
                         "update data set value = '{}'".format(image_path)])
         subprocess.run(["killall", "Dock"])
