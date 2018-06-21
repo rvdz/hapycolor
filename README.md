@@ -103,15 +103,20 @@ by running:
 hapycolor --help
 ```
 
-gnome-terminal:
-    - create a new profile called 'Default', and switch to it
-    - OR execute dconf reset -f /org/gnome/terminal/legacy/profiles:/
-    (or replace the path with yours, but this is the default one)
+## Warnings
+Gnome Terminal might not load the generated profile at first. In that
+case:
+- Create a new profile called 'Default', and switch to it
+- OR run:
+```sh
+dconf reset -f /org/gnome/terminal/legacy/profiles:/
+```
 
-!! If one of the above solutions does not work for you (Debian 9, 
-   Gnome shell 3.22 for instance), try doing both by reseting first
+If one of the above solutions does not work for you (Debian 9,
+Gnome shell 3.22 for instance), try doing both by reseting first.
 
 ## Test
+
 To run the tests locally, excute:
 ```sh
 python3 tests/run_suite.py --verbose <0-3>
