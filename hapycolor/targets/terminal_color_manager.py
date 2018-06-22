@@ -86,10 +86,10 @@ class TerminalColorManager:
         medoids = []
         for medoid in colors:
             # Check if there is only one color in the cluster
-            try:
-                hue_split_cluster = pam.PAM(colors[medoid], 2, luminosity_diff)()
-            except exceptions.PAMException:
+            if len(colors[medoid]) == 1:
                 hue_split_cluster = [medoid] * 2
+            elif len(colors[medoid]) >= 2:
+                hue_split_cluster = pam.PAM(colors[medoid], 2, luminosity_diff)()
             c_1, c_2 = tuple([m for m in hue_split_cluster])
             normal, light = (c_1, c_2) if c_1[2] < c_2[2] else (c_2, c_1)
             medoids.append((normal, light))

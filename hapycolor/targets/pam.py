@@ -53,18 +53,16 @@ classes, since it only has {} colors.".format(K, len(colors))
         """
         self._build()
         self._swap()
-        clusters = {}
 
-        for c in self.colors:
+
+        clusters = dict([(m, [m]) for m in self.selected])
+        for c in self.unselected:
             distance_c = []
             for s in self.selected:
                 distance_c.append(self.distance(c, s))
             medoid_index = distance_c.index(min(distance_c))
             medoid = self.selected[medoid_index]
-            if medoid in clusters:
-                clusters[medoid].append(c)
-            else:
-                clusters[medoid] = [c]
+            clusters[medoid].append(c)
         return clusters
 
     def _build(self):
