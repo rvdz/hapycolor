@@ -37,10 +37,6 @@ class ConfigurationManager:
     This class is meant to be inherited by a class that interacts with
     hapycolor's configuration file. It provides the basic methods to read
     and write in it.
-
-    .. todo::
-        We should change the name of this class, since it can be
-        confused with :class:`ConfigurationManager`
     """
 
     def load(section):
@@ -53,7 +49,7 @@ class ConfigurationManager:
         config = configparser.ConfigParser()
         config.read(get_config())
         try:
-            return config[section]
+            return dict(config[section])
         except KeyError as e:
             msg = "Configuration entry not found"
             raise exceptions.InvalidConfigKeyError(msg, e)

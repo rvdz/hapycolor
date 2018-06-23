@@ -40,4 +40,4 @@ class TestLightline(unittest.TestCase):
         path = Lightline.select_colorscheme_path()
         expected = "~/.vim/pack/bundle/start/lightline.vim/autoload/lightline" \
                     + "/colorscheme/hapycolor.vim"
-        self.assertEqual(path, expected)
+        self.assertEqual(path, pathlib.Path(expected).expanduser().as_posix())

@@ -1,4 +1,5 @@
 import enum
+import pathlib
 import datetime
 from . import base
 from . import eight_bit_colors
@@ -111,6 +112,7 @@ class Lightline(base.Target):
         configuration file.
         """
         colorscheme = Lightline.load_config()[Lightline.colorscheme_key]
+        assert (pathlib.Path(colorscheme).is_file()), "{} is not a file".format(colorscheme)
         with open(colorscheme, 'w') as f:
             f.write(Lightline.header(image_path))
 

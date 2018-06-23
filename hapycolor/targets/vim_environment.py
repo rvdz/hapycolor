@@ -60,5 +60,5 @@ class VimEnvironments:
         pattern = re.compile(r".*/{}$".format(plugin))
         for p in plugins:
             if pattern.match(p):
-                return p
+                return pathlib.Path(p).expanduser().as_posix()
         return None

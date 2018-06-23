@@ -14,6 +14,7 @@ class Palette:
         self._foreground = None
         self._background = None
         self._colors = None
+        self.current = None
 
     @property
     def foreground(self):
@@ -47,11 +48,20 @@ class Palette:
 
     @colors.setter
     def colors(self, rgb_colors):
-        if rgb_colors.__class__ != list or len(rgb_colors) == 0 \
+        if not isinstance(rgb_colors, list) or not rgb_colors \
                 or not all([helpers.can_be_rgb(c) for c in rgb_colors]):
             raise exceptions.ColorFormatError("The color must be defined"
                                               + " in the rgb base")
         self._colors = rgb_colors
+
+    def __iter__(self):
+        self.current = 0
+        return self
+
+    def __next__(self):
+        color = self._colors[self.current % len(self._colors)]
+        self.current += 1
+        return color
 
     def is_initialized(self):
         """ Returns 'True' if the palette has been correctly initialized,

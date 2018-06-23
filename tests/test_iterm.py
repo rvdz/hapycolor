@@ -42,6 +42,9 @@ class TestIterm(unittest.TestCase):
         except ET.ParseError as err:
             self.fail(str(err))
 
+    plutil_reason = "To decode the file preferences, Darwin's command " \
+            + "'plutil' is needed"
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export(self):
@@ -77,12 +80,14 @@ class TestIterm(unittest.TestCase):
         except ET.ParseError as err:
             self.fail(str(err))
 
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_0_color_palette(self):
         with self.assertRaises(exceptions.ColorFormatError):
             Iterm.export(generate_palette(0), "iterm_test")
 
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_1_color_palette(self):
@@ -92,6 +97,7 @@ class TestIterm(unittest.TestCase):
         except Exception as err:
             self.fail(str(err))
 
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_16_color_palette(self):
@@ -101,6 +107,7 @@ class TestIterm(unittest.TestCase):
         except Exception as err:
             self.fail(str(err))
 
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_200_color_palette(self):
