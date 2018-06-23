@@ -128,8 +128,7 @@ def os():
         return OS.DARWIN
     elif platform_os == "Linux":
         return OS.LINUX
-    else:
-        raise exceptions.PlatformNotSupportedError()
+    raise exceptions.PlatformNotSupportedError()
 
 
 def get_compatible():

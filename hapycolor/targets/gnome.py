@@ -84,7 +84,7 @@ class Gnome(base.Target):
         process = subprocess.Popen(['bash',
                                     './hapycolor/targets/export_gnome.sh',
                                     name, tmp_file, saved_profiles_path],
-                                   stdout=subprocess.PIPE, bufsize=1)
+                                    stdout=subprocess.PIPE, bufsize=1)
         with process.stdout:
             for line in iter(process.stdout.readline, b''):
                 print(line, )

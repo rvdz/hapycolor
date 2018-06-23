@@ -2,7 +2,7 @@ import re
 from hapycolor import helpers
 from hapycolor import exceptions
 
-class ConfigurationEditor:
+class ConfigFileEditor:
     """
     Many targets are usually defined by a configuration file which
     maps colors to the elements of the target.
@@ -48,8 +48,8 @@ class ConfigurationEditor:
     def parser(self):
         attributes = [None]
         for line in self.configuration:
-            if ConfigurationEditor.is_macro(line):
-                attributes.append(ConfigurationEditor.from_macro(line))
+            if ConfigFileEditor.is_macro(line):
+                attributes.append(ConfigFileEditor.from_macro(line))
             else:
                 attributes.append(None)
         return attributes

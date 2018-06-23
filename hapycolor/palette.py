@@ -48,7 +48,7 @@ class Palette:
 
     @colors.setter
     def colors(self, rgb_colors):
-        if rgb_colors.__class__ != list or not rgb_colors \
+        if not isinstance(rgb_colors, list) or not rgb_colors \
                 or not all([helpers.can_be_rgb(c) for c in rgb_colors]):
             raise exceptions.ColorFormatError("The color must be defined"
                                               + " in the rgb base")
