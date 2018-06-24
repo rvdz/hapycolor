@@ -19,8 +19,8 @@
 #
 import os
 import sys
-from hapycolor import __version__
 sys.path.insert(0, os.path.abspath('../..'))
+from hapycolor import __version__
 
 
 # -- General configuration ------------------------------------------------
@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
-              'sphinxcontrib.plantuml',
+              # 'sphinxcontrib.plantuml',
               'sphinx.ext.githubpages']
 
 

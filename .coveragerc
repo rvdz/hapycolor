@@ -2,7 +2,6 @@
 [run]
 branch = True
 omit =
-    *__init__.py
     *__version__.py
     *hyperplan/*
 
