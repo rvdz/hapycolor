@@ -7,6 +7,8 @@ import subprocess
 
 @unittest.skipIf(not VimEnvironments.is_vim_installed(), "Vim is not installed")
 class TestVimEnvironments(unittest.TestCase):
+    @unittest.skip("Fails if vim environment is not installed, we might want \
+to create a flag to activate this kind of tests that won't be run on travis")
     def test_find_plugin_regex(self):
         res = VimEnvironments.find_plugin("lightline.vim")
         self.assertIsNotNone(res)
