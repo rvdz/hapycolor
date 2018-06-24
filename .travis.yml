@@ -6,8 +6,8 @@ python:
 install:
   - sudo apt-get install imagemagick
   - pip3 install pipenv
-  - pipenv install
   - pipenv shell
+  - pipenv install
 
 # command to run tests
 script:
