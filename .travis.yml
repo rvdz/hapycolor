@@ -12,5 +12,6 @@ install:
 script:
   - pipenv run coverage run ./tests/run_suite.py -v 3
 
+# Export to coveralls
 after_success:
   - coveralls
