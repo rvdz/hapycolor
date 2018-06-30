@@ -30,13 +30,13 @@ class Terminal:
 
         colors = Terminal._classify_hue(colors)
         assert len(colors) == 6
-        medoids = Terminal._classify_luminosity(colors)
-        assert len(medoids) == 6
+        colors = Terminal._classify_luminosity(colors)
+        assert len(colors) == 6
 
         if Terminal.SIMPLE_SORT:
-            self.colors = Terminal._simple_sort(medoids)
+            self.colors = Terminal._simple_sort(colors)
         else:
-            self.colors = Terminal._sort(medoids)
+            self.colors = Terminal._sort(colors)
         assert len(self.colors) == 16
 
     def cast(self, i):
@@ -60,27 +60,31 @@ class Terminal:
     @staticmethod
     def _classify_luminosity(colors):
         """
-        For each cluster created previously, divide by two each group according
-        to their luminosity, and return the two medoids sorted by their
-        luminosity.
-        """
-        def luminosity_diff(c1, c2):
-            return abs(c1[2] - c2[2])
+        For each cluster created previously provided as the arguemnt, sets the
+        normal color as the median luminosity and a bright color which
+        corresponds to the color having the highest luminosity.
 
-        medoids = []
+        :arg colors: Dictionary containing the different clusters of colors, whose
+            keys are the medoids.
+        :return: A list of tuples normal/light color for each input cluster.
+        """
+        color_profile = []
         for medoid in colors:
-            # Check if there is only one color in the cluster
-            try:
-                hue_split_cluster = pam.PAM(colors[medoid], 2, luminosity_diff)()
-            except exceptions.PAMException:
-                hue_split_cluster = [medoid] * 2
-            c_1, c_2 = tuple([m for m in hue_split_cluster])
-            normal, light = (c_1, c_2) if c_1[2] < c_2[2] else (c_2, c_1)
-            medoids.append((normal, light))
-        return medoids
+            sorted_cluster = sorted(colors[medoid], key=lambda c: c[2])
+            if len(sorted_cluster) == 1:
+                color_profile.append(tuple([sorted_cluster[0]] * 2))
+            elif len(sorted_cluster) == 2:
+                color_profile.append(tuple(sorted_cluster))
+            elif len(sorted_cluster) > 2:
+                color_profile.append((sorted_cluster[len(sorted_cluster) // 2],
+                                      sorted_cluster[-1]))
+            else:
+                msg = "Cluster without any colors found" + str(colors)
+                raise exceptions.WrongInputError(msg)
+        return color_profile
 
     @staticmethod
-    def _simple_sort(medoids):
+    def _simple_sort(colors):
         """
         Adds default values for the blacks and whites and adds fills the
         palette with the provided pairs (normal/bright) of colors.
@@ -88,24 +92,24 @@ class Terminal:
         :see: `Standard and High-intensity colors
             <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_
         """
-        colors = [None] * 16
+        profile = [None] * 16
 
         # Black
-        colors[0] = (0, 0, 0)
-        colors[8] = (0, 0, 0.3)
+        profile[0] = (0, 0, 0)
+        profile[8] = (0, 0, 0.3)
         # White
-        colors[7] = (0, 0, 0.7)
-        colors[15] = (0, 0, 1)
+        profile[7] = (0, 0, 0.7)
+        profile[15] = (0, 0, 1)
         # Others
         for i in range(1, 7):
-            colors[i] = medoids[i-3][0]
+            profile[i] = colors[i-3][0]
         for i in range(9, 15):
-            colors[i] = medoids[i-11][1]
+            profile[i] = colors[i-11][1]
 
-        return [helpers.hsl_to_rgb(c) for c in colors]
+        return [helpers.hsl_to_rgb(c) for c in profile]
 
     @staticmethod
-    def _sort(medoids):
+    def _sort(colors):
         """
         Does the same thing as the :func:`_simple_sort`, but also checks
         if a pair of colors belongs to the red's or green's hue
@@ -119,7 +123,7 @@ class Terminal:
         green_component = None
         red_component = None
         other_components = []
-        for (normal, light) in medoids:
+        for (normal, light) in colors:
             if (normal[0] < 25 or normal[0] > 345) and red_component is None:
                 red_component = (normal, light)
             elif normal[0] < 160 and normal[0] > 60 \
@@ -133,24 +137,24 @@ class Terminal:
         if red_component is None:
             red_component = [(0, 1, 0.45), (0, 1, 0.75)]
 
-        colors = [None] * 16
+        profile = [None] * 16
 
         # Red
-        colors[1] = red_component[0]
-        colors[9] = red_component[1]
+        profile[1] = red_component[0]
+        profile[9] = red_component[1]
         # Green
-        colors[2] = green_component[0]
-        colors[10] = green_component[1]
+        profile[2] = green_component[0]
+        profile[10] = green_component[1]
         # Black
-        colors[0] = (0, 0, 0)
-        colors[8] = (0, 0, 0.3)
+        profile[0] = (0, 0, 0)
+        profile[8] = (0, 0, 0.3)
         # White
-        colors[7] = (0, 0, 0.7)
-        colors[15] = (0, 0, 1)
+        profile[7] = (0, 0, 0.7)
+        profile[15] = (0, 0, 1)
         # Others
         for i in range(3, 7):
-            colors[i] = other_components[i-3][0]
+            profile[i] = other_components[i-3][0]
         for i in range(11, 15):
-            colors[i] = other_components[i-11][1]
+            profile[i] = other_components[i-11][1]
 
-        return [helpers.hsl_to_rgb(c) for c in colors]
+        return [helpers.hsl_to_rgb(c) for c in profile]
