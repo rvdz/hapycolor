@@ -1,5 +1,5 @@
-from hapycolor import config
 from hapycolor import helpers
+from hapycolor import targets
 
 from hapycolor import exceptions
 from hapycolor import palette as pltte
@@ -13,6 +13,7 @@ import pathlib
 import uuid
 import re
 import xml.etree.ElementTree as ET
+
 
 class Iterm(base.Target):
 
@@ -30,23 +31,23 @@ class Iterm(base.Target):
                 setattr(Iterm, k, key_values[k])
 
     Tag = Enumeration({
-                       "DICT"   : "dict",
-                       "REAL"   : "real",
-                       "KEY"    : "key",
-                       "STRING" : "string"
-                      })
+        "DICT"   : "dict",
+        "REAL"   : "real",
+        "KEY"    : "key",
+        "STRING" : "string",
+        })
 
     Key = Enumeration({
-                       "DEFAULT"           : "Default Bookmark Guid",
-                       "NEW_BOOKMARKS"     : "New Bookmarks",
-                       "GUID"              : "Guid",
-                       "NAME"              : "Name",
-                       "TRANSPARENCY"      : "Transparency",
-                       "BACKGROUND_COLOR"  : "Background Color",
-                       "FOREGROUND_COLOR"  : "Foreground Color",
-                       "CURSOR_TEXT_COLOR" : "Cursor Text Color",
-                       "CURSOR_COLOR"      : "Cursor Color"
-                      })
+        "DEFAULT"           : "Default Bookmark Guid",
+        "NEW_BOOKMARKS"     : "New Bookmarks",
+        "GUID"              : "Guid",
+        "NAME"              : "Name",
+        "TRANSPARENCY"      : "Transparency",
+        "BACKGROUND_COLOR"  : "Background Color",
+        "FOREGROUND_COLOR"  : "Foreground Color",
+        "CURSOR_TEXT_COLOR" : "Cursor Text Color",
+        "CURSOR_COLOR"      : "Cursor Color"
+        })
 
     preferences_key = "iterm_preferences"
     default_key = "default"
@@ -90,9 +91,9 @@ class Iterm(base.Target):
     def set_configuration_path():
         default_str = "~/Library/Preferences/com.googlecode.iterm2.plist"
         default = pathlib.Path(default_str).expanduser()
-        msg = """Path to iTerm configuration file
-(Keep empty to use default path '""" + default.as_posix() + """'): """
-        p = config.input_path(msg)
+        msg = "Path to iTerm configuration file (Keep empty to use default path"
+        msg += "'{}'): ".format(default.as_posix())
+        p = helpers.input_path(msg)
 
         # If default is selected:
         if p.as_posix() == ".":
@@ -118,7 +119,7 @@ class Iterm(base.Target):
         return answer == "N"
 
     def compatible_os():
-        return [config.OS.DARWIN]
+        return [targets.OS.DARWIN]
 
     def export(palette, image_path):
         """
@@ -356,7 +357,8 @@ class TermColorManager():
                     # If the label is empty, pick another one
                     while not self.colors[label]:
                         label = random.choice(list(self.colors))
-                    return helpers.hsl_to_rgb(random.choice(self.colors[label]))
+                    hsl_color = random.choice(self.colors[label])
+                    return helpers.hsl_to_rgb(hsl_color)
 
                 if max(tc.value[1]) == index:
                     # Return the brightest color of the label

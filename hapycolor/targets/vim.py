@@ -1,8 +1,8 @@
-from hapycolor import config
+from hapycolor import targets
 from hapycolor import helpers
 from hapycolor import exceptions
 from hapycolor import palette as pltte
-from hapycolor.targets.vim_helpers import VimHelpers
+from hapycolor.targets.vim_environment import VimEnvironments
 from . import eight_bit_colors
 from . import base
 
@@ -23,6 +23,7 @@ class Vim(base.Target):
     exclusive_groups = [
              ["Comment"],
              ["Search"],
+             ["String"],
             ]
 
     groups = [
@@ -30,7 +31,6 @@ class Vim(base.Target):
               ["Character"],
               ["Keyword"],
               ["Number", "Float"],
-              ["String"],
               ["Conditional", "Repeat"],
               ["Include"],
               ["Macro"],
@@ -70,24 +70,25 @@ class Vim(base.Target):
         Creates the path where the colorscheme will be generated, and stores it
         in the project's configuration file.
         """
-        if not VimHelpers.is_vim_installed():
+        if not VimEnvironments.is_vim_installed():
             print("Vim is not installed, this target will be disabled. Once"
                   + "  you install vim, ")
             return
 
         p = None
         try:
-            p = VimHelpers.bundle_plugins_path()
+            p = VimEnvironments.bundle_plugins_path()
         except exceptions.NoCommonPathFound:
             p = Vim.custom_path()
 
         p = p / "hapycolor" / "colors"
         if not p.exists():
             p.mkdir(parents=True)
-        Vim.save_config({Vim.configuration_key: (p / "hapycolor.vim").as_posix()})
+        entry = {Vim.configuration_key: (p / "hapycolor.vim").as_posix()}
+        Vim.save_config(entry)
 
     def custom_path():
-        p = config.input_path("Path to vim's custom plugins directory: ")
+        p = helpers.input_path("Path to vim's custom plugins directory: ")
         if not p.is_absolute():
             p = p.resolve()
 
@@ -95,7 +96,7 @@ class Vim(base.Target):
             raise exceptions.WrongInputError("Must be a directory")
 
     def compatible_os():
-        return [config.OS.LINUX, config.OS.DARWIN]
+        return [targets.OS.LINUX, targets.OS.DARWIN]
 
     def export(palette, image_path):
         if palette.__class__ != pltte.Palette or not palette.is_initialized:
@@ -115,7 +116,7 @@ set background=dark
 if exists("syntax_on")
 syntax reset
 endif
-let g:colors_name = "%s"''' % config.app_name()
+let g:colors_name = "Hapycolor"'''
         f.write(header + "\n\n")
 
     @staticmethod
@@ -144,15 +145,15 @@ let g:colors_name = "%s"''' % config.app_name()
         Vim.__write_entry(f, "Visual", fg, bg)
 
     @staticmethod
-    def __print_body(vim_colors, f):
+    def __print_body(color_manager, f):
         for i, G in enumerate(Vim.exclusive_groups):
-            color = vim_colors.get_next_color()
-            vim_colors.remove_last()
+            color = color_manager.get_next_color()
+            color_manager.remove_last()
             for g in G:
                 Vim.__write_entry(f, g, color)
 
         for i, G in enumerate(Vim.groups):
-            color = vim_colors.get_next_color()
+            color = color_manager.get_next_color()
             for g in G:
                 Vim.__write_entry(f, g, color)
 
@@ -169,7 +170,7 @@ class VimColorManager:
 
         hsl_colors = [helpers.rgb_to_hsl(c) for c in rgb_colors]
         self.colors = self.__label_colors(hsl_colors)
-        self.index = 0
+        self.current = 0
         self.size = len(rgb_colors)
         self.removed = []
 
@@ -188,7 +189,7 @@ class VimColorManager:
         return -1
 
     def remove_last(self):
-        self.removed.append(self.index)
+        self.removed.append(self.current)
 
     def get_next_color(self):
         """
@@ -197,12 +198,12 @@ class VimColorManager:
         values have been returned, it retrives the seconds and so on.
         Once all the colors will been used, it repeates the pattern.
         """
-        while self.index in self.removed:
-            self.index = (self.index + 1) % self.size
+        while self.current in self.removed:
+            self.current = (self.current + 1) % self.size
 
-        label = self.index % len(self.colors)
+        label = self.current % len(self.colors)
         while len(self.colors[label]) == 0:
             label = (label + 1) % len(self.colors)
-        i = (self.index // len(self.colors)) % len(self.colors[label])
-        self.index = (self.index + 1) % self.size
+        i = (self.current // len(self.colors)) % len(self.colors[label])
+        self.current = (self.current + 1) % self.size
         return helpers.hsl_to_rgb(self.colors[label][i])

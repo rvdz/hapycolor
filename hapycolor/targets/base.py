@@ -3,7 +3,7 @@ from hapycolor import config
 from hapycolor import exceptions
 
 
-class Target(metaclass=abc.ABCMeta):
+class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
     """
     Abstract class introducting the basic methods needed to initialize the
     target and export the palette or the image to the environment. The
@@ -56,19 +56,19 @@ class Target(metaclass=abc.ABCMeta):
         Loads the configuration related to the subclass and returns a
         dictionary.
         """
-        return config.load(cls.__name__)
+        return cls.load(cls.__name__)
 
     @classmethod
     def save_config(cls, target_config):
-        return config.save(cls.__name__, target_config)
+        return cls.save(cls.__name__, target_config)
 
     @classmethod
     def enable(cls):
-        config.save(cls.__name__, {"enabled": True})
+        cls.save(cls.__name__, {"enabled": True})
 
     @classmethod
     def disable(cls):
-        config.save(cls.__name__, {"enabled": False})
+        cls.save(cls.__name__, {"enabled": False})
 
     @classmethod
     def is_enabled(cls):

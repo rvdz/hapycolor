@@ -1,10 +1,6 @@
-:function! GetPlugins(cmd)
-:  redir => message
-:  silent execute a:cmd
-:  redir END
-:  setlocal bufhidden=wipe noswapfile nobuflisted nomodified
-:  silent put=message
+:function! Get()
+:    redir @a | set rtp | redir END
+:    let a = writefile([@a], "plugin_paths.txt")
+:    quit
 :endfunction
-:command! -nargs=+ -complete=command GetPlugins call GetPlugins(<q-args>)
-:GetPlugins scriptnames
-:wq
+:call Get()
