@@ -31,13 +31,13 @@ class TerminalColorManager:
 
         colors = TerminalColorManager._classify_hue(colors)
         assert len(colors) == 6
-        colors = Terminal._classify_luminosity(colors)
+        colors = TerminalColorManager._classify_luminosity(colors)
         assert len(colors) == 6
 
-        if Terminal.SIMPLE_SORT:
-            self.colors = Terminal._simple_sort(colors)
+        if TerminalColorManager.SIMPLE_SORT:
+            self.colors = TerminalColorManager._simple_sort(colors)
         else:
-            self.colors = Terminal._sort(colors)
+            self.colors = TerminalColorManager._sort(colors)
         assert len(self.colors) == 16
 
     def __call__(self):
