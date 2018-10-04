@@ -32,6 +32,8 @@ class TestPAM(unittest.TestCase):
         expected = {3: [1, 2, 3, 4, 5], 12: [10, 11, 12, 13, 14]}
 
         res = PAM(colors, k, TestPAM.distance)()
+        for k in res:
+            res[k] = sorted(res[k])
         self.assertDictEqual(res, expected)
 
     def test_3_clusters(self):
@@ -40,6 +42,9 @@ class TestPAM(unittest.TestCase):
         expected = {2: [1, 2, 3], 8: [7, 8, 9], 21: [20, 21, 22]}
 
         res = PAM(colors, k, TestPAM.distance)()
+        for k in res:
+            res[k] = sorted(res[k])
+
         self.assertDictEqual(res, expected)
 
     def test_4_clusters_4_colors(self):
@@ -81,6 +86,7 @@ class TestPAM(unittest.TestCase):
         res = PAM(lab_colors, k, distance)()
         for i, medoid in enumerate(res):
             cluster = [helpers.lab_to_rgb(c) for c in res[medoid]]
+            cluster.sort()
             self.assertIn(cluster, expected)
 
     @unittest.skip("Too slow, but working")
