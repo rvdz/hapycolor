@@ -2,6 +2,10 @@ let s:grey1  = [ '#5c6370', 59 ]
 let s:grey2  = [ '#2c323d', 237 ]
 let s:grey3  = [ '#3e4452', 59 ]
 
+let s:yellow = [ '#d3bb06', 204 ]
+let s:red = [ '#d35506', 190 ]
+
+
 let s:foreground = [ $FG ]
 let s:background = [ $BG ]
 let s:normal = [ $NORMAL ]
@@ -13,7 +17,7 @@ let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': 
 let s:p.normal.left     = [ [ s:background, s:normal, 'bold' ], [ s:foreground, s:grey3 ] ]
 let s:p.normal.middle   = [ [ s:foreground, s:grey2 ] ]
 let s:p.normal.right   = [ [ s:background, s:normal, 'bold' ], [ s:background, s:normal, 'bold' ] ]
-let s:p.normal.error   = [ [ s:replace,   s:background ] ]
+let s:p.normal.error   = [ [ s:red,   s:background ] ]
 let s:p.normal.warning = [ [ s:yellow, s:background ] ]
 
 let s:p.inactive.left   = [ [ s:grey1,  s:background ], [ s:grey1, s:background ] ]
