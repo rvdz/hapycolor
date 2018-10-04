@@ -43,12 +43,7 @@ class GnomeTerminal(base.Target):
 
     @staticmethod
     def is_config_initialized():
-        try:
-            config = GnomeTerminal.load_config()
-            is_init = GnomeTerminal.default_key in config
-        except exceptions.InvalidConfigKeyError:
-            return False
-        return is_init
+        return True
 
     @staticmethod
     def compatible_os():
@@ -89,7 +84,6 @@ class GnomeTerminal(base.Target):
             msg = 'The palette does not contain any color'
             raise exceptions.PaletteFormatError(msg)
 
-        config = GnomeTerminal.load_config()
         fg = rgb_to_hex(palette.foreground)
         bg = rgb_to_hex(palette.background)
 
