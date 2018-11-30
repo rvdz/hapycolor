@@ -62,7 +62,7 @@ brew install python3 python3-pip imagemagick
 ```
 
 ## Installation
-Hapycolor can be installed with `pip`, or by cloning this repository.
+Hapycolor can be installed with `pip`, `pipenv`, or by cloning this repository.
 
 ### Pip install
 TODO: Still not enabled

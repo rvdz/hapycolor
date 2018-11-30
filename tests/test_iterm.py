@@ -176,12 +176,12 @@ class TestTermColor(unittest.TestCase):
         self.assertEqual(len(classified), 6)
 
     def test_classify_luminosity(self):
-        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
-                  (60, 0.5, 0.5), (70, 0.5, 0.7),
-                  (100, 0.5, 0.5), (110, 0.5, 0.7),
-                  (170, 0.5, 0.5), (180, 0.5, 0.7),
-                  (250, 0.5, 0.5), (260, 0.5, 0.7),
-                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [(0, 0.5, 0.5), (5, 0.5, 0.6), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (65, 0.5, 0.6), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (105, 0.5, 0.6), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (175, 0.5, 0.6), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (255, 0.5, 0.6), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (305, 0.5, 0.6), (310, 0.5, 0.7)]
         colors = [helpers.hsl_to_rgb(c) for c in colors]
         classified_hue = TCM._classify_hue(colors)
         classified_lum = TCM._classify_luminosity(classified_hue)
