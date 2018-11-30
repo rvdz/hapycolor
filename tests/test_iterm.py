@@ -38,7 +38,7 @@ class TestIterm(unittest.TestCase):
         """ Checks that the template file is valid """
         import xml.etree.ElementTree as ET
         try:
-            ET.parse(Iterm.load_config()[Iterm.template_key])
+            ET.parse(Iterm.template)
         except ET.ParseError as err:
             self.fail(str(err))
 
@@ -287,6 +287,6 @@ class TestTermColor(unittest.TestCase):
     @unittest.skipUnless(targets.os() == targets.OS.DARWIN, "Tests Darwin's"
                          + " environment")
     def test_configuration_iterm_template(self):
-        raw_path = Iterm.load_config()[Iterm.template_key]
+        raw_path = Iterm.template
         iterm_template_path = pathlib.Path(raw_path).resolve()
         self.assertTrue(iterm_template_path.exists())

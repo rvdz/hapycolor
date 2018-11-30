@@ -7,7 +7,7 @@ class Palette:
 
         - foreground
         - background
-        - colors: an unordered list of colors
+        - colors: an unordered list of colors. Cannot be empty
      """
 
     def __init__(self):
@@ -44,7 +44,9 @@ class Palette:
 
     @property
     def hexcolors(self):
-        return [helpers.rgb_to_hex(c) for c in self._colors]
+        return (helpers.rgb_to_hex(self.foreground),
+                helpers.rgb_to_hex(self.background),
+                [helpers.rgb_to_hex(c) for c in self.colors])
 
     @colors.setter
     def colors(self, rgb_colors):
@@ -53,6 +55,30 @@ class Palette:
             raise exceptions.ColorFormatError("The color must be defined"
                                               + " in the rgb base")
         self._colors = rgb_colors
+
+    def to_json(self, file_name):
+        data = {
+                "foreground": self.foreground,
+                "background": self.background,
+                "colors": self.colors
+               }
+        print("Saving palette to: ", file_name)
+        helpers.save_json(file_name, data)
+
+    def from_json(json_file):
+        json_palette = helpers.load_json(json_file)
+        if "foreground" not in json_palette or \
+                "background" not in json_palette or \
+                "colors" not in json_palette:
+            msg = "ERROR: The provided json file does not implement a valid" \
+                    + " palette."
+            raise exceptions.PaletteFormatError(msg)
+
+        palette = Palette()
+        palette.foreground = tuple(json_palette["foreground"])
+        palette.background = tuple(json_palette["background"])
+        palette.colors = [tuple(c) for c in json_palette["colors"]]
+        return palette
 
     def __iter__(self):
         self.current = 0
