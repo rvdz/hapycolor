@@ -76,15 +76,14 @@ class TerminalColorManager:
     @staticmethod
     def _classify_luminosity(colors):
         """
-        For each cluster created previously provided as the arguemnt, sets the
-        normal color as the median luminosity and a bright color which
-        corresponds to the color having the highest luminosity.
-
-        :arg colors: Dictionary containing the different clusters of colors, whose
-            keys are the medoids.
-        :return: A list of tuples normal/light color for each input cluster.
+        For each cluster created previously, divide by two each group according
+        to their luminosity, and return the two medoids sorted by their
+        luminosity.
         """
-        color_profile = []
+        def luminosity_diff(c1, c2):
+            return abs(c1[2] - c2[2])
+
+        medoids = []
         for medoid in colors:
             # Check if there is only one color in the cluster
             if len(colors[medoid]) == 1:
