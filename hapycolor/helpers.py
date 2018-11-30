@@ -8,6 +8,10 @@ import pathlib
 """ Utilitary methods to convert color types  """
 
 
+def bold(string):
+    print("\033[1m{}\033[0m".format(string))
+
+
 def is_hex(color):
     return re.match(r"0[xX][0-9a-fA-F]{6}", color) is not None
 

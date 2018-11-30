@@ -1,6 +1,7 @@
-from hapycolor import palette
-from hapycolor import exceptions
+from hapycolor import palette, exceptions, helpers
 import unittest
+from tests.helpers import disableprints
+import os
 
 
 class TestPalette(unittest.TestCase):
@@ -41,3 +42,22 @@ class TestPalette(unittest.TestCase):
                         pltte.colors = f
         except Exception as e:
             self.fail(str(e))
+
+    @disableprints()
+    def test_json_conversion(self):
+        pltte = palette.Palette()
+        pltte.foreground = (255, 255, 255)
+        pltte.background = (0, 0, 0)
+        colors = [
+                  [(12, 12, 12), (15, 15, 15), (17, 16, 16)],
+                  [(0, 0, 0)],
+                 ]
+        json_file = "./tests/test_palette.json"
+        for c in colors:
+            pltte.colors = c
+            pltte.to_json(json_file)
+            new_palette = palette.Palette.from_json(json_file)
+            self.assertEqual(new_palette.foreground, pltte.foreground)
+            self.assertEqual(new_palette.background, pltte.background)
+            self.assertEqual(new_palette.colors, pltte.colors)
+        os.remove(json_file)

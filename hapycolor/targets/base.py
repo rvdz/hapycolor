@@ -72,4 +72,9 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
 
     @classmethod
     def is_enabled(cls):
-        return cls.load_config()["enabled"] == str(True)
+        try:
+            if "enabled" not in cls.load_config():
+                return False
+            return cls.load_config()["enabled"] == str(True)
+        except exceptions.InvalidConfigKeyError:
+            return False

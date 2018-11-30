@@ -10,17 +10,62 @@
 
 """
 
-from . import config
-from . import visual
-from . import helpers
-from . import targets
-from . import raw_colors
-from . import filters
+from . import config, visual, helpers, targets, raw_colors, filters, imgur
+from . import exceptions
+from . import palette as pltte
 
 from PIL import Image, ImageDraw
-import argparse
+from docopt import docopt
 import os
+import pathlib
 
+version = 1.0
+
+help_msg = """Hapycolor.
+
+Usage:
+  hapycolor (--imgur URL | -f FILE) [--json OUTPUT_DIR]
+  hapycolor --export-from-json FILE
+  hapycolor --dir DIRECTORY -o OUTPUT_DIR
+  hapycolor --reconfigure TARGETS ...
+  hapycolor --print-config TARGETS ...
+  hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
+  hapycolor -l | --list-all
+  hapycolor [--list-compatible-targets | --list-enabled-targets | --list-all-targets] ...
+  hapycolor -h | --help
+  hapycolor --version
+
+Options:
+  -h, --help     Show this screen.
+  --version      Show version.
+
+  -f, --file     The path of the source image from which the palette will be generated.
+  --dir          Generates a palette for each image in the provided directory, without exporting them.
+  -o, --output   Target directory where the palettes will be saved.
+  --imgur    The url of an image from imgur.com from which the palette will be generated.
+  --json     Save image's palette into the provided directory, without exporting it.
+  --export-from-json
+                 Export json palette to enabled targets.
+
+  -r, --reconfigure
+                 Reconfigure every target passed in arguments.
+                 (Separated by spaces)
+  -p, --print-config
+                 Print configuration of targets passed in arguments.
+                 Argument 'all' prints the whole config.
+
+  -e, --enable   Enable targets passed in arguments.
+                 Argument 'all' enables every compatible targets.
+  -d, --disable  Disable targets passed in arguments.
+                 Argument 'all' disables every targets.
+
+  -l, --list-all
+                 Triggers all following listing options.
+  --list-enabled-targets
+                 List all enabled targets.
+  --list-compatible-targets
+                 List all compatible targets.
+"""
 
 def colors_to_file(colors, filename, resize=150, swatchsize=20):
     """ Creates a color palette and saves it to file """
@@ -39,21 +84,8 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 
 def parse_arguments():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--file", help="File path to the image")
-    ap.add_argument("-d", "--dir", help="Directory path to the images "
-                    + "(this option will NOT export variables, use -f instead)"
-                    + ". This option implicitly enables -j option")
-    ap.add_argument("-j", "--json", action="store_true", help="Saves output "
-                    + "(RGB format) in a Json file palettes.json instead of "
-                    + "exporting variables. Json file is updated if the file "
-                    + "exists.")
-    args = vars(ap.parse_args())
-    if not (args["file"] or args["dir"]):
-        ap.error('expected either argument -f or -d')
-    if args["file"] and args["dir"]:
-        ap.error('cannot use simultaneaously option -f and -d')
-    return args
+    return docopt(help_msg, version="Hapycolor " + str(version))
+
 
 
 def display_palette(palette):
@@ -67,11 +99,15 @@ def display_palette(palette):
     visual.print_palette([palette.background], size=4)
 
     colors_to_file([c for c in palette.colors], "palette.png")
-    helpers.save_json("palette.json", palette.colors)
+    palette.to_json("palette.json")
+
 
 
 def add_palette_json(img_name, palette, filename):
-    data_dict = {img_name: palette.hexcolors}
+    hexcolors = palette.hexcolors()
+    data_dict = {foreground: hexcolors[0],
+                 background: hexcolors[1],
+                 colors: hexcolors[2]}
     helpers.update_json(filename, data_dict)
 
 
@@ -80,32 +116,136 @@ def main(args=None):
     config.create_config()
     args = parse_arguments()
 
-    img_name = args["file"]
-    img_dir = args["dir"]
+    targs = args['TARGETS'] if args['TARGETS'] else args['EN_TARGETS']
+    distargs = args['DIS_TARGETS']
+    if targs == ["all"]:
+        targs = targets.get_compatible_names()
+    if distargs == ["all"]:
+        distargs = targets.get_compatible_names()
+    # Capitalize first letter for esthetics and access
+    targs = [t.title() for t in sorted(targs)]
+    distargs = [t.title() for t in sorted(distargs)]
 
-    if args["json"] or args["dir"]:
+    if args['--list-all']:
+        args['--list-all-targets'] = True
+        args['--list-compatible-targets'] = True
+        args['--list-enabled-targets'] = True
+
+    if args['--list-all-targets']:
+        tlist = targets.get_all_names()
+        helpers.bold("Targets are:")
+        for t in tlist:
+            print("    - {}".format(t))
+
+    if args['--list-compatible-targets']:
+        tlist = targets.get_compatible_names()
+        if not tlist:
+            helpers.bold("No compatible targets.")
+        else:
+            helpers.bold("Compatible targets are:")
+            for t in tlist:
+                print("    - {}".format(t))
+
+    if args['--list-enabled-targets']:
+        tlist = targets.get_enabled()
+        if not tlist:
+            helpers.bold("No enabled targets.")
+        else:
+            helpers.bold("Enabled targets are:")
+            for t in tlist:
+                print("    - {}".format(t.__name__))
+
+    if args['--enable']:
+        for t in [targets.get_class(c) for c in targs]:
+            if t.is_enabled():
+                print("Target {} was already enabled.".format(t.__name__))
+            elif not t.is_config_initialized():
+                targets.initialize_target(t)
+                print("Enabled target {}.".format(t.__name__))
+            else:
+                t.enable()
+                print("Enabled target {}.".format(t.__name__))
+
+    if args['--disable']:
+        for t in distargs:
+            if targets.disable(t):
+                print("Target {} was already disabled.".format(t))
+            else:
+                print("Disabled target {}.".format(t))
+
+    if args['--print-config']:
+        for t in targs:
+            helpers.bold("Configuration of target {}:".format(t))
+            if not targets.get_class(t).is_config_initialized():
+                print("    Target has not been initialized.")
+                continue
+            cfg = config.load(t)
+            print("    enabled: {}".format(cfg["enabled"]))
+            for key in (k for k in cfg if k != "enabled"):
+                print("    {}: {}".format(key, cfg[key]))
+
+    if args['--reconfigure']:
+        for t in targs:
+            helpers.bold("Reconfiguring target {}".format(t))
+            targets.reconfigure(t)
+
+    try:
+        max_colors = 150
         img_list = []
-        if img_name is not None:
-            img_list.append(img_name)
-        elif img_dir is not None:
-            for f in os.listdir(img_dir):
-                if os.path.splitext(f)[1] in [".jpg", "jpeg"]:
-                    img_list.append(os.path.join(img_dir, f))
 
-        for img in img_list:
-            print("Processing file {}".format(img))
-            palette = raw_colors.get(img, num_colors=200)
-            palette = filters.apply(palette)
-            add_palette_json(os.path.abspath(img), palette, "palettes.json")
-        print()
-        print("Palette saved to palettes.json")
-    else:
-        palette = raw_colors.get(img_name, num_colors=200)
-        visual.print_palette(palette.colors, size=2)
-        palette = filters.apply(palette)
-        targets.initialize()
-        targets.export(palette, args["file"])
-        display_palette(palette)
+        # Checking provided files and directories
+        if args['--export-from-json'] or args['--file']:
+            if not pathlib.Path(args['FILE']).resolve().exists():
+                msg = "ERROR: The provided image does not exist"
+                raise exceptions.ImageNotFoundException(msg)
+            img_list.append(args['FILE'])
+
+        if args['--json'] or args['--dir']:
+            if not pathlib.Path(args['OUTPUT_DIR']).exists():
+                msg = "ERROR: The provided output directory does not exist"
+                raise exceptions.InvalidDirectoryException(msg)
+            if args['--dir']:
+                for f in os.listdir(args['DIRECTORY']):
+                    if os.path.splitext(f)[1] in [".jpg", ".jpeg", ".png"]:
+                        img_list.append(os.path.join(args['DIRECTORY'], f))
+
+        # Extracting palettes
+        palettes = []
+        if args['--imgur']:
+            with imgur.download(args['URL']) as local_path:
+                print("Processing file {}".format(local_path))
+                palettes.append(raw_colors.get(local_path,
+                                               num_colors=max_colors))
+                palettes[-1] = filters.apply(palettes[-1])
+                img_list.append(local_path)
+        if args['--file'] or args['--dir']:
+            for img in img_list:
+                print("Processing file {}".format(img))
+                palettes.append(raw_colors.get(img, num_colors=max_colors))
+                palettes[-1] = filters.apply(palettes[-1])
+        if args['--export-from-json']:
+            palettes.append(pltte.Palette.from_json(img_list[0]))
+
+        # Saving palettes in a json file
+        if args['--json'] or args['--dir']:
+            for i in range(len(img_list)):
+                name = pathlib.Path(img_list[i]).with_suffix('.json').name
+                output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()
+                path = (output_dir / name).resolve().as_posix()
+                palettes[i].to_json(path)
+        # Exporting the first palette
+        elif args['--imgur'] or args['--file'] or args['--export-from-json']:
+            targets.initialize()
+            targets.export(palettes[0], img_list[0])
+            display_palette(palettes[0])
+    except exceptions.ImageNotFoundException as inf:
+        print(inf.msg)
+    except exceptions.InvalidDirectoryException as ide:
+        print(ide.msg)
+    except exceptions.PaletteFormatError as pfe:
+        print(pfe.msg)
+    except exceptions.InvalidImageException as iie:
+        print(iie.msg)
 
 
 if __name__ == '__main__':
