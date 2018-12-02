@@ -36,40 +36,17 @@ class TestTargets(unittest.TestCase):
 
     def test_get_valid_module(self):
         try:
-            clazz = targets.get_class("vim")
+            clazz = targets.get_class("Vim")
             self.assertIsInstance(clazz(), base.Target)
         except Exception as e:
             self.fails(str(e))
 
     def test_get_invalid_module(self):
         with self.assertRaises(exceptions.InvalidTarget):
-            targets.get_class("emacs")
+            targets.get_class("vim")
 
         with self.assertRaises(exceptions.InvalidTarget):
             targets.get_class("__doc__")
-
-    def test_target_class_names(self):
-        """
-        Assert that each target class is named after its module name. It should
-        be a PascalCase version of it. In addition, it checks also if the
-        respective class inherits from :class:base.Target.
-
-        .. note:: When adding a new test, it should be added in the list:
-            `targets.__all__`, defined in this test.
-        """
-        import inspect
-        targets.__all__ = ['vim', 'lightline', 'iterm', 'wallpaper',
-                           'gnome_terminal']
-        target_modules = inspect.getmembers(targets)[1][1]
-        for m in target_modules:
-            try:
-                self.assertTrue(inspect.ismodule(eval("targets." + m)))
-                clazz_str = "".join([t.title() for t in m.split("_")])
-                clazz = eval(m + "." + clazz_str)
-                self.assertTrue(inspect.isclass(clazz))
-                self.assertIsInstance(clazz(), base.Target)
-            except NameError as e:
-                self.fails(str(e))
 
     @patch('platform.system', return_value="Windows")
     def test_not_supported_operating_system(self, get_os):

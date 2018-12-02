@@ -3,7 +3,7 @@ Lightline module
 """
 import enum
 import datetime
-from os import listdir
+from pathlib import Path
 
 from hapycolor import targets
 from hapycolor import exceptions
@@ -44,11 +44,6 @@ class Lightline(base.Target):
     - Wombat
     - Solarized
     """
-    ThemeEnum = enum.Enum("ThemeEnum",
-                          [(t.split('.')[0].upper(),
-                            "hapycolor/targets/lightline/" + t)
-                           for t in listdir("./hapycolor/targets/lightline") if ".vim" in t])
-
     # The colorscheme's path
     colorscheme_key = "colorscheme"
 
@@ -89,17 +84,21 @@ class Lightline(base.Target):
 
     @staticmethod
     def select_theme():
+        module_dir = Path(__file__).parent
+        ThemeEnum = enum.Enum("ThemeEnum",
+                              [(t.stem.upper(), module_dir / t)
+                               for t in module_dir.iterdir() if ".vim" == t.suffix])
         try:
             print("\nSelect a theme:")
-            for i, theme in enumerate(Lightline.ThemeEnum):
+            for i, theme in enumerate(ThemeEnum):
                 print(theme.name + ": (" + str(i) + ")")
             theme_i = int(input("Theme: "))
-            if theme_i < 0 or len(Lightline.ThemeEnum) <= theme_i:
+            if theme_i < 0 or len(ThemeEnum) <= theme_i:
                 raise ValueError
-            return list(Lightline.ThemeEnum)[theme_i]
+            return list(ThemeEnum)[theme_i]
         except ValueError:
             print("Value must be an integer between 0 and "
-                  + str(len(Lightline.ThemeEnum)))
+                  + str(len(ThemeEnum)))
             return Lightline.select_theme()
 
     @staticmethod

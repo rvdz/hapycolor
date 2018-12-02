@@ -123,8 +123,8 @@ def main(args=None):
     if distargs == ["all"]:
         distargs = targets.get_compatible_names()
     # Capitalize first letter for esthetics and access
-    targs = [t.title() for t in sorted(targs)]
-    distargs = [t.title() for t in sorted(distargs)]
+    # targs = [t.title() for t in sorted(targs)]
+    # distargs = [t.title() for t in sorted(distargs)]
 
     if args['--list-all']:
         args['--list-all-targets'] = True

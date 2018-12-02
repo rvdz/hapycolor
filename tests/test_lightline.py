@@ -10,29 +10,6 @@ from hapycolor.targets.lightline import Lightline
 
 
 class TestLightline(unittest.TestCase):
-    @disableprints()
-    @mock.patch('builtins.input', return_value="0")
-    def test_theme_selection_valid(self, mock_input):
-        self.assertIsInstance(Lightline.select_theme(), Lightline.ThemeEnum)
-
-    @disableprints()
-    @mock.patch('builtins.input', side_effect=["999", "0"])
-    def test_theme_selection_invalid_entry(self, mock_input):
-        self.assertIsInstance(Lightline.select_theme(), Lightline.ThemeEnum)
-
-    @disableprints()
-    @mock.patch('builtins.input', side_effect=["-1", "0"])
-    def test_theme_selection_negative_entry(self, mock_input):
-        self.assertIsInstance(Lightline.select_theme(), Lightline.ThemeEnum)
-
-    @disableprints()
-    @mock.patch('builtins.input', side_effect=["-1", "999", "0"])
-    def test_theme_selection_valid_third_attempt(self, mock_input):
-        self.assertIsInstance(Lightline.select_theme(), Lightline.ThemeEnum)
-
-    def test_theme_exist(self):
-        for theme in Lightline.ThemeEnum:
-            self.assertTrue(pathlib.Path(theme.value).exists())
 
     @unittest.skipUnless(pathlib.Path("~/.vim/pack/bundle/start/lightline.vim")
         .expanduser().is_dir(), "This test requires vim's plugins to be "
@@ -42,10 +19,6 @@ class TestLightline(unittest.TestCase):
         expected = "~/.vim/pack/bundle/start/lightline.vim/autoload/lightline" \
                     + "/colorscheme/hapycolor.vim"
         self.assertEqual(path, pathlib.Path(expected).expanduser().as_posix())
-
-    def test_themes_finder(self):
-        self.assertIn("hapycolor/targets/lightline/landscape.vim",
-                      [t.value for t in Lightline.ThemeEnum])
 
     def test_add_colors_one_mode(self):
         mock_theme = ["line 1", "some text $NORMAL some other text", "line 3"]

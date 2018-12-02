@@ -29,5 +29,9 @@ class TestYabar(unittest.TestCase):
 
         mock_open = mock.mock_open(read_data=configuration)
         with mock.patch("builtins.open", mock_open):
-            yabar.Yabar.export(pltte, "path/to/image")
+            yabar.Yabar.update_config(pltte, "path/to/config")
         mock_open().write.assert_called_once_with(expected)
+
+    def test_luminosity(self):
+        avg_luminosity = yabar.Yabar.get_top_luminosity("images/firewatch.jpg")
+        self.assertAlmostEqual(avg_luminosity, 0.886, places=2)

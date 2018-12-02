@@ -25,6 +25,7 @@ name.
 
 import platform
 import enum
+import re
 from hapycolor import config
 from hapycolor import exceptions
 from . import vim, iterm, wallpaper, lightline, gnome_terminal, yabar, i3, rofi
@@ -72,15 +73,11 @@ def initialize_target(target):
             break
 
 
-def is_target_subclass(target_str):
+def is_target_subclass(clazz):
     try:
-        clazz_str = "".join([t.title() for t in target_str.split("_")])
-        clazz = eval(target_str + "." + clazz_str)
-        if not issubclass(clazz, base.Target):
-            return False
-    except (NameError, AttributeError):
+        return issubclass(clazz, base.Target)
+    except TypeError:
         return False
-    return True
 
 
 def get_class(target_str):
@@ -92,18 +89,18 @@ def get_class(target_str):
         resolve from the provided string, or if there are no matching classes
         defined in the module that implement a :class:`Target`.
     """
-    target_str = target_str.lower()
+    def convert(name):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    if target_str not in globals().keys():
-        raise exceptions.InvalidTarget("Input does not match a module"
-                                       + " from targets")
+    msg = "Input does not match a module containing a Target class"
+    try:
+        clazz = eval(convert(target_str) + "." + target_str)
+    except AttributeError:
+        raise exceptions.InvalidTarget(msg)
 
-    if not is_target_subclass(target_str):
-        raise exceptions.InvalidTarget("Input does not match a module"
-                                       + " containing a Target class")
-
-    clazz_str = "".join([t.title() for t in target_str.split("_")])
-    clazz = eval(target_str + "." + clazz_str)
+    if not is_target_subclass(clazz):
+        raise exceptions.InvalidTarget(msg)
     return clazz
 
 

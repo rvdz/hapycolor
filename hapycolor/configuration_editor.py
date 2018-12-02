@@ -125,6 +125,8 @@ class ConfigurationEditor:
                 color = iter_palette.foreground
             elif opt == "background":
                 color = iter_palette.background
+            elif opt in iter_palette.other:
+                color = iter_palette.other[opt]
             else:
                 msg = "Macro not recognized in line: {}".format(line)
                 raise exceptions.InvalidMacroException(msg)

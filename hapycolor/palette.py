@@ -15,6 +15,7 @@ class Palette:
         self._background = None
         self._colors = None
         self.current = None
+        self.other = {}
 
     @property
     def foreground(self):
