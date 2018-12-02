@@ -22,10 +22,8 @@ class Wallpaper(base.Target):
 
         :arg img: the image's path
         """
-        path = None
-        try:
-            path = pathlib.Path(image_path).resolve().as_posix()
-        except FileNotFoundError:
+        path = pathlib.Path(image_path).resolve()
+        if not image_path.exists():
             msg = "Image not found: {}".format(image_path)
             raise exceptions.WrongInputError(msg)
 
