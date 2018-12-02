@@ -18,8 +18,8 @@ from PIL import Image, ImageDraw
 from docopt import docopt
 import os
 import pathlib
+from hapycolor.__version__ import __version__
 
-version = 1.0
 
 help_msg = """Hapycolor.
 
@@ -84,7 +84,7 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 
 def parse_arguments():
-    return docopt(help_msg, version="Hapycolor " + str(version))
+    return docopt(help_msg, version="Hapycolor " + str(__version__))
 
 
 

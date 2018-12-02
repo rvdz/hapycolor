@@ -19,7 +19,7 @@
 #
 import os
 import sys
-from hapycolor import __version__
+from hapycolor.__version__ import __version__
 sys.path.insert(0, os.path.abspath('../..'))
 
 
