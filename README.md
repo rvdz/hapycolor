@@ -62,10 +62,9 @@ brew install python3 python3-pip imagemagick
 ```
 
 ## Installation
-Hapycolor can be installed with `pip`, `pipenv`, or by cloning this repository.
+Hapycolor can be installed with `pip`, or by cloning this repository.
 
 ### Pip install
-TODO: Still not enabled
 ```sh
 pip3 install hapycolor
 ```
@@ -74,20 +73,8 @@ pip3 install hapycolor
 ```sh
 git clone https://github.com/rvdz/hapycolor
 cd hapycolor
-python3 setup.py install
+pip install . --user
 ```
-
-If you don't have sudoers permissions, then run: (TODO: does it work?)
-```sh
-python3 setup.py install --user
-```
-
-Then, you should add the generated binary in your $PATH. To do so, execute
-the following command or add it in your bashrc or zshrc.
-```sh
-export PATH=<path/to/bin>:$PATH
-```
-For more information, please check: [Installing Python Modules](https://docs.python.org/3.6/install/index.html#alternate-installation).
 
 ## Usage
 For basic usage, execute:
@@ -116,20 +103,7 @@ If one of the above solutions does not work for you (Debian 9,
 Gnome shell 3.22 for instance), try doing both by reseting first.
 
 ## Test
-
 To run the tests locally, excute:
 ```sh
-python3 tests/run_suite.py --verbose <0-3>
-```
-
-To run the tests on a clean Debian Stretch image, you can build and run
-the provided dockerfile:
-```sh
-make build
-make run
-```
-
-The created container can be stopped by running:
-```sh
-make stop
+python3 setup.py test
 ```

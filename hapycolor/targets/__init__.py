@@ -28,27 +28,8 @@ import enum
 import re
 from hapycolor import config
 from hapycolor import exceptions
-from . import vim, iterm, wallpaper, lightline, gnome_terminal, yabar, i3, rofi
-from . import base
-
-
-def initialize():
-    """ Initialize config and/or choose to enable targets """
-    print("Targets found: " + ", ".join([t.__name__ for t in get()]))
-    targets = get_compatible()
-    uninit_targets = []
-
-    for target in targets:
-        if not target.is_defined() \
-                or (target.is_enabled() and not target.is_config_initialized()):
-            uninit_targets.append(target)
-
-    for target in uninit_targets:
-        res = input("Enable " + target.__name__ + "? (y/n) :")
-        if res.capitalize() == "Y":
-            initialize_target(target)
-        else:
-            target.disable()
+from hapycolor.targets import vim, iterm, wallpaper, lightline, gnome_terminal, \
+                              yabar, i3, rofi, base
 
 
 def initialize_target(target):
@@ -60,16 +41,23 @@ def initialize_target(target):
 
     :arg target: one of the subclasses of :class:`Target`
     """
-    while 1:
+    print("Initializing {}".format(target.__name__))
+    while not target.is_config_initialized():
         try:
             target.initialize_config()
         except exceptions.WrongInputError as e:
             print(e.msg)
-        else:
-            target.enable()
+            if not retry():
+                break
+
+def reconfigure(target):
+    while 1:
+        try:
+            target.reconfigure()
             break
+        except exceptions.WrongInputError as e:
+            print(e.msg)
         if not retry():
-            target.disable()
             break
 
 
@@ -90,55 +78,19 @@ def get_class(target_str):
         defined in the module that implement a :class:`Target`.
     """
     def convert(name):
+        """Convert PascalCase to snake_case"""
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    msg = "Input does not match a module containing a Target class"
+    msg = "Input {} does not match a module containing a Target class".format(target_str)
     try:
         clazz = eval(convert(target_str) + "." + target_str)
-    except AttributeError:
-        raise exceptions.InvalidTarget(msg)
+    except (AttributeError, NameError) as err:
+        raise exceptions.InvalidTarget(msg) from err
 
     if not is_target_subclass(clazz):
         raise exceptions.InvalidTarget(msg)
     return clazz
-
-
-def reconfigure(target_str):
-    """
-    Calls the :func:reconfigure method of the appropriate class
-    contained in the target module provided in the arguments.
-    This method allows to interact with the user and change the
-    target settings.
-
-    :param target_str: a string representing a target module.
-    """
-    clazz = get_class(target_str)
-    clazz.reconfigure()
-
-
-def enable(target_str):
-    """
-    Calls the :func:targets.base.Target.enable() method of the appropriate class
-    contained in the target module provided in the arguments.
-    """
-    clazz = get_class(target_str)
-    if clazz.is_enabled():
-        return 1
-    clazz.enable()
-    return 0
-
-
-def disable(target_str):
-    """
-    Calls the :func:targets.base.Target.disable() method of the appropriate class
-    contained in the target module provided in the arguments.
-    """
-    clazz = get_class(target_str)
-    if not clazz.is_enabled():
-        return 1
-    clazz.disable()
-    return 0
 
 
 def retry():
@@ -147,9 +99,7 @@ def retry():
     to enter correct inputs. This class is usefull in order to
     test the targets' initializations
     """
-    res = input("\nAbort? (y/n): ").capitalize() == "Y"
-    print("Abort: " + str(res))
-    return res
+    return input("\nAbort? (y/n): ").lower() == "n"
 
 
 def get_all_names():

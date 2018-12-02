@@ -3,11 +3,13 @@ from hapycolor import exceptions
 
 
 class Palette:
-    """ A palette is defined by rgb tuples stored in three attributes:
-
-        - foreground
-        - background
-        - colors: an unordered list of colors. Cannot be empty
+    """
+    A palette is defined by rgb tuples stored in three attributes:
+    - foreground
+    - background
+    - colors: an unordered list of colors. Cannot be empty
+    - others: targets willing to enrich the palette can do this
+              through this dictionnary
      """
 
     def __init__(self):
@@ -15,6 +17,15 @@ class Palette:
         self._background = None
         self._colors = None
         self.current = None
+
+        # This attribute is meant to be used by Target classes
+        # when dealing with a configuration file (through the ConfigEditor)
+        # For instance, when exporting the palette to yabar, it can
+        # useful to mark the foreground colors with a hapycolor
+        # macro: @hapycolor('yabar-foreground')
+        # To make this work, Yabar's export function customizes
+        # the 'other' attribute of the palette with the same keyword
+        # 'yabar-foreground' and the color to be used as foreground.
         self.other = {}
 
     @property

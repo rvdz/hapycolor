@@ -72,7 +72,7 @@ Moreover, Hapycolor has been designed to be a collaborative project where it is 
 or new targets. This means that it provides new tools upon which ricers can walk the Trail, and share easily
 their knowledge and work.
 
-tl;dr?
+tl;dr
 ------
 Hapycolor is an tool that helps ricers to efficiently configure their system from a selected image, according
 to their will, in addition of benefiting from other people's work. In particular through the choice of

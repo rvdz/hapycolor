@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:stretch
 
 RUN apt update && apt install git python3 python3-pip imagemagick vim -y
 RUN pip3 install pipenv
@@ -19,4 +19,4 @@ ENV LANG C.UTF-8
 
 RUN pipenv install
 
-CMD pipenv run python tests/run_suite.py -v 3
+CMD pipenv run python setup.py test

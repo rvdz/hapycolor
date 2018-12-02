@@ -60,31 +60,21 @@ class Lightline(base.Target):
 
     @staticmethod
     def reconfigure():
-        try:
-            entry = int(input("\nTheme: 1\nLightline's path: 2\nEntry: "))
-            if entry not in [1, 2]:
-                raise ValueError
-        except ValueError:
-            print("Wrong input")
-            Lightline.reconfigure()
-
-        if entry == 1:
-            theme = Lightline.select_theme()
-            Lightline.save_config({Lightline.theme_key: str(theme.value)})
-        elif entry == 2:
-            colorscheme_path = Lightline.select_colorscheme_path()
-            entry = {Lightline.colorscheme_key: colorscheme_path}
-            Lightline.save_config(entry)
+        theme = Lightline.select_theme()
+        Lightline.save_config({Lightline.theme_key: str(theme.value)})
 
     @staticmethod
     def select_colorscheme_path():
+        print("Searching for lightline's plugin location") 
         p = vim.environment.VimEnvironments.find_plugin("lightline.vim")
         file_path = p + "/autoload/lightline/colorscheme/hapycolor.vim"
+        print("Found at: {}".format(file_path))
         return file_path
 
     @staticmethod
     def select_theme():
         module_dir = Path(__file__).parent
+        # Getting themes from ./hapycolor/targets/lightline
         ThemeEnum = enum.Enum("ThemeEnum",
                               [(t.stem.upper(), module_dir / t)
                                for t in module_dir.iterdir() if ".vim" == t.suffix])

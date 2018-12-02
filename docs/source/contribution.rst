@@ -54,12 +54,15 @@ Configuration Editor
 ^^^^^^^^^^^^^^^^^^^^
 
 :class:`hapycolor.configuration_editor.ConfigurationEditor` - Some targets like
-i3 or yabar, rely on a configuration file which maps colors to the elements of
-the target. In order to create a generic tool able to deal with these
-kind of targets, hapycolor defines a "macro" indicating
-that the next color will have to be replaced, i.e., if the
-user wants a color to be replaced by hapycolor, he or she will
-have to precede the target line by a comment line similar to:
+i3 or yabar, rely on a configuration file which maps colors to elements of
+the target. For instance, in i3's configuration, it is possible to define the
+color of the borders. In order to create a generic tool able to deal with these
+kind of targets, hapycolor implements an editor able to identify and replace colors
+marked by a "macro". This mark indicates that the next color will have to be
+replaced when exporting the color to this target. Following the previous example,
+if a user wants to automatically update the border color of i3's windows
+with a color of the generated palette, he or she will have to mark
+the line that precedes the target line with a comment line similar to:
 
 .. code-block:: shell
 
@@ -67,7 +70,7 @@ have to precede the target line by a comment line similar to:
 
 The provided arguments specify which color has to be replaced
 by which color. For instance, if there is only one color which
-has to be replaced by the foreground (resp. background),
+has to be replaced by the generated foreground color (resp. background),
 then the argument will only be: "foreground" (resp. "background").
 If the user wants to use another color from the palette, then use:
 "random".

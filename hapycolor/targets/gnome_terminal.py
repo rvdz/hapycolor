@@ -43,7 +43,11 @@ class GnomeTerminal(base.Target):
 
     @staticmethod
     def is_config_initialized():
-        return True
+        try:
+            cfg = GnomeTerminal.load_config()
+            return GnomeTerminal.default_key in cfg
+        except exceptions.InvalidConfigKeyError:
+            return False
 
     @staticmethod
     def compatible_os():

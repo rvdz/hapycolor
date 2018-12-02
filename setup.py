@@ -21,7 +21,7 @@ REQUIRED = [
     'scipy==1.0.1',
     'colormath==3.0.0',
     'numpy==1.14.3',
-    'imgur-downloader==0.1.7',
+    'imgur-downloader',
 ]
 
 HERE = os.path.abspath(os.path.dirname(__file__))

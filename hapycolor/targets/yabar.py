@@ -46,6 +46,9 @@ class Yabar(base.Target):
         """
         avg_luminosity = Yabar.get_top_luminosity(image_path)
         foreground = (255, 255, 255) if avg_luminosity < 0.5 else (0, 0, 0)
+
+        # colors marked by a hapycolor macro using the keywork 'yabar_foreground'
+        # will be replaced by the generated foreground color.
         palette.other["yabar_foreground"] = foreground
 
         yabar_config = Yabar.load_config()[Yabar.configuration_key]
