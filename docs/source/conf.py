@@ -19,8 +19,9 @@
 #
 import os
 import sys
-from hapycolor.__version__ import __version__
 sys.path.insert(0, os.path.abspath('../..'))
+from hapycolor.__version__ import __version__
+
 
 
 # -- General configuration ------------------------------------------------
