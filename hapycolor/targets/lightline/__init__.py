@@ -76,7 +76,7 @@ class Lightline(base.Target):
         module_dir = Path(__file__).parent
         # Getting themes from ./hapycolor/targets/lightline
         ThemeEnum = enum.Enum("ThemeEnum",
-                              [(t.stem.upper(), module_dir / t)
+                              [(t.stem.upper(), t.as_posix())
                                for t in module_dir.iterdir() if ".vim" == t.suffix])
         try:
             print("\nSelect a theme:")

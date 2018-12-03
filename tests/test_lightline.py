@@ -1,6 +1,7 @@
 """
 Lightline test module
 """
+import enum
 import contextlib
 import pathlib
 import unittest
@@ -53,3 +54,13 @@ class TestLightline(unittest.TestCase):
 
         result = Lightline.add_colors(mock_theme, mock_palette)
         self.assertEqual(result, expected)
+
+    def test_themes_finder(self):
+        lightline_file = "hapycolor/targets/lightline/__init__.py"
+        lightline_dir = pathlib.Path(lightline_file).parent
+        lightline_files = [t for t in lightline_dir.iterdir() if ".vim" == t.suffix]
+        ThemeEnum = enum.Enum("ThemeEnum", [(t.stem.upper(), t.as_posix())
+                                            for t in lightline_files])
+
+        self.assertIn("hapycolor/targets/lightline/landscape.vim", [t.value for t in ThemeEnum])
+        self.assertNotIn("hapycolor/targets/lightling/__init__.py", [t.value for t in ThemeEnum])

@@ -11,10 +11,12 @@ networkx = "*"
 pillow = "*"
 imgur-downloader = "*"
 docopt = "*"
+sphinx = "*"
 
 [dev-packages]
 sphinx = "*"
 sphinx-rtd-theme = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.5"

@@ -1,6 +1,5 @@
 import pathlib
 import enum
-from os import listdir
 from hapycolor import helpers
 from hapycolor import targets
 from hapycolor import exceptions
@@ -37,11 +36,6 @@ class Rofi(base.Target):
     configuration_key = "configuration"
     template_key = "template"
 
-    ThemeEnum = enum.Enum("ThemeEnum",
-                          [(t.split('.')[0].upper(),
-                            "hapycolor/targets/rofi/" + t)
-                           for t in listdir("./hapycolor/targets/rofi") if ".rasi" in t])
-
     @staticmethod
     def is_config_initialized():
         try:
@@ -69,6 +63,11 @@ class Rofi(base.Target):
 
     @staticmethod
     def select_theme():
+        rofi_dir = pathlib.Path(__file__).parent
+        rasi_files = [t for t in rofi_dir.iterdir() if ".rasi" == t.suffix]
+        ThemeEnum = enum.Enum("ThemeEnum", [(t.stem.upper(), t.as_posix())
+                                            for t in rasi_files])
+
         try:
             print("\nSelect a theme:")
             for i, t in enumerate(Rofi.ThemeEnum):

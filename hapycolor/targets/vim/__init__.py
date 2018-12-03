@@ -57,13 +57,13 @@ class Vim(base.Target):
         in the project's configuration file.
         """
         if not VimEnvironments.is_vim_installed():
-            print("Vim is not installed, this target will be disabled. Once"
-                  + "  you install vim, ")
+            print("Vim is not installed, this target will be disabled")
             return
 
         p = None
         try:
             p = VimEnvironments.bundle_plugins_path()
+            print("Found automatically plugin folder: {}".format(p.as_posix()))
         except exceptions.NoCommonPathFound:
             p = Vim.custom_path()
 
@@ -156,7 +156,7 @@ class ColorManager:
         The problem of casting the colors to the syntactic groups is a
         quadratic assignment problem. So, a QAP algorithm is ran with
         the medoids of the clusters previously found as the input colors,
-        longside the occurrence frequencies, of each main syntactic group. The
+        and the syntax groups weighted by their frequencies [#]_. The
         former elements represent the weights between two groups, for
         instance, the weight between the group "Comment" and the group
         "Statement" is the product of both their frequencies.
@@ -164,19 +164,19 @@ class ColorManager:
         a cluster, which will be retrieved by calling the method
         :func:`ColorManager.cast`.
 
-    .. note::
-        The occurrence frequencies are previously calculated and are located in
-        `hapycolor/targets/vim/frequencies.json`
+    .. [#] The occurrence frequencies have been previously calculated by running
+        `hapycolor/targets/vim/syntax_groups.vim` on Hapycolor's codebase.
+        The result is stored in: `hapycolor/targets/vim/frequencies.json`.
 
     .. note::
-        If you are interested in correctly alter the occurrence frequencies
+        If you are interested in modify the occurrence frequencies
         of the syntactic groups, the vimscript
         `hapycolor/targets/vim/syntax_groups.vim` might be useful. It uses
         a list of files as the input, and generates a json file defining
         the occurrences of each syntactic group. Keep in mind that the
-        result will be dependent on the syntax files and the active
+        result will be dependent on the syntax file and the active
         colorscheme file that you currently have. For instance, some
-        does not define a specific color for minor syntactic groups and some
+        of them do not define a specific color for minor syntactic groups and some
         do. Currently, this class aims at defining a cluster for each 'group'
         of syntactic groups, so it only defines frequences for the major
         groups.
