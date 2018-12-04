@@ -277,6 +277,21 @@ Hapycolor supports yabar's configuration files and allows users to define colors
 to be replaced through the use of hapycolor's macros (see
 :class:`hapycolor.configuration_editor.ConfigurationEditor`).
 
+Moreover, :class:`hapycolor.targets.yabar.Yabar` evaluates the average luminosity
+of the top 5% section of the image so that the color of the text can be visible
+on top of the wallpaper. If the image is bright (resp. dark) the couple
+:python:`("yabar_foreground", (0, 0, 0))`
+(resp. :python:`("yabar_foreground", (255, 255, 255))`)
+That way, when parsing Yabar's configuration:
+
+.. code-block:: c
+
+    /* @hapycolor("yabar_foreground") */
+    foreground-color-rgb: 0x000000;
+
+The foreground color will be set to white (resp. black) if the top section
+of the wallpaper is dark (resp. bright).
+
 .. _`add targets`:
 
 How to add a target?

@@ -6,26 +6,18 @@ Directory Structure
 +======================+========================================================+
 | /hapycolor           | Source code for the library.                           |
 +----------------------+--------------------------------------------------------+
-| /hapycolor/filters   | Submodule that defines all the color filters.          |
+| /hapycolor/filters   | Submodule which defines how to filter the colors of    |
+                       | the image.                                             |
 +----------------------+--------------------------------------------------------+
-| /hapycolor/targets   | Submodule which define how to export the final palette |
-|                      | to the targets.                                        |
-+----------------------+--------------------------------------------------------+
-| /build               | All built code from the compile scripts goes here.     |
-+----------------------+--------------------------------------------------------+
-| /dist                | Distributable Python wheels go here after the build    |
-|                      | script has run.                                        |
+| /hapycolor/targets   | Submodule which defines how to export the final        |
+|                      | palette to the targets.                                |
 +----------------------+--------------------------------------------------------+
 | /tests               | Unit tests.                                            |
 +----------------------+--------------------------------------------------------+
-| /doc                 | Hapycolor documentation. Note that API documentation   |
+| /docs                | Hapycolor documentation. Note that API documentation   |
 |                      | is in docstring along with the sources.                |
 +----------------------+--------------------------------------------------------+
-| /doc/source          | Source rst files for the documentation.                |
-+----------------------+--------------------------------------------------------+
-| /doc/build/html      | After making the documentation, all the HTML code      |
-|                      | goes here. Look at this in a web browser to see        |
-|                      | what the documentation will look like.                 |
+| /docs/source         | Source rst files for the documentation.                |
 +----------------------+--------------------------------------------------------+
 | /images              | Some example images                                    |
 +----------------------+--------------------------------------------------------+

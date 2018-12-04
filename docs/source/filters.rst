@@ -46,6 +46,4 @@ Its main method, "apply" takes in a :class:`hapycolor.Palette` and should output
 In addition, in order to enable it, the module's name should be added in the "Filters" section of the configuration file,
 coupled with a value representing the complexity of the algorithm. At runtime, hapycolor searches for classes stored in
 the provided modules that inherits from :class:`hapycolor.filters.base.Filter` and whose name is a PascalCase version of the respective module
-(which should be named in snake_case, but you already know that, I hope).
-
-.. note:: Maybe, in a near future, this last constraint could be removed.
+(which should be named in snake_case, but you already know that).

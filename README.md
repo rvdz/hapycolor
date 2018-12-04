@@ -1,13 +1,10 @@
 # Hapycolor
 
-Some examples of badges:
-
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![forthebadge](http://forthebadge.com/images/badges/kinda-sfw.svg)](http://forthebadge.com)
 [![shileds.io](https://img.shields.io/badge/built--with-vim-green.svg?style=for-the-badge)](http://shields.io)
+[![Documentation Status](https://readthedocs.org/projects/hapycolor/badge/?version=latest)](https://hapycolor.readthedocs.io/en/latest/?badge=latest)
 
-TODO: we could add a badge according to our code coverage: https://codecov.io/gh or https://coveralls.io
 
 ## What is Hapycolor?
 Hapyolor generates beautiful color palettes from an input image and exports it
@@ -18,40 +15,40 @@ the colors should be automatically exported to targets selected by the user.
 
 ## What defines a suitable palette of colors?
 First of all, if the purpose of those colors is to be used in a terminal or in
-an editor, they should'nt be too dark, nor too bright (except the background or,
+an editor, they shouldn't be too dark, nor too bright (except for the background or,
 for some people, the foreground). Then, due to the low number of colors usually needed by the
 targets (e.g., a terminal's profile only needs sixteen colors), compared to the
-large number of colors in the original image, it is undesirable
-to have colors that are "too close". For instance, if an image has multiple
+large number of colors of the original image, it is necessary to filter the colors
+so that they are not "too close". For instance, if an image has multiple
 shades of blue, the output should contain hues of blue that are easily
-distinguishable, thus, reducing the total number of colors.
+distinguishable.
 
 ## What targets are currently supported?
 Currently, are supported:
 
+__multiplatform__:
 - Vim
-- Gnome Terminal and iTerm
 - Lightline
+
+__macOS__:
+- iTerm
+
+__Debian__ and __Ubuntu__:
+- Gnome Terminal
 - Rofi
 - Yabar
 - i3
 
-For more details, The full documentation can be found [here](https://rvdz.github.io/hapycolor/).
-
-## Requirements
-Tested on:
-
-- Debian
-- Ubuntu
-- macOS
+For more details, The full documentation can be found [here](https://hapycolor.readthedocs.io/en/latest/).
 
 ### Dependencies
 - python >= 3.5
 - imagemagick
+- feh (Linux only)
 
 __Debian or Ubuntu__:
 ```sh
-sudo apt-get update && sudo apt-get install python3 python3-pip imagemagick -y
+sudo apt-get update && sudo apt-get install python3 python3-pip imagemagick feh -y
 ```
 
 __macOS__:
@@ -73,7 +70,7 @@ pip3 install hapycolor
 ```sh
 git clone https://github.com/rvdz/hapycolor
 cd hapycolor
-pip install . --user
+pip3 install . --user
 ```
 
 ## Usage
@@ -83,8 +80,7 @@ For basic usage, execute:
 hapycolor -f <path/to/file>
 ```
 
-The full details of Hapycolor's command line features are available
-by running:
+The full documentation of Hapycolor's cli can be found by running:
 
 ```sh
 hapycolor --help

@@ -1,6 +1,9 @@
 How to Contribute
 =================
 
+.. role:: python(code)
+    :language: python
+
 We would love to have you contribute to the project! There are several ways that you can do so.
 
 How to contribute without coding
@@ -57,7 +60,7 @@ Configuration Editor
 i3 or yabar, rely on a configuration file which maps colors to elements of
 the target. For instance, in i3's configuration, it is possible to define the
 color of the borders. In order to create a generic tool able to deal with these
-kind of targets, hapycolor implements an editor able to identify and replace colors
+kind of targets, Hapycolor implements an editor able to identify and replace colors
 marked by a "macro". This mark indicates that the next color will have to be
 replaced when exporting the color to this target. Following the previous example,
 if a user wants to automatically update the border color of i3's windows
@@ -90,6 +93,27 @@ case, the macro should look like:
 
     # @hapycolor("foreground", None, "random")
     set colors #010203 #020304 #040506
+
+Finally, the palette object has an additional attribute
+:attr:`hapycolor.palette.Palette.other`
+which defines a dictionary whose keys can be used as macro's arguments
+and its values will be the colors used for the colors marked with
+the macro. For instance, :class:`hapycolor.targets.yabar.Yabar` evaluates
+the average luminosity of the top 5% section of the image so that
+the color of the text can be visible on top of the wallpaper.
+If the image is bright (resp. dark) the couple
+:python:`("yabar_foreground", (0, 0, 0))`
+(resp. :python:`("yabar_foreground", (255, 255, 255))`)
+That way, when parsing Yabar's configuration:
+
+.. code-block:: c
+
+    /* @hapycolor("yabar_foreground") */
+    foreground-color-rgb: 0x000000;
+
+The foreground color will be set to white (resp. black) if the top section
+of the wallpaper is dark (resp. bright).
+
 
 Terminal Color Manager
 ^^^^^^^^^^^^^^^^^^^^^^
