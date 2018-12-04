@@ -15,7 +15,7 @@ LOCAL_CONFIG = CONFIG
 def create_config():
     """
     Creates a local configuration from the default one, in the user's base
-    directory
+    directory.
     """
     dst = get_config()
     if not pathlib.Path(dst).is_file():
@@ -37,8 +37,13 @@ class ConfigurationManager:
     This class is meant to be inherited by a class that interacts with
     hapycolor's configuration file. It provides the basic methods to read
     and write in it.
+
+    .. todo::
+        We should change the name of this class, since it can be
+        confused with :class:`ConfigurationManager`
     """
 
+    @staticmethod
     def load(section):
         """
         Loads the content of a given section of hapycolor's configuration file
@@ -54,6 +59,7 @@ class ConfigurationManager:
             msg = "Configuration entry not found"
             raise exceptions.InvalidConfigKeyError(msg, e)
 
+    @staticmethod
     def save(section, target_config):
         """
         Save a new entry in the config file.

@@ -4,8 +4,20 @@ import readline
 from hapycolor import exceptions
 import os
 import pathlib
+from colormath.color_conversions import convert_color
+from colormath.color_objects import LabColor, sRGBColor
 
 """ Utilitary methods to convert color types  """
+
+
+def rgb_to_lab(c):
+    rgb = sRGBColor(c[0], c[1], c[2])
+    return convert_color(rgb, LabColor)
+
+
+def lab_to_rgb(lab_c):
+    c = convert_color(lab_c, sRGBColor)
+    return (round(c.rgb_r), round(c.rgb_g), round(c.rgb_b))
 
 
 def bold(string):

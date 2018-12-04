@@ -1,5 +1,5 @@
-hapycolor
-=========
+Hapycolor API Docs
+==================
 
 .. toctree::
    :maxdepth: 4

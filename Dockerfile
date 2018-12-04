@@ -1,10 +1,10 @@
-FROM debian
+FROM debian:stretch
 
-RUN apt-get update && apt-get install git python3 python3-pip python3-scipy python3-matplotlib imagemagick -y
+RUN apt update && apt install git python3 python3-pip imagemagick vim -y
+RUN pip3 install pipenv
 
-RUN apt-get install vim -y
-RUN useradd -m bonisseur-de-la-batte
-RUN su - bonisseur-de-la-batte
+# RUN useradd -m bonisseur-de-la-batte
+# RUN su - bonisseur-de-la-batte
 
 ENV hapycolor ~/hapycolor
 
@@ -13,5 +13,10 @@ ADD ./ ${hapycolor}
 
 WORKDIR ${hapycolor}
 
-RUN python3 setup.py install
-CMD python3 tests/run_suite.py -v 3
+# Set the locale
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+RUN pipenv install
+
+CMD pipenv run python setup.py test

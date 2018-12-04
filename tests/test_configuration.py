@@ -1,8 +1,5 @@
-from hapycolor import config
-import os
-import contextlib
 import unittest
-from unittest import mock
+from hapycolor import config
 
 
 class TestConfiguration(unittest.TestCase):
@@ -12,5 +9,5 @@ class TestConfiguration(unittest.TestCase):
 
         configuration = configparser.ConfigParser()
         configuration.read(config.get_default_config())
-        expected_sections = ["hyperplan", "Wallpaper", "Gnome"]
+        expected_sections = ["hyperplan"]
         self.assertEqual(set(expected_sections), set(configuration.sections()))

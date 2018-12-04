@@ -1,9 +1,9 @@
 import abc
-from hapycolor import config
+from hapycolor.config import ConfigurationManager
 from hapycolor import exceptions
 
 
-class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
+class Target(ConfigurationManager, metaclass=abc.ABCMeta):
     """
     Abstract class introducting the basic methods needed to initialize the
     target and export the palette or the image to the environment. The
@@ -34,7 +34,7 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
 
     @abc.abstractstaticmethod
     def compatible_os():
-        """ Returns a list of enum of class :class:`hapycolor.config.OS` """
+        """ Returns a list of enum of class :class:`hapycolor.targets.OS` """
         raise exceptions.CallingAbstractMethodError("Your are a wizard!")
 
     # --- Configuration Methods ---
@@ -45,6 +45,19 @@ class Target(config.ConfigurationManager, metaclass=abc.ABCMeta):
     @classmethod
     def reconfigure(cls):
         cls.initialize_config()
+
+    @classmethod
+    def is_defined(cls):
+        """
+        Checks if there target has already been enabled/disabled once.
+        This is useful, since at first, any target is set to be
+        enabled/disabled so to initialize them when first running
+        Hapycolor.
+        """
+        try:
+            return "enabled" in cls.load(cls.__name__)
+        except exceptions.InvalidConfigKeyError:
+            return False
 
     @staticmethod
     def is_config_initialized():

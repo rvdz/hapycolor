@@ -11,10 +11,10 @@ hapycolor\.filters\.base module
 
 .. automodule:: hapycolor.filters.base
 
-hapycolor\.filters\.luminosity\_filter module
+hapycolor\.filters\.lum\_filter module
 ---------------------------------------------
 
-.. automodule:: hapycolor.filters.luminosity_filter
+.. automodule:: hapycolor.filters.lum_filter
 
 hapycolor\.filters\.reducer module
 ----------------------------------

@@ -297,11 +297,11 @@ def _create_dicts():
     return rgb2short_dict, short2rgb_dict
 
 
-def short2rgb(short):
+def short_to_rgb(short):
     return helpers.hex_to_rgb("#" + SHORT2RGB_DICT[short])
 
 
-def rgb2short(rgb):
+def rgb_to_short(rgb):
     """ Find the closest xterm-256 approximation to the given RGB value.
     :arg rgb: A tuple representing an RGB value.
     :return: String between 0 and 255, compatible with xterm.

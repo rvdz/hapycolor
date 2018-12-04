@@ -1,14 +1,14 @@
-from hapycolor import exceptions, config, helpers, palette
-from hapycolor import targets
-from hapycolor.targets.iterm import Iterm, TermColorManager, TermColorEnum
-from tests.helpers import generate_palette, configurationtesting, disableprints
+import unittest
 from unittest import mock
-from unittest.mock import patch
 import pathlib
 import contextlib
 import os
 import shutil
-import unittest
+from hapycolor import exceptions, config, helpers, palette
+from hapycolor import targets
+from hapycolor.targets.iterm import Iterm
+from hapycolor.targets.terminal_color_manager import TerminalColorManager as TCM
+from tests.helpers import generate_palette, configurationtesting, disableprints
 
 
 @contextlib.contextmanager
@@ -44,30 +44,6 @@ class TestIterm(unittest.TestCase):
 
     plutil_reason = "To decode the file preferences, Darwin's command " \
             + "'plutil' is needed"
-    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
-    @itermtesting()
-    @configurationtesting()
-    def test_export(self):
-        """
-        iTerm Integration test: provides a valid set of colors to the main
-        function and check if it does not fail
-        """
-        try:
-            Iterm.initialize_config()
-            self.assertTrue(Iterm.is_config_initialized())
-        except Exception as e:
-            self.fail(str(e))
-
-        pltte = palette.Palette()
-        pltte.foreground = (0, 0, 0)
-        pltte.background = (0, 0, 0)
-        hsl_colors =  ([(16  , 0.54 , 0.45) , (28  , 0.77 , 0.64) , (45  , 0.94 , 0.66) , (52  , 0.38 , 0.53) , (59  , 0.97 , 0.67) , (98  , 0.82 , 0.69) , (147 , 0.70 , 0.48) , (162 , 0.60 , 0.42) , (172 , 0.85 , 0.54) , (177 , 0.64 , 0.39) , (182 , 0.78 , 0.50) , (202 , 0.57 , 0.57) , (227 , 0.05 , 0.65) , (239 , 0.44 , 0.50) , (305 , 0.70 , 0.50) , (319 , 0.32 , 0.50) , (333 , 0.57 , 0.42) , (338 , 0.57 , 0.60) , (342 , 0.57 , 0.44) , (344 , 0.60 , 0.5)  , (348 , 0.92 , 0.62)])
-        pltte.colors = [helpers.hsl_to_rgb(c) for c in hsl_colors]
-
-        try:
-            Iterm.export(pltte, "iterm_test")
-        except Exception as e:
-            self.fail(str(e))
 
     @itermtesting()
     @configurationtesting()
@@ -85,15 +61,36 @@ class TestIterm(unittest.TestCase):
     @configurationtesting()
     def test_export_iterm_0_color_palette(self):
         with self.assertRaises(exceptions.ColorFormatError):
-            Iterm.export(generate_palette(0), "iterm_test")
+                Iterm.export(generate_palette(0), "iterm_test")
 
     @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_1_color_palette(self):
+        with self.assertRaises(exceptions.InvalidPaletteException):
+                Iterm.initialize_config()
+                Iterm.export(generate_palette(1), "iterm_test")
+
+    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
+    @itermtesting()
+    @configurationtesting()
+    def test_export_iterm_12_color_palette(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        pltte = mock.Mock()
+        pltte.colors = colors
+        pltte.background = (0, 0, 0)
+        pltte.foreground = (255, 255, 255)
+        pltte.__class__ = palette.Palette
+        pltte.is_initialized = mock.MagicMock(return_value=True)
         try:
             Iterm.initialize_config()
-            Iterm.export(generate_palette(1), "iterm_test")
+            Iterm.export(pltte, "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
@@ -101,19 +98,24 @@ class TestIterm(unittest.TestCase):
     @itermtesting()
     @configurationtesting()
     def test_export_iterm_16_color_palette(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (70, 0.5, 0.7),
+                  (30, 0.5, 0.5), (40, 0.5, 0.7),
+                  (100, 0.5, 0.5), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (210, 0.5, 0.5), (220, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        pltte = mock.Mock()
+        pltte.colors = colors
+        pltte.background = (0, 0, 0)
+        pltte.foreground = (255, 255, 255)
+        pltte.__class__ = palette.Palette
+        pltte.is_initialized = mock.MagicMock(return_value=True)
         try:
             Iterm.initialize_config()
-            Iterm.export(generate_palette(16), "iterm_test")
-        except Exception as err:
-            self.fail(str(err))
-
-    @unittest.skipUnless(targets.os() == targets.OS.DARWIN, plutil_reason)
-    @itermtesting()
-    @configurationtesting()
-    def test_export_iterm_200_color_palette(self):
-        try:
-            Iterm.initialize_config()
-            Iterm.export(generate_palette(200), "iterm_test")
+            Iterm.export(pltte, "iterm_test")
         except Exception as err:
             self.fail(str(err))
 
@@ -135,7 +137,7 @@ class TestIterm(unittest.TestCase):
         with itermtesting(default=True):
             Iterm.initialize_config()
         self.assertEqual(Iterm.load_config()[Iterm.default_key], str(True))
-        with patch('builtins.input', return_value="2"):
+        with mock.patch('builtins.input', return_value="2"):
             Iterm.reconfigure()
         self.assertEqual(Iterm.load_config()[Iterm.default_key], str(False))
 
@@ -143,95 +145,143 @@ class TestIterm(unittest.TestCase):
 class TestTermColor(unittest.TestCase):
     def test_color_format(self):
         with self.assertRaises(exceptions.ColorFormatError):
-            TermColorManager([(240, 240, 0.3), (0, 0, 1)])
+            TCM([(240, 240, 0.3), (0, 0, 1)])
 
-    def test_arguments_type(self):
-        with self.assertRaises(exceptions.EmptyListError):
-            TermColorManager([])
+    def test_invalid_argument(self):
+        with self.assertRaises(exceptions.WrongInputError):
+            TCM((12, 14, 16))
 
-    def test_labels(self):
-        """ Asserts that 'get_label' method works properly """
-        colors = {
-                (10, 0.4, 1): TermColorEnum.RED,
-                (350, 0.8, 1): TermColorEnum.RED,
-                (240, 0, 0): TermColorEnum.BLUE,
-                (300, 1, 1): TermColorEnum.MAGENTA,
-             }
+    def test_not_enough_arguments(self):
+        colors = [(100, 100, 100), (200, 200, 200), (150, 100, 50)]
+        with self.assertRaises(exceptions.InvalidPaletteException):
+            TCM(colors)
 
-        for c in colors:
-            self.assertEqual(TermColorManager.get_label(c), colors[c])
+    def test_classify_hue(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.5),
+                  (60, 0.5, 0.5), (70, 0.5, 0.5),
+                  (100, 0.5, 0.5), (110, 0.5, 0.5),
+                  (170, 0.5, 0.5), (180, 0.5, 0.5),
+                  (250, 0.5, 0.5), (260, 0.5, 0.5),
+                  (300, 0.5, 0.5), (310, 0.5, 0.5)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified = TCM._classify_hue(colors)
+        self.assertEqual(len(classified), 6)
 
-    def test_get_color_when_not_enough_labels(self):
-        """
-        Asserts that even if some labels are empty, the program still works
-        """
-        input_colors = [
-                (16, 0.54, 0.45),
-                (28, 0.77, 0.64),
-                (45, 0.94, 0.66),
-                (52, 0.38, 0.53),
-           ]
-        term_colors = TermColorManager([helpers.hsl_to_rgb(c) for c in
-                                        input_colors])
-        try:
-            for i in range(16):
-                term_colors.get_color(i)
-        except Exception as e:
-            self.fail(str(e))
+    def test_classify_hue_1_color_cluster(self):
+        colors = [(0, 0.5, 0.5), (60, 0.5, 0.5),
+                  (100, 0.5, 0.5), (170, 0.5, 0.5),
+                  (250, 0.5, 0.5), (300, 0.5, 0.5)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified = TCM._classify_hue(colors)
+        self.assertEqual(len(classified), 6)
 
-    def test_get_color_fails_with_invalid_argument(self):
-        """
-        Checks that 'get_color' fails when called with invalid arguments
-        """
-        input_colors = [
-                (16, 0.54, 0.45),
-                (28, 0.77, 0.64),
-                (45, 0.94, 0.66),
-                (52, 0.38, 0.53),
-            ]
+    def test_classify_luminosity(self):
+        colors = [(0, 0.5, 0.5), (5, 0.5, 0.6), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (65, 0.5, 0.6), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (105, 0.5, 0.6), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (175, 0.5, 0.6), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (255, 0.5, 0.6), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (305, 0.5, 0.6), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        self.assertEqual(len(classified_lum), 6)
+        for (c1, c2) in classified_lum:
+            self.assertNotEqual(c1, c2)
+            self.assertLess(c1[2], c2[2])
 
-        term_colors = TermColorManager([helpers.hsl_to_rgb(c) for c in
-                                        input_colors])
-        inputs = [-5, 16, "jkl", [], {}, 0.5]
-        for i in inputs:
-            with self.subTest(line=i):
-                with self.assertRaises(exceptions.InvalidValueError):
-                    term_colors.get_color(i)
+    def test_classify_luminosity_1_color_cluster(self):
+        colors = [(0, 0.5, 0.5), (60, 0.5, 0.5),
+                  (100, 0.5, 0.5), (170, 0.5, 0.5),
+                  (250, 0.5, 0.5), (300, 0.5, 0.5)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        self.assertEqual(len(colors), 6)
+        for (c1, c2) in classified_lum:
+            self.assertEqual(c1, c2)
 
-    def test_analyze_colors(self):
-        """
-        Asserts that 'analyze_colors' creates a correct dictionary for a given
-        set of colors
-        """
-        input_colors = [
-                (16, 0.54, 0.45), (28, 0.77, 0.64), (45, 0.94, 0.66),
-                (52, 0.38, 0.53), (59, 0.97, 0.67), (98, 0.82, 0.69),
-                (147, 0.70, 0.48), (162, 0.60, 0.42), (172, 0.85, 0.54),
-                (177, 0.64, 0.39), (182, 0.78, 0.50), (202, 0.57, 0.57),
-                (227, 0.05, 0.65), (239, 0.44, 0.50), (305, 0.70, 0.50),
-                (319, 0.32, 0.50), (333, 0.57, 0.42), (338, 0.57, 0.60),
-                (342, 0.57, 0.44), (344, 0.60, 0.5), (348, 0.92, 0.62),
-               ]
+    def test_sort_medoids(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
+        self.assertEqual(len(sorted_colors), 16)
 
-        expected_dict = {
-                TermColorEnum.BLACK: [(0, 0, 0)],
-                TermColorEnum.WHITE: [(0, 0, 1)],
-                TermColorEnum.RED: [(16, 0.54, 0.45), (348, 0.92, 0.62)],
-                TermColorEnum.YELLOW: [(28, 0.77, 0.64), (45, 0.94, 0.66),
-                                       (52, 0.38, 0.53), (59, 0.97, 0.67)],
-                TermColorEnum.GREEN: [(98, 0.82, 0.69), (147, 0.70, 0.48)],
-                TermColorEnum.CYAN: [(162, 0.60, 0.42), (172, 0.85, 0.54),
-                                     (177, 0.64, 0.39), (182, 0.78, 0.50)],
-                TermColorEnum.BLUE: [(202, 0.57, 0.57), (227, 0.05, 0.65),
-                                     (239, 0.44, 0.50)],
-                TermColorEnum.MAGENTA: [(305, 0.70, 0.50), (319, 0.32, 0.50),
-                                        (333, 0.57, 0.42), (338, 0.57, 0.60),
-                                        (342, 0.57, 0.44), (344, 0.60, 0.5)],
-                }
+        hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
+        for i in range(8):
+            self.assertLessEqual(hsl_sorted[i][2], hsl_sorted[i+8][2])
 
-        colors_dict = TermColorManager.analyze_colors(input_colors)
-        for tc in TermColorEnum:
-            self.assertEqual(colors_dict[tc], expected_dict[tc])
+    def test_sort_no_geen_components(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (40, 0.5, 0.5), (50, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7),
+                  (340, 0.5, 0.5), (350, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
+        self.assertEqual(len(sorted_colors), 16)
+
+        hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
+        # Testing red component
+        self.assertTrue(hsl_sorted[1][0] < 25 or hsl_sorted[1][0] > 345)
+        self.assertTrue(hsl_sorted[9][0] < 25 or hsl_sorted[9][0] > 345)
+        # Testing green component
+        self.assertEqual(hsl_sorted[2], (140, 1, 0.3))
+        self.assertEqual(hsl_sorted[10], (120, 1, 0.7))
+
+    def test_sort_special_components(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        classified_hue = TCM._classify_hue(colors)
+        classified_lum = TCM._classify_luminosity(classified_hue)
+        sorted_colors = TCM._sort(classified_lum)
+        self.assertEqual(len(sorted_colors), 16)
+
+        hsl_sorted = [helpers.rgb_to_hsl(c) for c in sorted_colors]
+        # Testing red component
+        self.assertTrue(hsl_sorted[1][0] < 25 or hsl_sorted[1][0] > 345)
+        self.assertTrue(hsl_sorted[9][0] < 25 or hsl_sorted[9][0] > 345)
+        # Testing green component
+        self.assertTrue(hsl_sorted[2][0] < 160 and hsl_sorted[2][0] > 60)
+        self.assertTrue(hsl_sorted[10][0] < 160 and hsl_sorted[10][0] > 60)
+
+    def test_init_6_colors(self):
+        colors = [(0, 0.5, 0.5), (60, 0.5, 0.5),
+                  (100, 0.5, 0.5), (170, 0.5, 0.5),
+                  (250, 0.5, 0.5), (300, 0.5, 0.5)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        cm = TCM(colors)
+        self.assertEqual(len(cm.colors), 16)
+        self.assertEqual(len(set(cm.colors)), 10)
+
+    def test_init_12_colors(self):
+        colors = [(0, 0.5, 0.5), (10, 0.5, 0.7),
+                  (60, 0.5, 0.5), (70, 0.5, 0.7),
+                  (100, 0.5, 0.5), (110, 0.5, 0.7),
+                  (170, 0.5, 0.5), (180, 0.5, 0.7),
+                  (250, 0.5, 0.5), (260, 0.5, 0.7),
+                  (300, 0.5, 0.5), (310, 0.5, 0.7)]
+        colors = [helpers.hsl_to_rgb(c) for c in colors]
+        cm = TCM(colors)
+        self.assertEqual(len(cm.colors), 16)
+        self.assertEqual(len(set(cm.colors)), 16)
+        for c in cm.colors:
+            self.assertTrue(helpers.can_be_rgb(c))
 
     @configurationtesting()
     @unittest.skipUnless(targets.os() == targets.OS.DARWIN, "Tests Darwin's"

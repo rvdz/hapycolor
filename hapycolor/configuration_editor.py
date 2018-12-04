@@ -2,16 +2,20 @@ import re
 from hapycolor import helpers
 from hapycolor import exceptions
 
-class ConfigFileEditor:
+
+class ConfigurationEditor:
     """
     Many targets are usually defined by a configuration file which
     maps colors to the elements of the target.
     In order to create a generic tool able to deal with these kind
-    of targets, hapycolor defines a "macro" indicating hapycolor
+    of targets, hapycolor defines a "macro" indicating
     that the next color will have to be replaced, i.e., if the
     user wants a color to be replaced by hapycolor, he or she will
     have to precede the target line by a comment line similar to:
-    '# @hapycolor(args)'.
+
+    .. code-block:: shell
+
+        # @hapycolor(args)
 
     The provided arguments specify which color has to be replaced
     by which color. For instance, if there is only one color which
@@ -23,18 +27,22 @@ class ConfigFileEditor:
     In some cases, there might be multiple colors on the same line,
     but only a few of them have to be replaced, for instance:
 
+    .. code-block:: shell
+
         set colors #010203 #020304 #040506
 
     Here, the first color should be replaced by the foreground, and
     the last, should be replaced by a color of the palette. In this
     case, the macro should look like:
 
+    .. code-block:: shell
+
         # @hapycolor("foreground", None, "random")
         set colors #010203 #020304 #040506
 
     To use this class, first initialize it with a list storing the
     lines of the configuration file, then, call the function
-    :func:`replace(palette)` providing the generated palette which
+    :func:`replace` providing the generated palette which
     will return the new configuration file.
     """
     def __init__(self, configuration):
@@ -48,8 +56,8 @@ class ConfigFileEditor:
     def parser(self):
         attributes = [None]
         for line in self.configuration:
-            if ConfigFileEditor.is_macro(line):
-                attributes.append(ConfigFileEditor.from_macro(line))
+            if ConfigurationEditor.is_macro(line):
+                attributes.append(ConfigurationEditor.from_macro(line))
             else:
                 attributes.append(None)
         return attributes
@@ -74,18 +82,26 @@ class ConfigFileEditor:
                     # (r, g, b, alpha)
                     r"\( *[0-9]+ *, *[0-9]+ *, *[0-9]+ *,",
                     # #rrggbb
-                    r"#[0-9a-f-A-F]{6}"]
+                    r"#[0-9a-f-A-F]{6}",
+                    # 0xrrggbb
+                    r"0x[0-9a-f-A-F]{6}",
+                    # 0Xrrggbb
+                    r"0X[0-9a-f-A-F]{6}"]
 
-        converters = [lambda c: "({}, {}, {})".format(c[0], c[1], c[2]),
-                      lambda c: "({}, {}, {},".format(c[0], c[1], c[2]),
+        converters = [lambda c: "({}, {}, {})".format(*c),
+                      lambda c: "({}, {}, {},".format(*c),
+                      lambda c: "#{:02X}{:02X}{:02X}".format(*c),
+                      lambda c: "0x{:02X}{:02X}{:02X}".format(*c),
+                      lambda c: "0X{:02X}{:02X}{:02X}".format(*c),
                       helpers.rgb_to_hex]
 
         for pattern, converter in zip(patterns, converters):
             if re.match(".*" + pattern + ".*", color_line):
                 return pattern, converter
 
-        msg = "Color format at line '{}' not found, feel ".format(color_line)
-        msg += " free to raise an issue: https://github.com/rvdz/hapycolor/issues"
+        msg = "Color format at line '{}' not found, ".format(color_line)
+        msg += "feel free to raise an issue: "
+        msg += "https://github.com/rvdz/hapycolor/issues"
         raise exceptions.ColorFormatNotFound(msg)
 
     def replace(self, palette):
@@ -109,6 +125,8 @@ class ConfigFileEditor:
                 color = iter_palette.foreground
             elif opt == "background":
                 color = iter_palette.background
+            elif opt in iter_palette.other:
+                color = iter_palette.other[opt]
             else:
                 msg = "Macro not recognized in line: {}".format(line)
                 raise exceptions.InvalidMacroException(msg)

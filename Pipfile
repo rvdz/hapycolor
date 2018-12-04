@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+colormath = "*"
+numpy = "*"
+scipy = "*"
+networkx = "*"
+pillow = "*"
+imgur-downloader = "*"
+docopt = "*"
+sphinx = "*"
+
+[dev-packages]
+sphinx = "*"
+sphinx-rtd-theme = "*"
+pylint = "*"
+
+[requires]
+python_version = "3.5"

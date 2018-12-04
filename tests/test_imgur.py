@@ -13,11 +13,11 @@ class TestImgur(unittest.TestCase):
     def test_download_image(self):
         url = "http://i.imgur.com/tfraio8.png"
         try:
-            with imgur.download(url) as image_path:
-                self.assertTrue(pathlib.Path(image_path).exists(),
-                        TestImgur.warning)
+            image_path = imgur.download(url)
+            self.assertTrue(pathlib.Path(image_path).exists(), TestImgur.warning)
         except urllib.error.URLError:
             self.fail(TestImgur.warning)
+        pathlib.Path(image_path).unlink()
 
     def test_download_unexistent_image(self):
         url = "https://imgur.com/trijjjjo8"

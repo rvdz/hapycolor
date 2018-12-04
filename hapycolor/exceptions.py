@@ -2,8 +2,6 @@
 Hapycolor's exceptions
 """
 
-from hapycolor import config
-
 
 class HapycolorError(Exception):
     """ Basic exception for errors raised by hapycolor """
@@ -39,21 +37,25 @@ class ExportTargetFailure(HapycolorError):
 
 class PlatformNotSupportedError(HapycolorError):
     def __str__(self):
-        supported_os = ",".join([o.name for o in config.OS])
-        err_msg = "Platform not supported\n" \
-                  + "Currently supporting: %s" % supported_os
+        err_msg = "Platform not supported"
         super(PlatformNotSupportedError, self).__init__(err_msg)
 
 
 class InvalidValueError(HapycolorError):
     def __init__(self, msg):
-        super(HapycolorError, self).__init__(msg)
+        super(InvalidValueError, self).__init__(msg)
         self.msg = msg
 
 
 class EmptyPaletteException(HapycolorError):
     def __init__(self, msg):
         super(EmptyPaletteException, self).__init__(msg)
+        self.msg = msg
+
+
+class InvalidPaletteException(HapycolorError):
+    def __init__(self, msg):
+        super(InvalidPaletteException, self).__init__(msg)
         self.msg = msg
 
 
@@ -204,4 +206,9 @@ class InvalidMacroException(HapycolorError):
 class ColorFormatNotFound(HapycolorError):
     def __init__(self, msg):
         super(ColorFormatNotFound, self).__init__(msg)
+        self.msg = msg
+
+class DconfInvalidCommand(HapycolorError):
+    def __init__(self, msg):
+        super(DconfInvalidCommand, self).__init__(msg)
         self.msg = msg

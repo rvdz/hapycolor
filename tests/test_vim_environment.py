@@ -1,5 +1,5 @@
 import unittest
-from hapycolor.targets.vim_environment import VimEnvironments
+from hapycolor.targets.vim.environment import VimEnvironments
 from unittest.mock import patch
 import re
 from hapycolor import exceptions

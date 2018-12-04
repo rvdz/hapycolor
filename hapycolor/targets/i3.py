@@ -6,7 +6,7 @@ import re
 from hapycolor import exceptions
 from hapycolor import helpers
 from hapycolor import targets
-from hapycolor.configuration_editor import ConfigFileEditor
+from hapycolor.configuration_editor import ConfigurationEditor
 from hapycolor.targets import wallpaper
 from . import base
 
@@ -16,7 +16,7 @@ class I3(base.Target):
     This class aims at altering i3's configuration file.
     Currently, it changes the color of the borders and sets the new
     wallpaper in addition of executing yabar with the custom configuration
-    file
+    file.
     """
     configuration_key = "config"
 
@@ -70,7 +70,7 @@ class I3(base.Target):
         This class implements two main features:
         - it replaces the wallpaper in the configuration file
         - replaces the colors preceded by the macro replace line, for more info,
-            please check out :class:`hapycolor.configuration_editor.ConfigFileEditor`:
+        please check out :class:`hapycolor.configuration_editor.ConfigurationEditor`:
         """
         config_path = I3.load_config()[I3.configuration_key]
         configuration = []
@@ -85,7 +85,7 @@ class I3(base.Target):
         except exceptions.InvalidConfigKeyError:
             pass
 
-        configuration = ConfigFileEditor(configuration).replace(palette)
+        configuration = ConfigurationEditor(configuration).replace(palette)
 
         with open(config_path, 'w') as config_file:
             config_file.write('\n'.join(configuration))

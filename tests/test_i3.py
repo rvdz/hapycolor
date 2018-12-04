@@ -8,7 +8,7 @@ import contextlib
 from hapycolor import exceptions
 from hapycolor import targets
 from hapycolor import palette
-from hapycolor.configuration_editor import ConfigFileEditor
+from hapycolor.configuration_editor import ConfigurationEditor
 from hapycolor.targets.i3 import I3
 
 class TestI3(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestI3(unittest.TestCase):
         mock_palette = palette.Palette()
         mock_palette.colors = [(4, 6, 7), (1, 3, 6), (3, 6, 8)]
 
-        result = ConfigFileEditor(config).replace(mock_palette)
+        result = ConfigurationEditor(config).replace(mock_palette)
 
         expected = ["line 1", "# @hapycolor('random')", "set $var_color    #040607", "Last line"]
         self.assertEqual(result, expected)

@@ -10,16 +10,16 @@
 
 """
 
-from . import config, visual, helpers, targets, raw_colors, filters, imgur
-from . import exceptions
-from . import palette as pltte
+from hapycolor import config, visual, helpers, targets, raw_colors, filters, imgur
+from hapycolor import exceptions
+from hapycolor import palette as pltte
 
 from PIL import Image, ImageDraw
 from docopt import docopt
 import os
 import pathlib
+from hapycolor.__version__ import __version__
 
-version = 1.0
 
 help_msg = """Hapycolor.
 
@@ -42,8 +42,8 @@ Options:
   -f, --file     The path of the source image from which the palette will be generated.
   --dir          Generates a palette for each image in the provided directory, without exporting them.
   -o, --output   Target directory where the palettes will be saved.
-  --imgur    The url of an image from imgur.com from which the palette will be generated.
-  --json     Save image's palette into the provided directory, without exporting it.
+  --imgur        The url of an image from imgur.com from which the palette will be generated.
+  --json         Save image's palette into the provided directory, without exporting it.
   --export-from-json
                  Export json palette to enabled targets.
 
@@ -84,7 +84,7 @@ def colors_to_file(colors, filename, resize=150, swatchsize=20):
 
 
 def parse_arguments():
-    return docopt(help_msg, version="Hapycolor " + str(version))
+    return docopt(help_msg, version="Hapycolor " + str(__version__))
 
 
 
@@ -98,9 +98,8 @@ def display_palette(palette):
     print("\nBackground color:")
     visual.print_palette([palette.background], size=4)
 
-    colors_to_file([c for c in palette.colors], "palette.png")
-    palette.to_json("palette.json")
-
+    # colors_to_file([c for c in palette.colors], "palette.png")
+    # palette.to_json("palette.json")
 
 
 def add_palette_json(img_name, palette, filename):
@@ -122,9 +121,14 @@ def main(args=None):
         targs = targets.get_compatible_names()
     if distargs == ["all"]:
         distargs = targets.get_compatible_names()
-    # Capitalize first letter for esthetics and access
-    targs = [t.title() for t in sorted(targs)]
-    distargs = [t.title() for t in sorted(distargs)]
+
+    # Resolve targets
+    try:
+        targs = [targets.get_class(t) for t in targs]
+        distargs = [targets.get_class(t) for t in distargs]
+    except exceptions.InvalidTarget as exc:
+        print(exc)
+        return
 
     if args['--list-all']:
         args['--list-all-targets'] = True
@@ -135,7 +139,7 @@ def main(args=None):
         tlist = targets.get_all_names()
         helpers.bold("Targets are:")
         for t in tlist:
-            print("    - {}".format(t))
+            print("\t- {}".format(t))
 
     if args['--list-compatible-targets']:
         tlist = targets.get_compatible_names()
@@ -144,7 +148,7 @@ def main(args=None):
         else:
             helpers.bold("Compatible targets are:")
             for t in tlist:
-                print("    - {}".format(t))
+                print("\t- {}".format(t))
 
     if args['--list-enabled-targets']:
         tlist = targets.get_enabled()
@@ -153,40 +157,39 @@ def main(args=None):
         else:
             helpers.bold("Enabled targets are:")
             for t in tlist:
-                print("    - {}".format(t.__name__))
+                print("\t- {}".format(t.__name__))
 
     if args['--enable']:
-        for t in [targets.get_class(c) for c in targs]:
+        for t in targs:
+            if not t.is_config_initialized():
+                targets.initialize_target(t)
             if t.is_enabled():
                 print("Target {} was already enabled.".format(t.__name__))
-            elif not t.is_config_initialized():
-                targets.initialize_target(t)
-                print("Enabled target {}.".format(t.__name__))
             else:
                 t.enable()
                 print("Enabled target {}.".format(t.__name__))
 
     if args['--disable']:
         for t in distargs:
-            if targets.disable(t):
-                print("Target {} was already disabled.".format(t))
+            if not t.is_enabled():
+                print("Target {} was already disabled.".format(t.__name__))
             else:
-                print("Disabled target {}.".format(t))
+                t.disable()
+                print("Disabled target {}.".format(t.__name__))
 
     if args['--print-config']:
         for t in targs:
-            helpers.bold("Configuration of target {}:".format(t))
-            if not targets.get_class(t).is_config_initialized():
-                print("    Target has not been initialized.")
+            helpers.bold("Configuration of target {}:".format(t.__name__))
+            if not t.is_config_initialized():
+                print("\tTarget has not been initialized.")
                 continue
-            cfg = config.load(t)
-            print("    enabled: {}".format(cfg["enabled"]))
-            for key in (k for k in cfg if k != "enabled"):
-                print("    {}: {}".format(key, cfg[key]))
+            cfg = t.load_config()
+            for key in cfg:
+                print("\t{}: {}".format(key, cfg[key]))
 
     if args['--reconfigure']:
         for t in targs:
-            helpers.bold("Reconfiguring target {}".format(t))
+            helpers.bold("Reconfiguring target {}".format(t.__name__))
             targets.reconfigure(t)
 
     try:
@@ -212,12 +215,12 @@ def main(args=None):
         # Extracting palettes
         palettes = []
         if args['--imgur']:
-            with imgur.download(args['URL']) as local_path:
-                print("Processing file {}".format(local_path))
-                palettes.append(raw_colors.get(local_path,
-                                               num_colors=max_colors))
-                palettes[-1] = filters.apply(palettes[-1])
-                img_list.append(local_path)
+            local_path = imgur.download(args['URL'])
+            print("Processing file {}".format(local_path))
+            palettes.append(raw_colors.get(local_path,
+                                           num_colors=max_colors))
+            palettes[-1] = filters.apply(palettes[-1])
+            img_list.append(local_path)
         if args['--file'] or args['--dir']:
             for img in img_list:
                 print("Processing file {}".format(img))
@@ -235,7 +238,6 @@ def main(args=None):
                 palettes[i].to_json(path)
         # Exporting the first palette
         elif args['--imgur'] or args['--file'] or args['--export-from-json']:
-            targets.initialize()
             targets.export(palettes[0], img_list[0])
             display_palette(palettes[0])
     except exceptions.ImageNotFoundException as inf:

@@ -1,5 +1,5 @@
 import unittest
-from hapycolor.configuration_editor import ConfigFileEditor
+from hapycolor.configuration_editor import ConfigurationEditor
 from hapycolor import exceptions
 from hapycolor import palette
 
@@ -8,7 +8,7 @@ class TestConfigurationEditor(unittest.TestCase):
         entries = ["# @hapycolor(\"random\")", "!      @hapycolor()",
                    "@ @hapycolor(None)   "]
         for entry in entries:
-            self.assertTrue(ConfigFileEditor.is_macro(entry))
+            self.assertTrue(ConfigurationEditor.is_macro(entry))
 
     def test_from_macro(self):
         entries = ["# @hapycolor(\"random\")",
@@ -20,7 +20,7 @@ class TestConfigurationEditor(unittest.TestCase):
                     ["background"], ["foreground", None, "random"]]
 
         for entry, exp in zip(entries, expected):
-            self.assertEqual(ConfigFileEditor.from_macro(entry), exp)
+            self.assertEqual(ConfigurationEditor.from_macro(entry), exp)
 
     def test_get_format_rgb(self):
         # (r, g, b)
@@ -28,7 +28,7 @@ class TestConfigurationEditor(unittest.TestCase):
                  " (  12  ,  255  ,    0)"]
         for line in lines:
             try:
-                _, converter = ConfigFileEditor.get_format(line)
+                _, converter = ConfigurationEditor.get_format(line)
                 result = converter((12, 34, 45))
             except exceptions.ColorFormatNotFound:
                 self.fail("converter not found")
@@ -41,7 +41,7 @@ class TestConfigurationEditor(unittest.TestCase):
                  " (  12  ,  255  , 0, 50% )"]
         for line in lines:
             try:
-                _, converter = ConfigFileEditor.get_format(line)
+                _, converter = ConfigurationEditor.get_format(line)
                 result = converter((12, 34, 45))
             except exceptions.ColorFormatNotFound:
                 self.fail("converter not found")
@@ -53,7 +53,7 @@ class TestConfigurationEditor(unittest.TestCase):
         lines = ["#123456", "  #AAbbCC", "  #ab23cf   "]
         for line in lines:
             try:
-                _, converter = ConfigFileEditor.get_format(line)
+                _, converter = ConfigurationEditor.get_format(line)
                 result = converter((1, 2, 3))
             except exceptions.ColorFormatNotFound:
                 self.fail("converter not found")
@@ -73,7 +73,7 @@ class TestConfigurationEditor(unittest.TestCase):
                          "# @hapycolor(\"random\", None, \"background\")",
                          "#123456, #FFAACC, #987654",
                          "# @hapycolor(\"random\")", "Last line: #982345"]
-        conf_editor = ConfigFileEditor(configuration)
+        conf_editor = ConfigurationEditor(configuration)
         pltte = palette.Palette()
         pltte.colors = [(1, 2, 3), (4, 5, 6), (7, 8, 9)]
         pltte.foreground = (255, 255, 255)
@@ -86,7 +86,7 @@ class TestConfigurationEditor(unittest.TestCase):
                     "line 4",
                     "line 5 #aabbcc",
                     "# @hapycolor(\"random\")", "asdf #040506 sfdg",
-                    "# @hapycolor(\"foreground\")", "new line #ffffff",
+                    "# @hapycolor(\"foreground\")", "new line #FFFFFF",
                     "# @hapycolor(\"random\", None, \"background\")",
                     "#070809, #FFAACC, #000000",
                     "# @hapycolor(\"random\")", "Last line: #010203"]
