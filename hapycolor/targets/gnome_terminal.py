@@ -113,7 +113,7 @@ class GnomeTerminal(base.Target):
         """
         get_profiles_command = ["dconf", "read",
                                 "/org/gnome/terminal/legacy/profiles:/list"]
-        process = sp.run(get_profiles_command, stdout=sp.PIPE)
+        process = sp.run(' '.join(get_profiles_command), stdout=sp.PIPE, shell=True)
         profiles = eval(process.stdout.decode('ascii'))
         return set(profiles)
 
@@ -124,8 +124,8 @@ class GnomeTerminal(base.Target):
         """
         set_profile_command = ["dconf", "write",
                                "/org/gnome/terminal/legacy/profiles:/default",
-                               "\"" + profile + "\""]
-        process = sp.run(set_profile_command, stderr=sp.PIPE)
+                               "\"'{}'\"".format(profile)]
+        process = sp.run(' '.join(set_profile_command), stderr=sp.PIPE, shell=True)
         if process.returncode:
             msg = "Hapycolor encountered an error when running dconf: " \
                     + process.stderr.decode("utf-8")
@@ -138,9 +138,9 @@ class GnomeTerminal(base.Target):
         but currently, it is only useful for testing purposes.
         """
         remove_command = ["dconf", "reset", "-f",
-                          "/org/gnome/terminal/legacy/profiles:/" + profile]
-        process = sp.run(remove_command, stderr=sp.PIPE)
+                          "/org/gnome/terminal/legacy/profiles:/:{}/".format(profile)]
+        process = sp.run(' '.join(remove_command), stderr=sp.PIPE, shell=True)
         if process.returncode:
             msg = "Hapycolor encountered an error when running dconf: " \
-                    + process.stderr
+                    + process.stderr.decode("ascii")
             raise exceptions.DconfInvalidCommand(msg)
