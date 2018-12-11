@@ -1,4 +1,4 @@
-import subprocess
+import subprocess as sp
 import pathlib
 import platform
 from hapycolor import targets
@@ -27,6 +27,7 @@ class Wallpaper(base.Target):
             msg = "Image not found: {}".format(image_path)
             raise exceptions.WrongInputError(msg)
 
+        path = path.as_posix()
         os = targets.os()
         if os == targets.OS.DARWIN:
             Wallpaper._export_darwin(path)
@@ -35,16 +36,16 @@ class Wallpaper(base.Target):
 
     def _export_linux(image_path):
         try:
-            subprocess.run(['feh', '--bg-scale', image_path])
+            sp.run(['feh', '--bg-scale', image_path])
             return
         except Exception:
             pass
         try:
-            subprocess.run(['gsettings', 'set',
+            sp.run(['gsettings', 'set',
                              'org.gnome.desktop.background', 'picture-uri',
-                             "file:///" + image_path])
-        except Exception:
-            msg = '\nUnable to set the wallpaper\n'
+                             "file:///" + image_path], shell=True)
+        except Exception as exc:
+            msg = "\nUnable to set the wallpaper\n{}".format(exc)
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
     def _export_darwin(image_path):
@@ -54,7 +55,7 @@ class Wallpaper(base.Target):
             msg = "\nUnable to set the wallpaper, sorry\n"
             raise exceptions.ExportTargetFailure(msg, Wallpaper)
 
-        subprocess.run(["sqlite3",
+        sp.run(["sqlite3",
                         db_file.as_posix(),
                         "update data set value = '{}'".format(image_path)])
-        subprocess.run(["killall", "Dock"])
+        sp.run(["killall", "Dock"])

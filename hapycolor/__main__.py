@@ -183,9 +183,12 @@ def main(args=None):
             if not t.is_config_initialized():
                 print("\tTarget has not been initialized.")
                 continue
-            cfg = t.load_config()
-            for key in cfg:
-                print("\t{}: {}".format(key, cfg[key]))
+            try:
+                cfg = t.load_config()
+                for key in cfg:
+                    print("\t{}: {}".format(key, cfg[key]))
+            except exceptions.InvalidConfigKeyError:
+                pass
 
     if args['--reconfigure']:
         for t in targs:

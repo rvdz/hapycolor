@@ -39,7 +39,8 @@ class Rofi(base.Target):
     @staticmethod
     def is_config_initialized():
         try:
-            return Rofi.configuration_key in Rofi.load_config()
+            expected = {Rofi.configuration_key, Rofi.template_key}
+            return expected.issubset(set(Rofi.load_config()))
         except exceptions.InvalidConfigKeyError:
             return False
 
@@ -65,21 +66,21 @@ class Rofi(base.Target):
     def select_theme():
         rofi_dir = pathlib.Path(__file__).parent
         rasi_files = [t for t in rofi_dir.iterdir() if ".rasi" == t.suffix]
-        ThemeEnum = enum.Enum("ThemeEnum", [(t.stem.upper(), t.as_posix())
+        theme_enum = enum.Enum("ThemeEnum", [(t.stem.upper(), t.as_posix())
                                             for t in rasi_files])
 
         try:
             print("\nSelect a theme:")
-            for i, t in enumerate(Rofi.ThemeEnum):
+            for i, t in enumerate(theme_enum):
                 print("{}: ({})".format(t.name, i))
             theme_i = int(input("Theme: "))
-            if 0 <= theme_i < len(Rofi.ThemeEnum):
-                return list(Rofi.ThemeEnum)[theme_i]
+            if 0 <= theme_i < len(theme_enum):
+                return list(theme_enum)[theme_i]
             else:
                 raise ValueError
         except ValueError:
             print("Value must be an integer between 0 and {}" \
-                  .format(len(Rofi.ThemeEnum)))
+                  .format(len(theme_enum)))
             return Rofi.select_theme()
 
     @staticmethod
