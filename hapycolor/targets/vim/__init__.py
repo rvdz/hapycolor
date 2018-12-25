@@ -1,4 +1,5 @@
 import json
+import pathlib
 from colormath.color_diff import delta_e_cie2000
 
 from hapycolor import targets
@@ -213,8 +214,8 @@ class ColorManager:
         return groups_colors
 
     def load_frequencies():
-        frequencies_json = "hapycolor/targets/vim/frequencies.json"
-        with open(frequencies_json, 'r') as f:
+        frequencies_json = pathlib.Path(__file__).parent / "frequencies.json"
+        with open(frequencies_json.as_posix(), 'r') as f:
             frequencies = json.load(f)
         return frequencies
 

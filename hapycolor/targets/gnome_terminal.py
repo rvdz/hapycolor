@@ -1,5 +1,6 @@
 import os
 import subprocess as sp
+import pathlib
 
 from hapycolor import exceptions
 from hapycolor import helpers
@@ -96,7 +97,8 @@ class GnomeTerminal(base.Target):
         hex_colors = list(map(rgb_to_hex, colors))
         hex_colors = '", "'.join(hex_colors)
         hex_colors = '"' + hex_colors + '"'
-        process = sp.Popen(['bash', './hapycolor/targets/export_gnome.sh',
+        export_script = pathlib.Path(__file__).parent / "export_gnome.sh"
+        process = sp.Popen(['bash', export_script.as_posix(),
                             name, fg, bg, hex_colors,
                             '/org/gnome/terminal/legacy/profiles:'],
                            stdout=sp.PIPE, bufsize=1)

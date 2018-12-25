@@ -2,6 +2,7 @@ include README.md LICENCE setup.py
 include hapycolor/hyperplan/*
 include hapycolor/export/*
 include hapycolor/color/*
+include hapycolor/targets/*
 include hapycolor/targets/lightline/*
 include hapycolor/targets/vim/*
 include hapycolor/targets/rofi/*
