@@ -2,6 +2,7 @@
 i3 Test Module
 """
 import os
+import re
 import unittest
 from unittest import mock
 import contextlib
@@ -13,13 +14,20 @@ from hapycolor.targets.i3 import I3
 
 class TestI3(unittest.TestCase):
     def test_export_wallpaper_set(self):
-        config = ["line 1", "exec --no-startup-id feh --bg-fill \
-                  /path/to/otherimage.png",
-                  "line 3"]
-        result = I3.set_wallpaper(config, "/path/to/image.png")
+        config = I3.load_i3_config("tests/i3_config.txt")
+        config.insert(10,  "exec --no-startup-id feh --bg-fill \
+                      hapycolor/targets")
+        result = I3.set_wallpaper(config, "hapycolor/__init__.py")
 
-        expected = "exec --no-startup-id feh --bg-fill /path/to/image.png"
-        self.assertEqual(result[1], expected)
+        expected = "exec --no-startup-id feh --bg-fill /.+/hapycolor/__init__.py"
+        self.assertRegex(result[10], expected)
+
+    def test_wallpaper(self):
+        config = I3.load_i3_config("tests/i3_config.txt")
+        mock_path = "hapycolor/__init__.py"
+        new_config = I3.set_wallpaper(config, mock_path)
+        command = new_config[0]
+        self.assertRegex(command, "exec --no-startup-id feh --bg-fill /.+/hapycolor/__init__.py")
 
     def test_replace_color(self):
         config = ["line 1", "# @hapycolor('random')", "set $var_color    #aaaaaa", "Last line"]

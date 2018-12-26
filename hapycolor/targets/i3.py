@@ -60,6 +60,13 @@ class I3(base.Target):
         return [targets.OS.LINUX]
 
     @staticmethod
+    def load_i3_config(config_path):
+        configuration = []
+        with open(config_path, 'r') as config_file:
+            configuration = config_file.read().splitlines()
+        return configuration
+
+    @staticmethod
     def export(palette, image_path):
         """
         .. todo::
@@ -73,9 +80,7 @@ class I3(base.Target):
         please check out :class:`hapycolor.configuration_editor.ConfigurationEditor`:
         """
         config_path = I3.load_config()[I3.configuration_key]
-        configuration = []
-        with open(config_path, 'r') as config_file:
-            configuration = config_file.read().splitlines()
+        configuration = I3.load_i3_config(config_path)
 
         # TODO(yann) is_enabled() should return False if not initialized,
         # when this will be changed, remove the try/catch
@@ -97,6 +102,7 @@ class I3(base.Target):
         command in order to update the current wallpaper.
         """
         pattern = r".*exec .+feh"
+        image_path = pathlib.Path(image_path).resolve().as_posix()
         command = "exec --no-startup-id feh --bg-fill {}".format(image_path)
 
         new_config = []
@@ -109,5 +115,5 @@ class I3(base.Target):
                 new_config.append(line)
 
         if not match:
-            new_config = [replace] + config
+            new_config = [command] + config
         return new_config
