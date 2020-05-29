@@ -30,6 +30,10 @@ class Palette:
         self.other = {}
 
     @property
+    def visual_palette(self):
+        return [self._background] + self._colors[:7] + [self._foreground] + self._colors[7:]
+
+    @property
     def foreground(self):
         return self._foreground
 
@@ -77,6 +81,23 @@ class Palette:
                }
         print("Saving palette to: ", file_name)
         helpers.save_json(file_name, data)
+
+    def to_Xresources(self, file_name):
+        data = "St.color7: {}\n".format(self.hexcolors[0])
+        data += "St.color0: {}\n".format(self.hexcolors[1])
+        data += "St.color0-alpha: #cc{}\n".format(self.hexcolors[1][1:])
+        for i, hexcol in enumerate(self.hexcolors[2], 1):
+            data += "St.color{}: {}\n".format(i if i < 7 else i+1, hexcol)
+        print("Saving palette to: ", file_name)
+        helpers.save_file(file_name, data)
+
+    def to_rasi(self, file_name):
+        data = "* {{\n  fg: {};\n  bg: {};\n".format(*self.hexcolors[:2])
+        for i, hexcol in enumerate(self.hexcolors[2], 1):
+            data += "  color{}: {};\n".format(i if i < 7 else i+1, hexcol)
+        data += "}\n"
+        print("Saving palette to: ", file_name)
+        helpers.save_file(file_name, data)
 
     def from_json(json_file):
         json_palette = helpers.load_json(json_file)

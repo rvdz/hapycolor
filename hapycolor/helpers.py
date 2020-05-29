@@ -154,6 +154,16 @@ def update_json(data_file, data_object):
         json.dump(data, f, indent=2)
 
 
+def save_file(data_file, data_object):
+    with open(data_file, 'w') as f:
+        f.write(data_object)
+
+def get_output_path(output_dir, img_path, extension):
+    name = pathlib.Path(img_path).with_suffix(extension).name
+    path = (output_dir / name).resolve().as_posix()
+    return path
+
+
 def input_path(prompt_str):
     """
     Prompts the user with a string and returns a :class:`pathlib.Path` from the

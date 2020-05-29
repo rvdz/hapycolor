@@ -22,13 +22,14 @@ needs the class to be named after a PascalCase version of its module's name.
     in the module and retrieving the one that implements :class:`base.Filter`.
 """
 
-from . import lum_filter, reducer, base
+from . import lum_filter, reducer, base, kmeans_filter
 from hapycolor import visual
 from hapycolor import config
 
 
 def get():
-    return [lum_filter.LumFilter, reducer.Reducer]
+    #return [lum_filter.LumFilter, reducer.Reducer]
+    return[kmeans_filter.KMeansFilter]
 
 
 def apply(palette):
@@ -39,6 +40,6 @@ def apply(palette):
     for filtr in get():
         palette = filtr.apply(palette)
         print("\nFiltered colors with " + filtr.__name__ + " ("
-              + str(len(palette.colors)) + "):")
-        visual.print_palette(palette.colors, size=1)
+              + str(len(palette.visual_palette)) + "):")
+        visual.print_palette(palette.visual_palette, size=1)
     return palette

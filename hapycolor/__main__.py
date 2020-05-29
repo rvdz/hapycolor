@@ -24,9 +24,9 @@ from hapycolor.__version__ import __version__
 help_msg = """Hapycolor.
 
 Usage:
-  hapycolor (--imgur URL | -f FILE) [--json OUTPUT_DIR]
+  hapycolor (--imgur URL | -f FILE) [(--json | --Xresources | --rasi) ... -o OUTPUT_DIR]
   hapycolor --export-from-json FILE
-  hapycolor --dir DIRECTORY -o OUTPUT_DIR
+  hapycolor --dir DIRECTORY (--json | --Xresources | --rasi) ... -o OUTPUT_DIR
   hapycolor --reconfigure TARGETS ...
   hapycolor --print-config TARGETS ...
   hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
@@ -44,6 +44,8 @@ Options:
   -o, --output   Target directory where the palettes will be saved.
   --imgur        The url of an image from imgur.com from which the palette will be generated.
   --json         Save image's palette into the provided directory, without exporting it.
+  --Xresources   Save palette as Xresources format in OUTPUT_DIR, without exporting it..
+  --rasi         Save palette as rasi format in OUTPUT_DIR, without exporting it.
   --export-from-json
                  Export json palette to enabled targets.
 
@@ -196,7 +198,7 @@ def main(args=None):
             targets.reconfigure(t)
 
     try:
-        max_colors = 150
+        max_colors = 160
         img_list = []
 
         # Checking provided files and directories
@@ -233,12 +235,17 @@ def main(args=None):
             palettes.append(pltte.Palette.from_json(img_list[0]))
 
         # Saving palettes in a json file
-        if args['--json'] or args['--dir']:
-            for i in range(len(img_list)):
-                name = pathlib.Path(img_list[i]).with_suffix('.json').name
-                output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()
-                path = (output_dir / name).resolve().as_posix()
-                palettes[i].to_json(path)
+        if args['--json'] or args['--dir'] or args['--Xresources'] or args['--rasi']:
+            output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()
+            get_path = lambda i, ext: helpers.get_output_path(output_dir, img_list[i], ext)
+            for i, _ in enumerate(img_list):
+                if args['--json']:
+                    palettes[i].to_json(get_path(i, '.json'))
+                if args['--Xresources']:
+                    palettes[i].to_Xresources(get_path(i, '.Xresources'))
+                if args['--rasi']:
+                    palettes[i].to_rasi(get_path(i, '.rasi'))
+
         # Exporting the first palette
         elif args['--imgur'] or args['--file'] or args['--export-from-json']:
             targets.export(palettes[0], img_list[0])
