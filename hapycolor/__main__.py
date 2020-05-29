@@ -26,7 +26,7 @@ help_msg = """Hapycolor.
 Usage:
   hapycolor (--imgur URL | -f FILE) [(--json | --Xresources | --rasi) ... -o OUTPUT_DIR]
   hapycolor --export-from-json FILE
-  hapycolor --dir DIRECTORY (--json | --Xresources | --rasi) ... -o OUTPUT_DIR
+  hapycolor --dir DIRECTORY (--json | --Xresources | --rasi) ... -o OUTPUT_DIR [--refresh]
   hapycolor --reconfigure TARGETS ...
   hapycolor --print-config TARGETS ...
   hapycolor [-e EN_TARGETS ... | -d DIS_TARGETS ...] ...
@@ -48,6 +48,7 @@ Options:
   --rasi         Save palette as rasi format in OUTPUT_DIR, without exporting it.
   --export-from-json
                  Export json palette to enabled targets.
+  --refresh      Force refresh when saved file already exists.
 
   -r, --reconfigure
                  Reconfigure every target passed in arguments.
@@ -213,9 +214,18 @@ def main(args=None):
                 msg = "ERROR: The provided output directory does not exist"
                 raise exceptions.InvalidDirectoryException(msg)
             if args['--dir']:
+                output_dir = pathlib.Path(args['OUTPUT_DIR']).expanduser()
                 for f in os.listdir(args['DIRECTORY']):
-                    if os.path.splitext(f)[1] in [".jpg", ".jpeg", ".png"]:
-                        img_list.append(os.path.join(args['DIRECTORY'], f))
+                    if not os.path.splitext(f)[1] in [".jpg", ".jpeg", ".png"]:
+                        continue
+                    img_path = os.path.join(args['DIRECTORY'], f)
+                    for param in ['--json', '--Xresources', '--rasi']:
+                        if not args[param]:
+                            continue
+                        export_path = helpers.get_output_path(output_dir, img_path, param.replace('--', '.'))
+                        if args['--refresh'] or not os.path.exists(export_path):
+                            img_list.append(img_path)
+                            break
 
         # Extracting palettes
         palettes = []

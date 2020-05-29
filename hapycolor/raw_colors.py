@@ -46,6 +46,7 @@ def get(image_path, num_colors):
     # Select only the rgb colors from output
     try:
         rgb_colors = [extract_rgb(str(col)) for col in raw_colors]
+        rgb_colors = [col for col in rgb_colors if col is not None]
     except exceptions.BlackAndWhitePictureException as e:
         trolling("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         raise exceptions.InvalidImageException(str(e))
